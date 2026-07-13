@@ -1,25 +1,65 @@
 {
   "expo": {
     "name": "uLam-app",
-    "slug": "uLam-app",
-    "version": "1.0.0",
+    "slug": "ulam",
+    "scheme": "ulam",
+    "version": "1.17.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#1E6E47",
+      "resizeMode": "contain",
+      "image": "./assets/splash-icon.png"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "23",
+      "bundleIdentifier": "com.ulam.app"
     },
     "android": {
+      "versionCode": 23,
+      "package": "com.ulam.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "uLam needs access to your photos to set a profile picture.",
+          "cameraPermission": "uLam needs camera access to take a profile photo."
+        }
+      ],
+      "expo-web-browser",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3200d60d-716f-461f-aa45-fd7ff2b2c1b3"
+      }
+    },
+    "owner": "cessto103s-team"
   }
 }

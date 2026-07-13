@@ -1,0 +1,23 @@
+/** Item categories shared by Report a Price and the store owner's Add Item form. */
+export const ITEM_CATEGORIES = [
+  { key: 'isda',      labelEn: '🐟 Fish & Seafood',      labelTl: '🐟 Isda at Seafood' },
+  { key: 'karne',     labelEn: '🥩 Meat',                labelTl: '🥩 Karne' },
+  { key: 'manok',     labelEn: '🍗 Poultry',             labelTl: '🍗 Manok' },
+  { key: 'itlog',     labelEn: '🥚 Eggs & Dairy',        labelTl: '🥚 Itlog at Gatas' },
+  { key: 'gulay',     labelEn: '🥦 Vegetables',          labelTl: '🥦 Gulay' },
+  { key: 'prutas',    labelEn: '🍌 Fruits',              labelTl: '🍌 Prutas' },
+  { key: 'bigas',     labelEn: '🍚 Rice / Grains',       labelTl: '🍚 Bigas / Butil' },
+  { key: 'delata',    labelEn: '🥫 Canned Goods',        labelTl: '🥫 Delata' },
+  { key: 'pansit',    labelEn: '🍜 Noodles & Pasta',     labelTl: '🍜 Pansit at Pasta' },
+  { key: 'tinapay',   labelEn: '🍞 Bread & Bakery',      labelTl: '🍞 Tinapay' },
+  { key: 'sangkap',   labelEn: '🧴 Condiments & Sauces', labelTl: '🧴 Sangkap' },
+  { key: 'pampalasa', labelEn: '🧂 Spices & Seasoning',  labelTl: '🧂 Pampalasa' },
+  { key: 'mantika',   labelEn: '🛢️ Cooking Oil',         labelTl: '🛢️ Mantika' },
+  { key: 'meryenda',  labelEn: '🍪 Snacks',              labelTl: '🍪 Meryenda' },
+  { key: 'inumin',    labelEn: '🥤 Beverages',           labelTl: '🥤 Inumin' },
+  { key: 'kape',      labelEn: '☕ Coffee & Sugar',       labelTl: '☕ Kape at Asukal' },
+  { key: 'frozen',    labelEn: '🧊 Frozen Foods',        labelTl: '🧊 Frozen Foods' },
+  { key: 'gamit',     labelEn: '🧻 Household Items',     labelTl: '🧻 Gamit sa Bahay' },
+  { key: 'baby',      labelEn: '🍼 Baby Needs',          labelTl: '🍼 Pang-baby' },
+  { key: 'iba',       labelEn: '🛒 Others',              labelTl: '🛒 Iba pa' },
+] as const;

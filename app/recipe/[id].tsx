@@ -1,0 +1,1224 @@
+import ReportContentSheet from '@/src/components/ReportContentSheet';
+import client from '@/src/api/client';
+import { BoostBadge, BoostButton } from '@/src/components/BoostButton';
+import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
+import StarRating from '@/src/components/StarRating';
+import { formatCount } from '@/src/utils/formatCount';
+import { Skeleton } from '@/src/components/Skeleton';
+import { usePopOnActivate } from '@/src/hooks/usePopOnActivate';
+import { useLanguage } from '@/src/context/LanguageContext';
+import * as Haptics from 'expo-haptics';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import { LinearGradient } from 'expo-linear-gradient';
+import { captureRef } from 'react-native-view-shot';
+import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
+import { Ionicons } from '@expo/vector-icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Dimensions,
+  FlatList,
+  Image,
+  Linking,
+  Modal,
+  PanResponder,
+  Platform,
+  Pressable,
+  ScrollView,
+  Share,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const SCREEN_W = Dimensions.get('window').width;
+const SCREEN_H = Dimensions.get('window').height;
+
+// ─── Full-screen gallery: swipe (1-finger) + pinch-zoom (2-finger) ───────────
+// No ScrollView — single PanResponder owns all touch events so there is no
+// parent view to conflict with on Android.
+
+function ZoomableGallery({
+  photos,
+  startIndex,
+  onClose,
+  onIndexChange,
+}: {
+  photos: string[];
+  startIndex: number;
+  onClose: () => void;
+  onIndexChange: (i: number) => void;
+}) {
+  const idxRef   = useRef(startIndex);
+  const [idx, setIdx] = useState(startIndex);
+
+  // Strip translation (swipe between photos)
+  const stripX  = useRef(new Animated.Value(-startIndex * SCREEN_W)).current;
+
+  // Current-photo zoom + pan
+  const scale   = useRef(new Animated.Value(1)).current;
+  const imgTx   = useRef(new Animated.Value(0)).current;
+  const imgTy   = useRef(new Animated.Value(0)).current;
+
+  // Gesture tracking refs (never cause re-render)
+  const isPinch    = useRef(false);
+  const initDist   = useRef(0);
+  const baseScale  = useRef(1);
+  const baseTx     = useRef(0);
+  const baseTy     = useRef(0);
+  const isZoomed   = useRef(false);
+
+  function pinchDist(touches: { pageX: number; pageY: number }[]) {
+    const dx = touches[0].pageX - touches[1].pageX;
+    const dy = touches[0].pageY - touches[1].pageY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function resetZoom(animated = true) {
+    if (animated) {
+      Animated.parallel([
+        Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+        Animated.spring(imgTx,  { toValue: 0, useNativeDriver: true }),
+        Animated.spring(imgTy,  { toValue: 0, useNativeDriver: true }),
+      ]).start();
+    } else {
+      scale.setValue(1); imgTx.setValue(0); imgTy.setValue(0);
+    }
+    baseScale.current = 1; baseTx.current = 0; baseTy.current = 0;
+    isZoomed.current  = false;
+  }
+
+  function goTo(newIdx: number) {
+    if (newIdx < 0 || newIdx >= photos.length) return;
+    idxRef.current = newIdx;
+    setIdx(newIdx);
+    onIndexChange(newIdx);
+    Animated.timing(stripX, {
+      toValue: -newIdx * SCREEN_W,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+    resetZoom(false);
+  }
+
+  const responder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder:        () => true,
+      onStartShouldSetPanResponderCapture: () => true,
+      onMoveShouldSetPanResponder:         () => true,
+      onMoveShouldSetPanResponderCapture:  () => true,
+      onPanResponderTerminationRequest:    () => false,
+
+      onPanResponderGrant: (e) => {
+        const t = Array.from(e.nativeEvent.touches);
+        if (t.length >= 2) {
+          isPinch.current   = true;
+          initDist.current  = pinchDist(t);
+          baseScale.current = (scale as any)._value as number;
+          baseTx.current    = (imgTx as any)._value as number;
+          baseTy.current    = (imgTy as any)._value as number;
+        } else {
+          isPinch.current = false;
+        }
+      },
+
+      onPanResponderMove: (e, g) => {
+        const t = Array.from(e.nativeEvent.touches);
+
+        if (t.length >= 2) {
+          // ── Pinch zoom ──────────────────────────────────────────
+          if (!isPinch.current) {
+            isPinch.current  = true;
+            initDist.current = pinchDist(t);
+            baseScale.current = (scale as any)._value as number;
+          }
+          if (initDist.current > 0) {
+            const next = Math.max(1, Math.min(baseScale.current * (pinchDist(t) / initDist.current), 5));
+            scale.setValue(next);
+            isZoomed.current = next > 1.05;
+          }
+        } else {
+          if (isPinch.current) return; // finger lifted from pinch — wait for release
+          if (isZoomed.current) {
+            // ── Pan while zoomed ──────────────────────────────────
+            imgTx.setValue(baseTx.current + g.dx);
+            imgTy.setValue(baseTy.current + g.dy);
+          } else {
+            // ── Swipe between photos ──────────────────────────────
+            stripX.setValue(-idxRef.current * SCREEN_W + g.dx);
+          }
+        }
+      },
+
+      onPanResponderRelease: (_e, g) => {
+        if (isPinch.current) {
+          isPinch.current = false;
+          const cur = (scale as any)._value as number;
+          if (cur < 1.05) { resetZoom(true); }
+          else {
+            baseScale.current = cur;
+            baseTx.current    = (imgTx as any)._value as number;
+            baseTy.current    = (imgTy as any)._value as number;
+          }
+        } else if (isZoomed.current) {
+          baseTx.current = (imgTx as any)._value as number;
+          baseTy.current = (imgTy as any)._value as number;
+        } else {
+          // Swipe commit
+          const threshold = SCREEN_W * 0.28;
+          if (g.dx < -threshold && idxRef.current < photos.length - 1) {
+            goTo(idxRef.current + 1);
+          } else if (g.dx > threshold && idxRef.current > 0) {
+            goTo(idxRef.current - 1);
+          } else {
+            Animated.spring(stripX, {
+              toValue: -idxRef.current * SCREEN_W,
+              useNativeDriver: true,
+            }).start();
+          }
+        }
+      },
+    })
+  ).current;
+
+  const IMG_H = SCREEN_H * 0.78;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#000' }}>
+      {/* Photo strip */}
+      <Animated.View
+        {...responder.panHandlers}
+        style={{
+          position: 'absolute', top: 0, bottom: 0,
+          width: SCREEN_W * photos.length,
+          flexDirection: 'row',
+          transform: [{ translateX: stripX }],
+        }}
+      >
+        {photos.map((uri, i) => (
+          <View key={i} style={{ width: SCREEN_W, height: SCREEN_H, alignItems: 'center', justifyContent: 'center' }}>
+            {i === idx ? (
+              <Animated.Image
+                source={{ uri }}
+                style={{ width: SCREEN_W, height: IMG_H, transform: [{ scale }, { translateX: imgTx }, { translateY: imgTy }] }}
+                resizeMode="contain"
+              />
+            ) : (
+              <Image source={{ uri }} style={{ width: SCREEN_W, height: IMG_H }} resizeMode="contain" />
+            )}
+          </View>
+        ))}
+      </Animated.View>
+
+      {/* Close button */}
+      <Pressable
+        onPress={onClose}
+        style={{ position: 'absolute', top: 48, right: 16, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' }}
+        hitSlop={12}
+      >
+        <Ionicons name="close" size={20} color="#fff" />
+      </Pressable>
+
+      {/* Dot indicators */}
+      {photos.length > 1 && (
+        <View style={{ position: 'absolute', bottom: 32, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
+          {photos.map((_, i) => (
+            <View key={i} style={{ width: i === idx ? 18 : 6, height: 6, borderRadius: 3, backgroundColor: i === idx ? '#fff' : 'rgba(255,255,255,0.35)' }} />
+          ))}
+        </View>
+      )}
+
+      {/* Hint */}
+      <View style={{ position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' }}>
+        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 12 }}>Pinch to zoom · Swipe to navigate</Text>
+      </View>
+    </View>
+  );
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Ingredient = { id: number; name: string; quantity: string; unit: string; estimated_price: number };
+type Recipe = {
+  id: number;
+  user_id: number | null;
+  user?: { id: number; name: string; username: string | null };
+  title: string;
+  description: string;
+  source: 'official' | 'community';
+  difficulty?: string;
+  budget_tag: string;
+  estimated_cost: number;
+  servings: number;
+  prep_time_minutes: number;
+  cook_time_minutes: number;
+  tags: string[];
+  steps: string[];
+  tips: string[];
+  save_count: number;
+  share_count: number;
+  vote_up_count: number;
+  vote_down_count: number;
+  average_rating: number;
+  ratings_count: number;
+  views_count: number;
+  image_url: string | null;
+  image_urls: string[] | null;
+  collage_style: CollageStyle;
+  gradient_key: GradientKey;
+  font_key: FontKey;
+  youtube_url: string | null;
+  is_published: boolean;
+  ingredients: Ingredient[];
+  created_at: string;
+  updated_at: string;
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function extractYouTubeId(url: string): string | null {
+  if (!url) return null;
+  const match = url.match(/(?:v=|youtu\.be\/|embed\/)([^&\n?#]{11})/);
+  return match ? match[1] : null;
+}
+
+// ─── Components ───────────────────────────────────────────────────────────────
+
+function VoteButton({ emoji, active, activeColor, count, onPress }: {
+  emoji: string; active: boolean; activeColor: string; count: number; onPress: () => void;
+}) {
+  const scale = usePopOnActivate(active);
+  return (
+    <Pressable onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <Animated.Text style={{ fontSize: 20, opacity: active ? 1 : 0.35, transform: [{ scale }] }}>
+        {emoji}
+      </Animated.Text>
+      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? activeColor : '#B0A18C' }}>
+        {count}
+      </Text>
+    </Pressable>
+  );
+}
+
+const SHARE_CARD_WIDTH = 340;
+const SHARE_CARD_HEIGHT = 425;
+
+/**
+ * Rendered off-screen (never visible to the user) and captured to a real
+ * image file just before sharing. Baking the title/cost/servings into the
+ * pixels means the info always shows up regardless of platform — unlike
+ * relying on the OS share sheet to carry caption text alongside an image,
+ * which Android's share intent doesn't support and drops silently.
+ */
+function ShareCard({ recipe, photoUri, lang, cost }: {
+  recipe: Recipe; photoUri: string | null; lang: 'en' | 'tl'; cost: string;
+}) {
+  return (
+    <View style={{ width: SHARE_CARD_WIDTH, height: SHARE_CARD_HEIGHT, backgroundColor: '#292522', overflow: 'hidden' }}>
+      {photoUri ? (
+        <Image source={{ uri: photoUri }} style={{ width: '100%', height: '100%', position: 'absolute' }} resizeMode="cover" />
+      ) : (
+        <View style={{ width: '100%', height: '100%', position: 'absolute', backgroundColor: '#E7653B' }} />
+      )}
+      <LinearGradient
+        colors={['transparent', 'rgba(41,37,34,0.55)', 'rgba(41,37,34,0.95)']}
+        locations={[0, 0.45, 1]}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%' }}
+      />
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 }}>
+        <Text
+          style={{ fontFamily: 'Baloo2_800ExtraBold', fontSize: 24, color: '#fff', lineHeight: 28, marginBottom: 10 }}
+          numberOfLines={2}
+        >
+          {recipe.title}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <View style={{ backgroundColor: '#E7653B', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>{cost}</Text>
+          </View>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+            {lang === 'en' ? `serves ${recipe.servings}` : `para sa ${recipe.servings}`}
+          </Text>
+        </View>
+        <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginBottom: 10 }} />
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#F4B942' }}>
+          uLam <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+            {lang === 'en' ? '— budget-friendly Filipino recipes' : '— mga murang recipe ng Pinoy'}
+          </Text>
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const BUDGET_LABEL: Record<string, string> = {
+  budget_100:      '₱100',
+  budget_200:      '₱200',
+  budget_400:      '₱400',
+  budget_600:      '₱600',
+  budget_800:      '₱800',
+  budget_1000:     '₱1,000',
+  budget_1000plus: '₱1,000+',
+};
+
+const TAG_EMOJI: Record<string, string> = {
+  isda: '🐟', manok: '🍗', baboy: '🥩', baka: '🥩', gulay: '🥦',
+  sabaw: '🍲', prito: '🍳', espesyal: '⭐', klasiko: '📖', mabilis: '⚡',
+  masustansya: '💪', halal: '🟢', itlog: '🥚', tradisyunal: '📜',
+};
+
+// ─── Fetch ────────────────────────────────────────────────────────────────────
+
+type SharedByPost = { id: number; user_id: number; user: { id: number; name: string; username: string | null; avatar: string | null }; created_at: string };
+
+async function fetchRecipe(id: string) {
+  const { data } = await client.get(`/recipes/${id}`);
+  return data as {
+    recipe: Recipe;
+    is_saved: boolean;
+    is_mine: boolean;
+    is_boosted: boolean;
+    my_rating: number | null;
+    my_reaction: 'up' | 'down' | null;
+    shared_by: SharedByPost[];
+  };
+}
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
+
+export default function RecipeDetailScreen() {
+  const [reportSheetOpen, setReportSheetOpen] = useState(false);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const router  = useRouter();
+  const qc      = useQueryClient();
+  const insets  = useSafeAreaInsets();
+  const { lang } = useLanguage();
+
+  const [savePending,  setSavePending]  = useState(false);
+  const [myReaction,   setMyReaction]   = useState<'up' | 'down' | null>(null);
+  const [voteUp,       setVoteUp]       = useState<number | null>(null);
+  const [voteDown,     setVoteDown]     = useState<number | null>(null);
+  const [myRating,     setMyRating]     = useState<number | null>(null);
+  const [galleryOpen,    setGalleryOpen]    = useState(false);
+  const [galleryIndex,   setGalleryIndex]   = useState(0);
+  const [sharersOpen,    setSharersOpen]    = useState(false);
+  const [sharers,        setSharers]        = useState<SharedByPost[]>([]);
+  const [sharersLoading, setSharersLoading] = useState(false);
+
+  // Off-screen share card — rendered only while a share is in progress, then
+  // captured to a real image file (see shareToSocial below).
+  const shareCardRef = useRef<View>(null);
+  const [shareCardPhoto, setShareCardPhoto] = useState<string | null>(null);
+
+  // Add-to-meal-plan modal
+  const [mealModal,  setMealModal]  = useState(false);
+  const [mealType,   setMealType]   = useState('almusal');
+
+  const MEAL_TYPES = [
+    { key: 'almusal',    label: 'Breakfast', emoji: '🌅' },
+    { key: 'tanghalian', label: 'Lunch',     emoji: '☀️' },
+    { key: 'meryenda',   label: 'Snack',     emoji: '🍌' },
+    { key: 'hapunan',    label: 'Dinner',    emoji: '🌙' },
+    { key: 'iba pa',     label: 'Others',    emoji: '🍽️' },
+  ];
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+
+  const { mutate: assignMeal, isPending: assigning } = useMutation({
+    mutationFn: (payload: { date: string; meal_type: string; recipe_id: number; estimated_cost?: number }) =>
+      client.post('/meal-plan/add-item', payload),
+    onSuccess: () => {
+      setMealModal(false);
+      qc.invalidateQueries({ queryKey: ['meal-plan-date'] });
+    },
+    onError: (e: any) => {
+      const isDuplicate = e?.response?.status === 422;
+      if (isDuplicate) {
+        const slotLabel = MEAL_TYPES.find(m => m.key === mealType)?.label ?? mealType;
+        Alert.alert(
+          'Already in meal plan',
+          `This recipe is already in your ${slotLabel} meal plan.`,
+        );
+      } else {
+        const msg: string = e?.response?.data?.message ?? 'Could not add to meal plan.';
+        Alert.alert('Error', msg);
+      }
+    },
+  });
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['recipe', id],
+    queryFn: () => fetchRecipe(id!),
+    enabled: !!id,
+  });
+
+  const recipe    = data?.recipe;
+  const isSaved   = data?.is_saved ?? false;
+  const isMine    = data?.is_mine  ?? false;
+  const isBoosted = data?.is_boosted ?? false;
+
+  useEffect(() => {
+    if (data?.my_rating != null)        setMyRating(data.my_rating);
+    if (data?.my_reaction !== undefined) setMyReaction(data.my_reaction);
+    if (data?.recipe?.vote_up_count   != null) setVoteUp(data.recipe.vote_up_count);
+    if (data?.recipe?.vote_down_count != null) setVoteDown(data.recipe.vote_down_count);
+  }, [data]);
+
+  const { mutate: rateRecipe } = useMutation({
+    mutationFn: (rating: number) => client.post(`/recipes/${recipe!.id}/rate`, { rating }).then(r => r.data),
+    onSuccess: (res) => {
+      setMyRating(res.my_rating);
+      qc.invalidateQueries({ queryKey: ['recipe', id] });
+    },
+    onError: () => Alert.alert('Error', 'Could not submit rating. Please try again.'),
+  });
+
+  const toggleSave = async () => {
+    if (savePending || !recipe) return;
+    setSavePending(true);
+    try {
+      await client.post(`/recipes/${recipe.id}/save`);
+      qc.invalidateQueries({ queryKey: ['recipe', id] });
+      qc.invalidateQueries({ queryKey: ['recipes'] });
+    } catch {
+      Alert.alert('Error', 'Could not save recipe. Please try again.');
+    } finally {
+      setSavePending(false);
+    }
+  };
+
+  const voteRecipe = async (type: 'up' | 'down') => {
+    if (!recipe) return;
+    const prevReaction = myReaction;
+    const prevUp   = voteUp   ?? recipe.vote_up_count;
+    const prevDown = voteDown ?? recipe.vote_down_count;
+    if (myReaction === type) {
+      setMyReaction(null);
+      if (type === 'up') setVoteUp(prevUp - 1); else setVoteDown(prevDown - 1);
+    } else {
+      if (myReaction === 'up')   setVoteUp(prevUp - 1);
+      if (myReaction === 'down') setVoteDown(prevDown - 1);
+      setMyReaction(type);
+      if (type === 'up') setVoteUp(prevUp + (myReaction !== null ? 0 : 0) + 1);
+      else               setVoteDown(prevDown + 1);
+    }
+    try {
+      const res = await client.post(`/recipes/${recipe.id}/react`, { type });
+      setMyReaction(res.data.my_reaction);
+      qc.invalidateQueries({ queryKey: ['recipe', id] });
+    } catch {
+      setMyReaction(prevReaction);
+      setVoteUp(prevUp);
+      setVoteDown(prevDown);
+    }
+  };
+
+  // Share to any social app via the OS share sheet (FB, IG, TikTok, Messenger,
+  // etc — whatever the device has installed). Available on every recipe
+  // regardless of who owns it; all the data is already loaded on this screen.
+  const shareToSocial = async () => {
+    if (!recipe) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const cost = BUDGET_LABEL[recipe.budget_tag] ?? `₱${Math.round(recipe.estimated_cost)}`;
+    const message = lang === 'en'
+      ? `🍽️ ${recipe.title}\n${cost} · serves ${recipe.servings}\n\n${recipe.description ?? ''}\n\nMade with uLam — budget-friendly Filipino recipes.`.trim()
+      : `🍽️ ${recipe.title}\n${cost} · para sa ${recipe.servings}\n\n${recipe.description ?? ''}\n\nGawa gamit ang uLam — mga murang recipe ng Pinoy.`.trim();
+
+    const photoUrl = recipe.image_urls?.[0] ?? recipe.image_url ?? null;
+    let localPhotoUri: string | null = null;
+    if (photoUrl) {
+      try {
+        const downloaded = await File.downloadFileAsync(photoUrl, Paths.cache, { idempotent: true });
+        localPhotoUri = downloaded.uri;
+      } catch {
+        // No local copy — the card still renders with a plain brand-color
+        // background instead of the photo.
+      }
+    }
+
+    // Render the share card off-screen with this recipe's info baked in, give
+    // the Image a moment to actually paint, then capture it to a real file.
+    // This is what fixes the original bug: relying on the OS to carry caption
+    // text alongside an attached image doesn't work on Android at all (it
+    // silently drops the text), so the recipe's title/cost/servings need to
+    // be part of the image pixels themselves, not passed as separate text.
+    let cardUri: string | null = null;
+    try {
+      setShareCardPhoto(localPhotoUri);
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      if (shareCardRef.current) {
+        cardUri = await captureRef(shareCardRef, { format: 'jpg', quality: 0.92 });
+      }
+    } catch {
+      cardUri = null;
+    }
+
+    try {
+      if (cardUri) {
+        if (Platform.OS === 'ios') {
+          // iOS can carry a local image + caption text together — a bonus
+          // on top of the card, since some apps (Messages, Mail) show both.
+          await Share.share({ url: cardUri, message, title: recipe.title });
+        } else {
+          // Android's Share API silently drops the `url` field — it never
+          // attaches an image. expo-sharing drives Android's native
+          // image-share intent instead.
+          const canShareFile = await Sharing.isAvailableAsync();
+          if (canShareFile) {
+            await Sharing.shareAsync(cardUri, { dialogTitle: recipe.title, mimeType: 'image/jpeg' });
+          } else {
+            await Share.share({ title: recipe.title, message });
+          }
+        }
+        return;
+      }
+      // Card capture failed outright — fall back to a plain text share so
+      // sharing still works, just without an image.
+      await Share.share({ title: recipe.title, message });
+    } catch {
+      // User cancelled the share sheet — nothing to do.
+    } finally {
+      setShareCardPhoto(null);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
+        {/* Cover photo skeleton */}
+        <Skeleton style={{ height: 280, borderRadius: 0 }} />
+        {/* Body */}
+        <View style={{ padding: 20 }}>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+            <Skeleton style={{ height: 22, width: 60, borderRadius: 20 }} />
+            <Skeleton style={{ height: 22, width: 50, borderRadius: 20 }} />
+          </View>
+          <Skeleton style={{ height: 26, width: '85%', marginBottom: 8 }} />
+          <Skeleton style={{ height: 15, marginBottom: 4 }} />
+          <Skeleton style={{ height: 15, width: '70%', marginBottom: 20 }} />
+          <Skeleton style={{ height: 1, marginBottom: 20 }} />
+          {/* Ingredients */}
+          {[0,1,2,3,4].map(i => (
+            <View key={i} style={{ flexDirection: 'row', gap: 10, marginBottom: 12, alignItems: 'center' }}>
+              <Skeleton style={{ width: 28, height: 28, borderRadius: 6 }} />
+              <Skeleton style={{ flex: 1, height: 14 }} />
+              <Skeleton style={{ width: 50, height: 14 }} />
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    );
+  }
+
+  if (!recipe || error) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', paddingHorizontal: 32 }}>
+        <Text style={{ fontSize: 32, marginBottom: 12 }}>😕</Text>
+        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center' }}>Recipe not found.</Text>
+        <Pressable onPress={() => router.back()} style={{ marginTop: 16, borderRadius: 12, backgroundColor: '#C45E3A', paddingHorizontal: 24, paddingVertical: 12 }}>
+          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>Go back</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const photos    = recipe.image_urls ?? (recipe.image_url ? [recipe.image_url] : []);
+  const totalTime = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
+  const videoId   = recipe.youtube_url ? extractYouTubeId(recipe.youtube_url) : null;
+
+  const recipeSteps: string[] = Array.isArray(recipe.steps)
+    ? recipe.steps.filter(Boolean)
+    : (typeof recipe.steps === 'string' ? (JSON.parse(recipe.steps) as string[]) : []);
+
+  const wasEdited = recipe.updated_at && recipe.created_at &&
+    Math.abs(new Date(recipe.updated_at).getTime() - new Date(recipe.created_at).getTime()) > 60_000;
+
+  function editedLabel(): string {
+    if (!recipe?.updated_at) return '';
+    const ms   = Date.now() - new Date(recipe.updated_at).getTime();
+    const days = Math.floor(ms / 86_400_000);
+    if (days < 1)  { const h = Math.floor(ms / 3_600_000); return h < 1 ? 'edited just now' : `edited ${h}h ago`; }
+    if (days === 1) return 'edited yesterday';
+    if (days < 30)  return `edited ${days} days ago`;
+    const months = Math.floor(days / 30);
+    return months === 1 ? 'edited 1 month ago' : `edited ${months} months ago`;
+  }
+
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ paddingBottom: 48 }}>
+
+      {/* ── Cover photo with floating nav ── */}
+      <View style={{ position: 'relative' }}>
+        <RecipeCoverPhoto
+          height={280}
+          photos={photos}
+          collageStyle={recipe.collage_style ?? 'gradient'}
+          gradientKey={recipe.gradient_key ?? 'grad_a'}
+          fontKey={recipe.font_key ?? 'baloo'}
+          title={recipe.title}
+        />
+        {/* Floating buttons — pushed below status bar */}
+        <View style={{ position: 'absolute', top: insets.top + 4, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12 }}>
+          <Pressable
+            onPress={() => router.back()}
+            style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Ionicons name="arrow-back" size={18} color="#fff" />
+          </Pressable>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Pressable
+              onPress={shareToSocial}
+              style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Ionicons name="share-social-outline" size={17} color="#fff" />
+            </Pressable>
+            {isMine ? (
+              <Pressable
+                onPress={() => router.push(`/edit-recipe/${recipe.id}` as any)}
+                style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Ionicons name="create-outline" size={18} color="#fff" />
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={() => setReportSheetOpen(true)}
+                style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Ionicons name="flag-outline" size={17} color="#fff" />
+              </Pressable>
+            )}
+          </View>
+        </View>
+      </View>
+
+      {/* ── Title + meta ── */}
+      <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 }}>
+        {(isBoosted || isMine) && (
+          <View style={{ flexDirection: 'row', marginBottom: 8 }}>
+            <BoostBadge visible={isBoosted} />
+            <BoostButton
+              target="recipe"
+              boostableId={recipe.id}
+              isOwner={isMine}
+              isBoosted={isBoosted}
+              refetchKey={['recipe', id]}
+            />
+          </View>
+        )}
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: '#292522', lineHeight: 28, marginBottom: 2 }}>
+          {recipe.title}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
+          <Ionicons name="eye-outline" size={13} color="#B0A18C" />
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
+          </Text>
+        </View>
+        {wasEdited && (
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 4 }}>{editedLabel()}</Text>
+        )}
+        {recipe.description ? (
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 20, marginBottom: 8 }}>
+            {recipe.description}
+          </Text>
+        ) : null}
+
+        {/* Author */}
+        {!isMine && recipe.user && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
+                {recipe.user.name.substring(0, 2).toUpperCase()}
+              </Text>
+            </View>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+              by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#292522' }}>{recipe.user.name}</Text>
+            </Text>
+          </View>
+        )}
+
+        {/* Tags */}
+        {recipe.tags?.length > 0 && (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+            {recipe.tags.map((tag) => (
+              <View key={tag} style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 10, paddingVertical: 3 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#5E693F' }}>
+                  {TAG_EMOJI[tag] ? `${TAG_EMOJI[tag]} ` : ''}{tag}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+
+      {/* ── Vote + Save row ── */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F9EDD3', marginTop: 12, gap: 16 }}>
+        <VoteButton
+          emoji="👍"
+          active={myReaction === 'up'}
+          activeColor="#5E693F"
+          count={voteUp ?? recipe.vote_up_count ?? 0}
+          onPress={() => voteRecipe('up')}
+        />
+        <VoteButton
+          emoji="👎"
+          active={myReaction === 'down'}
+          activeColor="#E24B4A"
+          count={voteDown ?? recipe.vote_down_count ?? 0}
+          onPress={() => voteRecipe('down')}
+        />
+        <View style={{ flex: 1 }} />
+        {/* Share */}
+        <Pressable
+          onPress={() => router.push({
+            pathname: '/create-post' as any,
+            params: {
+              recipe_id: String(recipe.id),
+              recipe_title: recipe.title,
+              recipe_budget: recipe.budget_tag,
+              recipe_image: recipe.image_url ?? '',
+            },
+          })}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: 12 }}
+        >
+          <Ionicons name="paper-plane-outline" size={20} color="#6F655A" />
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            {recipe.share_count ?? 0}
+          </Text>
+        </Pressable>
+        {/* Save */}
+        <Pressable onPress={toggleSave} disabled={savePending} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {savePending ? <ActivityIndicator color="#6E7B4A" size="small" /> : (
+            <>
+              <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={22} color={isSaved ? '#F4B942' : '#D3C5AB'} />
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                {recipe.save_count ?? 0} saved
+              </Text>
+            </>
+          )}
+        </Pressable>
+      </View>
+
+      {/* ── Star rating ── */}
+      <StarRating
+        myRating={myRating}
+        avgRating={recipe.average_rating ?? 0}
+        count={recipe.ratings_count ?? 0}
+        onRate={rateRecipe}
+      />
+
+      {/* ── Photo gallery ── */}
+      {photos.length > 1 && (
+        <View style={{ marginBottom: 16 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', paddingHorizontal: 20, marginBottom: 8 }}>
+            Photos
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
+          >
+            {photos.map((uri, i) => (
+              <Pressable
+                key={i}
+                onPress={() => { setGalleryIndex(i); setGalleryOpen(true); }}
+              >
+                <Image
+                  source={{ uri }}
+                  style={{ width: 180, height: 130, borderRadius: 14 }}
+                  resizeMode="cover"
+                />
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      {/* ── Fullscreen gallery modal (swipe + pinch zoom) ── */}
+      <Modal
+        visible={galleryOpen}
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setGalleryOpen(false)}
+      >
+        {galleryOpen && (
+          <ZoomableGallery
+            photos={photos}
+            startIndex={galleryIndex}
+            onClose={() => setGalleryOpen(false)}
+            onIndexChange={setGalleryIndex}
+          />
+        )}
+      </Modal>
+
+      {/* ── YouTube video ── */}
+      {videoId && (
+        <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 8 }}>
+            Video
+          </Text>
+          <Pressable
+            onPress={() => Linking.openURL(recipe.youtube_url!)}
+            style={{ borderRadius: 14, overflow: 'hidden' }}
+          >
+            <View style={{ position: 'relative' }}>
+              <Image
+                source={{ uri: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` }}
+                style={{ width: '100%', height: 190 }}
+                resizeMode="cover"
+              />
+              {/* Dark overlay + play button */}
+              <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#E24B4A', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 8, elevation: 8 }}>
+                  <Ionicons name="play" size={26} color="#fff" style={{ marginLeft: 4 }} />
+                </View>
+              </View>
+              {/* Label */}
+              <View style={{ position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#fff' }}>Watch on YouTube</Text>
+              </View>
+            </View>
+          </Pressable>
+        </View>
+      )}
+
+      {/* ── Info strip ── */}
+      <View style={{ flexDirection: 'row', borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F9EDD3' }}>
+        {[
+          { label: 'Budget',   val: BUDGET_LABEL[recipe.budget_tag] ?? recipe.budget_tag },
+          { label: 'Cost',     val: `₱${Number(recipe.estimated_cost).toFixed(0)}` },
+          { label: 'Servings', val: `${recipe.servings} pax` },
+          { label: 'Time',     val: `${totalTime} min` },
+        ].map((s, i) => (
+          <View key={s.label} style={{ flex: 1, alignItems: 'center', paddingVertical: 16, borderRightWidth: i < 3 ? 1 : 0, borderRightColor: '#F9EDD3' }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#5E693F' }}>{s.val}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }}>{s.label}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
+
+        {/* ── Ingredients ── */}
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>Ingredients</Text>
+        <View style={{ backgroundColor: '#FFFCF5', borderRadius: 16, padding: 16, marginBottom: 20 }}>
+          {recipe.ingredients?.map((ing, i) => (
+            <View
+              key={ing.id}
+              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: i < recipe.ingredients.length - 1 ? 1 : 0, borderBottomColor: '#F9EDD3' }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#292522' }}>{ing.name}</Text>
+                {ing.quantity && (
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                    {ing.quantity} {ing.unit}
+                  </Text>
+                )}
+              </View>
+              {ing.estimated_price > 0 && (
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A', marginLeft: 12 }}>
+                  ~₱{Number(ing.estimated_price).toFixed(0)}
+                </Text>
+              )}
+            </View>
+          ))}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, marginTop: 4, borderTopWidth: 1, borderTopColor: '#F0DEBB' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>Total cost</Text>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C' }}>~₱{Number(recipe.estimated_cost).toFixed(0)}</Text>
+          </View>
+        </View>
+
+        {/* ── Instructions ── */}
+        {recipeSteps.length > 0 && (
+          <>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>Instructions</Text>
+            <View style={{ marginBottom: 20 }}>
+              {recipeSteps.map((step, i) => (
+                <View key={i} style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
+                  <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: '#6E7B4A', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>{i + 1}</Text>
+                  </View>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#292522', lineHeight: 22, flex: 1 }}>{step}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* ── Tips ── */}
+        {recipe.tips?.length > 0 && (
+          <>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>{lang === 'en' ? '💡 Tips' : '💡 Mga Tip'}</Text>
+            <View style={{ backgroundColor: '#FEF6E3', borderRadius: 16, padding: 16, marginBottom: 20 }}>
+              {recipe.tips.map((tip, i) => (
+                <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: i < recipe.tips.length - 1 ? 8 : 0 }}>
+                  <Text style={{ color: '#E3A32A', fontSize: 12, marginTop: 2 }}>•</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#9A6A12', lineHeight: 20, flex: 1 }}>{tip}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* ── Action buttons ── */}
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          {/* Add to meal plan */}
+          <Pressable
+            onPress={() => { setMealType('almusal'); setMealModal(true); }}
+            style={{ flex: 1, borderRadius: 12, paddingVertical: 14, alignItems: 'center', backgroundColor: '#C45E3A' }}
+            className="active:opacity-80"
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={{ fontSize: 14 }}>🍳</Text>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>Add to Meal Plan</Text>
+            </View>
+          </Pressable>
+
+          {/* Save / unsave */}
+          <Pressable
+            onPress={toggleSave}
+            disabled={savePending}
+            style={{
+              flex: 1, borderRadius: 12, paddingVertical: 14, alignItems: 'center',
+              backgroundColor: isSaved ? '#fff' : '#EFF4EC',
+              borderWidth: 1.5, borderColor: isSaved ? '#F4B942' : '#C45E3A',
+              opacity: savePending ? 0.6 : 1,
+            }}
+            className="active:opacity-80"
+          >
+            {savePending ? (
+              <ActivityIndicator color="#6E7B4A" />
+            ) : (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={16} color={isSaved ? '#F4B942' : '#C45E3A'} />
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: isSaved ? '#F4B942' : '#C45E3A' }}>
+                  {isSaved ? 'Saved' : 'Save'}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
+
+        {/* ── Add-to-meal-plan modal ── */}
+        <Modal visible={mealModal} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setMealModal(false)}>
+          <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
+            <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>Add to Today's Meal Plan</Text>
+                {recipe && (
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
+                    {recipe.title}
+                  </Text>
+                )}
+              </View>
+              <Pressable onPress={() => setMealModal(false)} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F9EDD3', alignItems: 'center', justifyContent: 'center' }} className="active:opacity-70">
+                <Ionicons name="close" size={16} color="#6F655A" />
+              </Pressable>
+            </View>
+
+            <ScrollView contentContainerStyle={{ padding: 20, gap: 10 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 }}>
+                Pick meal type
+              </Text>
+              {MEAL_TYPES.map((mt) => {
+                const active = mt.key === mealType;
+                return (
+                  <Pressable
+                    key={mt.key}
+                    onPress={() => setMealType(mt.key)}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 14, borderWidth: 1.5, borderColor: active ? '#6E7B4A' : '#F0DEBB', backgroundColor: active ? '#EFF4EC' : '#fff', marginBottom: 8 }}
+                  >
+                    <Text style={{ fontSize: 20 }}>{mt.emoji}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#292522', flex: 1 }}>{mt.label}</Text>
+                    {active && <Ionicons name="checkmark-circle" size={20} color="#6E7B4A" />}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+
+            <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff' }}>
+              <Pressable
+                onPress={() => {
+                  if (!recipe) return;
+                  assignMeal({ date: todayIso, meal_type: mealType, recipe_id: recipe.id, estimated_cost: recipe.estimated_cost });
+                }}
+                disabled={assigning}
+                style={{ backgroundColor: '#C45E3A', borderRadius: 14, paddingVertical: 14, alignItems: 'center', opacity: assigning ? 0.7 : 1 }}
+              >
+                {assigning
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 15, color: '#fff' }}>Add to Meal Plan</Text>}
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        {/* ── Shared by ── */}
+        {data?.shared_by && data.shared_by.length > 0 && (
+          <>
+            <View style={{ marginTop: 24, paddingBottom: 8 }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>
+                Shared by{(recipe.share_count ?? 0) > 0 ? ` (${recipe.share_count})` : ''}
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 0 }}>
+                {/* Overlapping avatar stack — each taps to user profile */}
+                {data.shared_by.slice(0, 5).map((post, idx) => (
+                  <Pressable
+                    key={post.id}
+                    onPress={() => router.push(`/user/${post.user?.id}`)}
+                    style={{
+                      width: 38, height: 38, borderRadius: 19,
+                      backgroundColor: '#EFF4EC',
+                      alignItems: 'center', justifyContent: 'center',
+                      overflow: 'hidden',
+                      borderWidth: 2, borderColor: '#fff',
+                      marginLeft: idx === 0 ? 0 : -10,
+                    }}
+                  >
+                    {post.user?.avatar ? (
+                      <Image source={{ uri: post.user.avatar }} style={{ width: 38, height: 38 }} />
+                    ) : (
+                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#5E693F' }}>
+                        {(post.user?.name ?? '??').substring(0, 2).toUpperCase()}
+                      </Text>
+                    )}
+                  </Pressable>
+                ))}
+                {/* "and X more" — taps to open full sharers modal */}
+                {(recipe.share_count ?? 0) > data.shared_by.length ? (
+                  <Pressable
+                    onPress={async () => {
+                      setSharersOpen(true);
+                      if (sharers.length === 0) {
+                        setSharersLoading(true);
+                        try {
+                          const res = await client.get(`/recipes/${recipe.id}/sharers`);
+                          setSharers(res.data.data ?? []);
+                        } catch {} finally { setSharersLoading(false); }
+                      }
+                    }}
+                    style={{ marginLeft: 8, flexDirection: 'row', alignItems: 'center', gap: 2 }}
+                  >
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#5E693F' }}>
+                      and {(recipe.share_count ?? 0) - data.shared_by.length} more
+                    </Text>
+                    <Ionicons name="chevron-forward" size={14} color="#5E693F" />
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    onPress={async () => {
+                      setSharersOpen(true);
+                      if (sharers.length === 0) {
+                        setSharersLoading(true);
+                        try {
+                          const res = await client.get(`/recipes/${recipe.id}/sharers`);
+                          setSharers(res.data.data ?? []);
+                        } catch {} finally { setSharersLoading(false); }
+                      }
+                    }}
+                    style={{ marginLeft: 8 }}
+                  >
+                    <Ionicons name="chevron-forward" size={16} color="#B0A18C" />
+                  </Pressable>
+                )}
+              </View>
+            </View>
+
+            {/* Sharers list modal */}
+            <Modal
+              visible={sharersOpen}
+              animationType="slide"
+              transparent
+              onRequestClose={() => setSharersOpen(false)}
+            >
+              <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }} onPress={() => setSharersOpen(false)} />
+              <View style={{
+                backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20,
+                maxHeight: SCREEN_H * 0.65, paddingTop: 12,
+              }}>
+                {/* Handle + header */}
+                <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#F0DEBB', alignSelf: 'center', marginBottom: 12 }} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+                    Shared by {recipe.share_count ?? 0} {(recipe.share_count ?? 0) === 1 ? 'person' : 'people'}
+                  </Text>
+                  <Pressable onPress={() => setSharersOpen(false)} hitSlop={10}>
+                    <Ionicons name="close" size={22} color="#B0A18C" />
+                  </Pressable>
+                </View>
+
+                {sharersLoading ? (
+                  <ActivityIndicator color="#6E7B4A" style={{ paddingVertical: 32 }} />
+                ) : (
+                  <FlatList
+                    data={sharers}
+                    keyExtractor={(item) => String(item.id)}
+                    contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 8, paddingBottom: insets.bottom + 20 }}
+                    renderItem={({ item: post }) => (
+                      <Pressable
+                        onPress={() => { setSharersOpen(false); router.push(`/user/${post.user?.id}`); }}
+                        style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 }}
+                      >
+                        <View style={{
+                          width: 44, height: 44, borderRadius: 22,
+                          backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+                        }}>
+                          {post.user?.avatar ? (
+                            <Image source={{ uri: post.user.avatar }} style={{ width: 44, height: 44 }} />
+                          ) : (
+                            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#5E693F' }}>
+                              {(post.user?.name ?? '??').substring(0, 2).toUpperCase()}
+                            </Text>
+                          )}
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }}>
+                            {post.user?.name ?? 'Unknown'}
+                          </Text>
+                          {post.user?.username ? (
+                            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                              @{post.user.username}
+                            </Text>
+                          ) : null}
+                        </View>
+                        <Ionicons name="chevron-forward" size={16} color="#D3C5AB" />
+                      </Pressable>
+                    )}
+                    ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: '#FFFCF5' }} />}
+                    ListEmptyComponent={
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', paddingVertical: 24 }}>
+                        No sharers yet.
+                      </Text>
+                    }
+                  />
+                )}
+              </View>
+            </Modal>
+          </>
+        )}
+
+      </View>
+    <ReportContentSheet visible={reportSheetOpen} onClose={() => setReportSheetOpen(false)} contentType="recipe" contentId={recipe.id} />
+
+    {/* Off-screen share card — never visible, captured to an image on share */}
+    <View style={{ position: 'absolute', top: 0, left: -9999 }} pointerEvents="none">
+      <View ref={shareCardRef} collapsable={false}>
+        <ShareCard
+          recipe={recipe}
+          photoUri={shareCardPhoto}
+          lang={lang === 'en' ? 'en' : 'tl'}
+          cost={BUDGET_LABEL[recipe.budget_tag] ?? `₱${Math.round(recipe.estimated_cost)}`}
+        />
+      </View>
+    </View>
+    </ScrollView>
+  );
+}
