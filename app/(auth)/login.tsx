@@ -123,8 +123,8 @@ export default function LoginScreen() {
 
         {/* Forgot */}
         <View className="items-end mb-5">
-          <Pressable>
-            <Text className="text-xs text-brand-600">{t('forgot_password')}</Text>
+          <Pressable onPress={() => router.push('/(auth)/forgot-password' as any)} hitSlop={8}>
+            <Text className="text-xs font-semibold text-brand-600">{t('forgot_password')}</Text>
           </Pressable>
         </View>
 

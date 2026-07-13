@@ -161,6 +161,42 @@ export default function SettingsScreen() {
   const isVerified = !!user?.secondary_email_verified_at;
   const isPending  = !!user?.secondary_email && !isVerified;
 
+  // ── Account deletion ──────────────────────────────────────────────────
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
+  const confirmDeleteAccount = () => {
+    Alert.alert(
+      lang === 'en' ? 'Delete your account?' : 'Burahin ang account?',
+      lang === 'en'
+        ? 'This permanently deletes everything. There is no way to recover your account afterwards.'
+        : 'Permanenteng mabubura ang lahat. Wala nang paraan para maibalik ang iyong account.',
+      [
+        { text: lang === 'en' ? 'Cancel' : 'Kanselahin', style: 'cancel' },
+        {
+          text: lang === 'en' ? 'Delete forever' : 'Burahin nang tuluyan',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleteBusy(true);
+            try {
+              await client.delete('/auth/account', { data: { password: deletePassword } });
+              await signOut();
+              router.replace('/(auth)/welcome' as any);
+            } catch (e: any) {
+              Alert.alert(
+                lang === 'en' ? 'Could not delete account' : 'Hindi mabura ang account',
+                errorMessage(e, lang === 'en' ? 'Something went wrong.' : 'May error.')
+              );
+            } finally {
+              setDeleteBusy(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleLogout = async () => {
     Alert.alert(
       lang === 'en' ? 'Log Out' : 'Mag-log Out',
@@ -455,6 +491,64 @@ export default function SettingsScreen() {
           >
             <Text className="text-sm font-semibold text-red-600">{lang === 'en' ? 'Log Out' : 'Mag-log Out'}</Text>
           </Pressable>
+
+          {/* Danger zone */}
+          <View className="rounded-2xl border border-red-200 bg-white p-4 mt-6">
+            <Text className="text-xs font-semibold text-red-600 uppercase mb-2">
+              {lang === 'en' ? 'Danger Zone' : 'Mapanganib na Aksyon'}
+            </Text>
+            <Text className="text-xs text-ink-soft mb-3">
+              {lang === 'en'
+                ? 'Deleting your account permanently removes your profile, recipes, posts, stores, and all other data. This cannot be undone.'
+                : 'Ang pagbura ng account ay permanenteng mag-aalis ng iyong profile, mga recipe, post, tindahan, at lahat ng iba pang datos. Hindi ito maibabalik.'}
+            </Text>
+            {!deletingAccount ? (
+              <Pressable
+                onPress={() => setDeletingAccount(true)}
+                className="w-full rounded-xl border border-red-300 py-3 items-center active:opacity-70"
+              >
+                <Text className="text-sm font-semibold text-red-600">
+                  {lang === 'en' ? 'Delete Account' : 'Burahin ang Account'}
+                </Text>
+              </Pressable>
+            ) : (
+              <View>
+                <Text className="text-xs font-medium text-ink-soft mb-1.5">
+                  {lang === 'en' ? 'Enter your password to confirm' : 'Ilagay ang password para kumpirmahin'}
+                </Text>
+                <TextInput
+                  className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink mb-3 border border-cream-200"
+                  placeholder="••••••••"
+                  placeholderTextColor="#B0A18C"
+                  value={deletePassword}
+                  onChangeText={setDeletePassword}
+                  secureTextEntry
+                />
+                <View className="flex-row gap-2">
+                  <Pressable
+                    onPress={() => { setDeletingAccount(false); setDeletePassword(''); }}
+                    className="flex-1 rounded-xl border border-cream-200 py-3 items-center active:opacity-70"
+                  >
+                    <Text className="text-xs font-semibold text-ink-soft">{lang === 'en' ? 'Cancel' : 'Kanselahin'}</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={confirmDeleteAccount}
+                    disabled={deleteBusy || !deletePassword}
+                    className="flex-1 rounded-xl py-3 items-center active:opacity-80 disabled:opacity-50"
+                    style={{ backgroundColor: '#DC2626' }}
+                  >
+                    {deleteBusy ? (
+                      <ActivityIndicator color="white" size="small" />
+                    ) : (
+                      <Text className="text-xs font-semibold text-white">
+                        {lang === 'en' ? 'Delete forever' : 'Burahin nang tuluyan'}
+                      </Text>
+                    )}
+                  </Pressable>
+                </View>
+              </View>
+            )}
+          </View>
         </ScrollView>
       </View>
     </KeyboardAvoidingView>

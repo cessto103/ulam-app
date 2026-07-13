@@ -5,6 +5,17 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.18.0] — 2026-07-14
+
+Password reset and account deletion — the two table-stakes account features the app was missing.
+
+### Added
+- **Forgot password** — the login screen's "Forgot password?" link (previously dead) now opens a real flow: enter your email → receive a 6-digit code → set a new password. Resetting logs out every other session. The endpoint answers identically whether or not the email exists, so it can't be used to probe for accounts.
+- **Delete account** — a Danger Zone at the bottom of Settings, requiring your password plus a final confirmation. Deletion permanently removes the profile, recipes, posts, stores, ratings, comments, meal plans, budgets, and sessions; the payment ledger is retained for financial records and community markets are unlinked rather than destroyed. (Required by Google Play for any app with account sign-up.)
+
+### Fixed
+- **Every database table was silently running on MyISAM** (WAMP's default engine), which ignores foreign keys and transactions — meaning no cascade deletes and no atomic billing operations, ever. All 63 tables converted to InnoDB, and Laravel now forces InnoDB for all future migrations.
+
 ## [1.17.0] — 2026-07-14
 
 Nearby Palengke Locator, Phase 1 (list-based — the interactive map comes with the dev-build phase).
