@@ -5,6 +5,17 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.20.1] — 2026-07-14
+
+Home screen fixes from on-device testing.
+
+### Fixed
+- **Search now does what its placeholder promised** — the Home search box said "recipes, ingredients, users" but the search page only found people. It now searches recipes (by title, ingredient, or tag) and people together, in sections; recipe results open the recipe page.
+- **The 7-day calendar strip fits the screen** — day boxes now share the width evenly instead of overflowing (Tuesday was getting cut off).
+
+### Added
+- **First-time budget explainer** — tapping "Set up budget" the first time opens a friendly sheet explaining what the food budget is, why it's the heart of uLam, and the three steps (set amount → get fitting meals → log and save). Shown once; after that the button goes straight to setup.
+
 ## [1.20.0] — 2026-07-14
 
 Interactive nearby map, smarter search, real popularity ranking.

@@ -2,6 +2,8 @@ import client from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { ULamScriptLogo } from '@/src/components/ULamLogo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BudgetExplainerSheet from '@/src/components/BudgetExplainerSheet';
 import DailyTaskRow from '@/src/components/DailyTaskRow';
 import HeaderIconRow from '@/src/components/HeaderIconRow';
 import { Ionicons } from '@expo/vector-icons';
@@ -406,6 +408,31 @@ export default function HomeScreen() {
     staleTime: 60_000,
   });
 
+  // ── Budget explainer (first-time only, AsyncStorage-flagged) ────────────────
+  const [explainerOpen, setExplainerOpen] = useState(false);
+
+  const openBudgetSetup = async () => {
+    try {
+      const seen = await AsyncStorage.getItem('budget_explainer_seen');
+      if (!seen) {
+        setExplainerOpen(true);
+        return;
+      }
+    } catch {}
+    router.push('/budget-setup' as any);
+  };
+
+  const proceedFromExplainer = async () => {
+    try { await AsyncStorage.setItem('budget_explainer_seen', '1'); } catch {}
+    setExplainerOpen(false);
+    router.push('/budget-setup' as any);
+  };
+
+  const dismissExplainer = async () => {
+    try { await AsyncStorage.setItem('budget_explainer_seen', '1'); } catch {}
+    setExplainerOpen(false);
+  };
+
   // ── Recipe picker state ───────────────────────────────────────────────────────
   const [pickerOpen,     setPickerOpen]     = useState(false);
   const [pickerMealType, setPickerMealType] = useState<string>('almusal');
@@ -554,12 +581,8 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      {/* Date strip */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8, paddingHorizontal: 12, paddingBottom: 6 }}
-      >
+      {/* Date strip — all 7 days share the screen width evenly, no scrolling */}
+      <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingBottom: 6 }}>
         {dateStrip.map(({ date, iso }) => {
           const selected  = iso === selectedDate;
           const today     = iso === todayIso;
@@ -569,11 +592,10 @@ export default function HomeScreen() {
               key={iso}
               onPress={() => setSelectedDate(iso)}
               style={{
+                flex: 1,
                 alignItems: 'center',
                 paddingVertical: 8,
-                paddingHorizontal: 11,
                 borderRadius: 14,
-                minWidth: 40,
                 backgroundColor: selected ? '#6E7B4A' : '#FFFCF5',
                 borderWidth: selected ? 0 : 1,
                 borderColor: '#F0DEBB',
@@ -613,7 +635,7 @@ export default function HomeScreen() {
             </Pressable>
           );
         })}
-      </ScrollView>
+      </View>
 
       <View className="px-4 pt-1">
 
@@ -991,7 +1013,7 @@ export default function HomeScreen() {
                 </View>
               </>
             ) : (
-              <Pressable onPress={() => router.push('/budget-setup' as any)} className="items-center py-2">
+              <Pressable onPress={openBudgetSetup} className="items-center py-2">
                 <Text className="text-xs text-ink-soft mb-1">{t('no_budget')}</Text>
                 <Text className="text-xs font-semibold text-brand-600">{t('setup_budget_cta')}</Text>
               </Pressable>
@@ -1255,6 +1277,13 @@ export default function HomeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* First-time budget explainer */}
+      <BudgetExplainerSheet
+        visible={explainerOpen}
+        onClose={dismissExplainer}
+        onProceed={proceedFromExplainer}
+      />
       </View>
     </ScrollView>
   );

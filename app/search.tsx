@@ -24,6 +24,20 @@ type SearchUser = {
   is_following: boolean;
 };
 
+type SearchRecipe = {
+  id: number;
+  title: string;
+  estimated_cost: number | null;
+  servings: number | null;
+  budget_tag: string | null;
+  source: 'official' | 'community';
+};
+
+type Row =
+  | { kind: 'header'; key: string; title: string }
+  | { kind: 'recipe'; key: string; recipe: SearchRecipe }
+  | { kind: 'user'; key: string; user: SearchUser };
+
 // ─── Avatar initials ──────────────────────────────────────────────────────────
 
 function Avatar({ name, size = 44 }: { name: string; size?: number }) {
@@ -49,28 +63,38 @@ async function searchUsers(q: string): Promise<SearchUser[]> {
   return data.users ?? [];
 }
 
+async function searchRecipes(q: string): Promise<SearchRecipe[]> {
+  const { data } = await client.get('/recipes', { params: { search: q.trim(), per_page: 20 } });
+  return (data.data ?? []).slice(0, 20);
+}
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function SearchScreen() {
   const router  = useRouter();
   const { lang } = useLanguage();
   const [query,     setQuery]     = useState('');
-  const [results,   setResults]   = useState<SearchUser[]>([]);
+  const [users,     setUsers]     = useState<SearchUser[]>([]);
+  const [recipes,   setRecipes]   = useState<SearchRecipe[]>([]);
   const [searching, setSearching] = useState(false);
   const [following, setFollowing] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
-    if (query.trim().length < 2) { setResults([]); return; }
+    if (query.trim().length < 2) { setUsers([]); setRecipes([]); return; }
     const t = setTimeout(async () => {
       setSearching(true);
       try {
-        const users = await searchUsers(query);
-        setResults(users);
+        // Recipes (title + ingredients + tags) and people, in parallel.
+        const [recipeResults, userResults] = await Promise.all([
+          searchRecipes(query).catch(() => [] as SearchRecipe[]),
+          searchUsers(query).catch(() => [] as SearchUser[]),
+        ]);
+        setRecipes(recipeResults);
+        setUsers(userResults);
         const init: Record<number, boolean> = {};
-        users.forEach(u => { init[u.id] = u.is_following; });
+        userResults.forEach(u => { init[u.id] = u.is_following; });
         setFollowing(init);
-      } catch {}
-      finally { setSearching(false); }
+      } finally { setSearching(false); }
     }, 380);
     return () => clearTimeout(t);
   }, [query]);
@@ -86,8 +110,18 @@ export default function SearchScreen() {
     }
   };
 
-  const showEmpty    = !searching && query.trim().length >= 2 && results.length === 0;
-  const showPrompt   = !searching && query.trim().length < 2;
+  const rows: Row[] = [];
+  if (recipes.length > 0) {
+    rows.push({ kind: 'header', key: 'h-recipes', title: lang === 'en' ? 'Recipes' : 'Mga Recipe' });
+    recipes.forEach(r => rows.push({ kind: 'recipe', key: `r-${r.id}`, recipe: r }));
+  }
+  if (users.length > 0) {
+    rows.push({ kind: 'header', key: 'h-users', title: lang === 'en' ? 'People' : 'Mga Tao' });
+    users.forEach(u => rows.push({ kind: 'user', key: `u-${u.id}`, user: u }));
+  }
+
+  const showEmpty  = !searching && query.trim().length >= 2 && rows.length === 0;
+  const showPrompt = !searching && query.trim().length < 2;
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -100,7 +134,7 @@ export default function SearchScreen() {
           <Text style={{ fontSize: 14 }}>🔍</Text>
           <TextInput
             className="flex-1 text-sm text-ink"
-            placeholder={lang === 'en' ? 'Search for people...' : 'Hanapin ang mga kasama...'}
+            placeholder={lang === 'en' ? 'Search recipes, ingredients, people...' : 'Maghanap ng recipe, sangkap, tao...'}
             placeholderTextColor="#B0A18C"
             value={query}
             onChangeText={setQuery}
@@ -110,7 +144,7 @@ export default function SearchScreen() {
             style={{ fontFamily: 'NunitoSans_400Regular' }}
           />
           {query.length > 0 && (
-            <Pressable onPress={() => { setQuery(''); setResults([]); }} className="p-1">
+            <Pressable onPress={() => { setQuery(''); setUsers([]); setRecipes([]); }} className="p-1">
               <Text style={{ fontSize: 13, color: '#6F655A' }}>✕</Text>
             </Pressable>
           )}
@@ -123,14 +157,14 @@ export default function SearchScreen() {
       {/* Prompt state */}
       {showPrompt && (
         <View className="flex-1 items-center justify-center px-8">
-          <Text style={{ fontSize: 48, marginBottom: 12 }}>👥</Text>
+          <Text style={{ fontSize: 48, marginBottom: 12 }}>🔍</Text>
           <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 6, textAlign: 'center' }}>
-            {lang === 'en' ? 'Search for people' : 'Hanapin ang mga kasama'}
+            {lang === 'en' ? 'Search uLam' : 'Maghanap sa uLam'}
           </Text>
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', lineHeight: 20 }}>
             {lang === 'en'
-              ? 'Type a name or username to find your friends and neighbors.'
-              : 'I-type ang pangalan o username para mahanap ang iyong mga kaibigan at kapitbahay.'}
+              ? 'Find recipes by name or ingredient ("manok", "monggo"), or people by name or username.'
+              : 'Maghanap ng recipe gamit ang pangalan o sangkap ("manok", "monggo"), o mga tao gamit ang pangalan o username.'}
           </Text>
         </View>
       )}
@@ -143,7 +177,7 @@ export default function SearchScreen() {
             {lang === 'en' ? 'No results found' : 'Walang nahanap'}
           </Text>
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
-            {lang === 'en' ? 'Try a different name or username.' : 'Subukan ang ibang pangalan o username.'}
+            {lang === 'en' ? 'Try a different word — a dish, an ingredient, or a name.' : 'Subukan ang ibang salita — ulam, sangkap, o pangalan.'}
           </Text>
         </View>
       )}
@@ -151,11 +185,45 @@ export default function SearchScreen() {
       {/* Results */}
       {!searching && (
         <FlatList
-          data={results}
-          keyExtractor={u => String(u.id)}
+          data={rows}
+          keyExtractor={row => row.key}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingTop: 4, paddingBottom: 32 }}
-          renderItem={({ item: user }) => {
+          renderItem={({ item: row }) => {
+            if (row.kind === 'header') {
+              return (
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 }}>
+                  {row.title}
+                </Text>
+              );
+            }
+
+            if (row.kind === 'recipe') {
+              const r = row.recipe;
+              return (
+                <Pressable
+                  onPress={() => router.push(`/recipe/${r.id}` as any)}
+                  className="flex-row items-center px-4 py-3 border-b border-cream-200 active:bg-cream-50"
+                >
+                  <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#FDF0EA', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 20 }}>🍲</Text>
+                  </View>
+                  <View className="flex-1 ml-3">
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }} numberOfLines={1}>
+                      {r.title}
+                    </Text>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                      {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toFixed(0)}` : '—'}
+                      {r.servings ? ` · ${r.servings} ${lang === 'en' ? 'servings' : 'tao'}` : ''}
+                      {r.source === 'official' ? ' · uLam' : ''}
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 16, color: '#B0A18C' }}>›</Text>
+                </Pressable>
+              );
+            }
+
+            const user = row.user;
             const isFollowing = following[user.id] ?? user.is_following;
             return (
               <Pressable
