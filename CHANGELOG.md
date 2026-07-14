@@ -5,6 +5,12 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.23.1] — 2026-07-15
+
+### Changed
+- **Premium subscription screen: single plan selection** — the Monthly and Yearly boxes are now tappable, radio-style selectors (checkmark indicator, highlighted border/fill when selected) instead of two separately-priced buttons at the bottom. One "Subscribe Now" button checks out whichever plan is selected (defaults to Yearly).
+- **Premium screen header is now admin-themeable** too (Content → Theme → "Premium subscription header") — same photo + color-overlay control as the other headers; looks identical to today until the admin configures it.
+
 ## [1.23.0] — 2026-07-15
 
 Color palette fixes, Market page layout cleanup, and an admin-editable Premium features list.

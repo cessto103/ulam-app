@@ -1,6 +1,8 @@
 ﻿import client from '@/src/api/client';
+import ThemedSection from '@/src/components/ThemedSection';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -22,11 +24,29 @@ const DEFAULT_FEATURES: Feature[] = [
   { emoji: '🚫', titleEn: 'No Ads',             titleTl: 'Walang Ads',       descEn: 'A clean experience, no interruptions',          descTl: 'Malinis na karanasan, walang abala',        free: false },
 ];
 
+function RadioDot({ selected, accentColor = '#C45E3A' }: { selected: boolean; accentColor?: string }) {
+  return (
+    <View
+      style={{
+        position: 'absolute', top: 10, right: 10,
+        width: 20, height: 20, borderRadius: 10,
+        alignItems: 'center', justifyContent: 'center',
+        backgroundColor: selected ? '#fff' : 'transparent',
+        borderWidth: selected ? 0 : 1.5,
+        borderColor: 'rgba(255,255,255,0.6)',
+      }}
+    >
+      {selected && <Ionicons name="checkmark" size={13} color={accentColor} />}
+    </View>
+  );
+}
+
 export default function UpgradeScreen() {
   const router = useRouter();
   const { user, refreshUser } = useAuth();
   const { lang } = useLanguage();
   const [loading, setLoading] = useState<'monthly' | 'yearly' | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
 
   const { data: remoteFeatures } = useQuery({
     queryKey: ['premium-features'],
@@ -89,9 +109,11 @@ export default function UpgradeScreen() {
     <ScrollView className="flex-1 bg-cream-50" contentContainerClassName="pb-12">
 
       {/* Hero */}
-      <View
-        className="px-6 pt-14 pb-8 items-center"
-        style={{ backgroundColor: '#C45E3A' }}
+      <ThemedSection
+        sectionKey="header_premium"
+        compiledImage={require('@/assets/profile-header-food.jpg')}
+        compiledOverlayColors={['#C45E3A']}
+        style={{ paddingHorizontal: 24, paddingTop: 56, paddingBottom: 32, alignItems: 'center' }}
       >
         <Pressable
           onPress={() => router.back()}
@@ -108,10 +130,19 @@ export default function UpgradeScreen() {
             : 'I-unlock ang lahat — meal plans, premium recipes, at higit pa.'}
         </Text>
 
-        {/* Pricing cards */}
+        {/* Pricing cards — tap to select, radio-style */}
         <View className="flex-row gap-3 mt-8 w-full">
           {/* Monthly */}
-          <View className="flex-1 bg-white/10 rounded-2xl p-4 border border-white/20">
+          <Pressable
+            onPress={() => setSelectedPlan('monthly')}
+            className="flex-1 rounded-2xl p-4"
+            style={{
+              backgroundColor: selectedPlan === 'monthly' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.1)',
+              borderWidth: selectedPlan === 'monthly' ? 2 : 1,
+              borderColor: selectedPlan === 'monthly' ? '#fff' : 'rgba(255,255,255,0.2)',
+            }}
+          >
+            <RadioDot selected={selectedPlan === 'monthly'} />
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>
               {lang === 'en' ? 'Monthly' : 'Buwanin'}
             </Text>
@@ -119,12 +150,18 @@ export default function UpgradeScreen() {
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>
               {lang === 'en' ? 'per month' : 'bawat buwan'}
             </Text>
-          </View>
+          </Pressable>
           {/* Yearly — highlighted */}
-          <View
+          <Pressable
+            onPress={() => setSelectedPlan('yearly')}
             className="flex-1 rounded-2xl p-4"
-            style={{ backgroundColor: 'rgba(229,162,111,0.18)', borderWidth: 2, borderColor: '#E5A26F' }}
+            style={{
+              backgroundColor: selectedPlan === 'yearly' ? 'rgba(229,162,111,0.28)' : 'rgba(229,162,111,0.12)',
+              borderWidth: selectedPlan === 'yearly' ? 2 : 1,
+              borderColor: selectedPlan === 'yearly' ? '#E5A26F' : 'rgba(229,162,111,0.4)',
+            }}
           >
+            <RadioDot selected={selectedPlan === 'yearly'} accentColor="#E5A26F" />
             <View className="flex-row items-center justify-between mb-1">
               <Text style={{ fontSize: 12, color: '#E5A26F' }}>{lang === 'en' ? 'Yearly' : 'Taon-taon'}</Text>
               <View className="rounded-full px-1.5 py-0.5" style={{ backgroundColor: '#E5A26F' }}>
@@ -135,9 +172,9 @@ export default function UpgradeScreen() {
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#E5A26F' }}>
               {lang === 'en' ? '₱41.58/month' : '₱41.58/buwan'}
             </Text>
-          </View>
+          </Pressable>
         </View>
-      </View>
+      </ThemedSection>
 
       {/* Features */}
       <View className="px-4 pt-5">
@@ -170,30 +207,17 @@ export default function UpgradeScreen() {
           ))}
         </View>
 
-        {/* CTA buttons */}
+        {/* CTA — one button, acts on whichever plan is selected above */}
         <Pressable
-          onPress={() => handleCheckout('yearly')}
+          onPress={() => handleCheckout(selectedPlan)}
           disabled={!!loading}
-          className="w-full rounded-xl bg-brand-600 py-3.5 items-center mb-3 active:opacity-80 disabled:opacity-60"
+          className="w-full rounded-xl bg-brand-600 py-3.5 items-center mb-6 active:opacity-80 disabled:opacity-60"
           style={{ shadowColor: '#C45E3A', shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }}
         >
-          {loading === 'yearly'
+          {loading
             ? <ActivityIndicator color="white" />
             : <Text className="text-sm font-semibold text-white">
-                {lang === 'en' ? 'Upgrade via GCash — ₱499/year' : 'Mag-upgrade via GCash — ₱499/taon'}
-              </Text>
-          }
-        </Pressable>
-
-        <Pressable
-          onPress={() => handleCheckout('monthly')}
-          disabled={!!loading}
-          className="w-full rounded-xl border border-cream-300 py-3.5 items-center mb-6 active:opacity-70 disabled:opacity-60"
-        >
-          {loading === 'monthly'
-            ? <ActivityIndicator color="#6E7B4A" />
-            : <Text className="text-sm font-medium text-ink-soft">
-                {lang === 'en' ? 'Monthly — ₱59/month' : 'Buwanin — ₱59/buwan'}
+                {lang === 'en' ? 'Subscribe Now' : 'Mag-subscribe Na'}
               </Text>
           }
         </Pressable>
