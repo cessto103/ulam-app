@@ -75,7 +75,8 @@ Last updated: 2026-07-14 · **v1.20.0**
 |---------|-------------------|-----------|
 | @types/react | ~19.1.10 | 19.1.10 |
 | typescript | ~5.9.2 | 5.9.2 |
-| eas-cli | ^20.5.1 | 20.5.1 (EAS Build setup paused pending package identifier decision — see memory) |
+| eas-cli | ^20.5.1 | 20.5.1 (EAS builds live: project `ulam`, package com.ulam.app, preview APK profile) |
+| sharp | (latest) | image asset compression script use (header photo slimming, v1.20.0) |
 
 ---
 
