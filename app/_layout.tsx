@@ -236,6 +236,10 @@ function RouteGuard() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="legal/[slug]"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="my-reports"
         options={{ headerShown: false }}
       />

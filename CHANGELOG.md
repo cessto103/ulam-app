@@ -5,6 +5,14 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.19.0] — 2026-07-14
+
+Terms & Conditions and Privacy Policy, with mandatory acceptance.
+
+### Added
+- **Legal documents in-app** — Settings now has Terms & Conditions and Privacy Policy rows; each opens a reader showing the current published version with its version number and date.
+- **Mandatory acceptance gate** — when a new version of either document is published from the admin dashboard, a blocking sheet appears on next app use: review each document, then "I have read and agree." Acceptance is recorded per user per version (with timestamp, IP, and device) — required for Play Store compliance and clean legal footing.
+
 ## [1.18.0] — 2026-07-14
 
 Password reset and account deletion — the two table-stakes account features the app was missing.

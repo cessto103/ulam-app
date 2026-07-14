@@ -1,4 +1,5 @@
 import AnimatedPressable from '@/src/components/AnimatedPressable';
+import LegalAcceptanceGate from '@/src/components/LegalAcceptanceGate';
 import { ULamScriptLogo } from '@/src/components/ULamLogo';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -145,6 +146,9 @@ export default function TabLayout() {
         <Tabs.Screen name="market" options={{ href: null }} />
         <Tabs.Screen name="profile" options={{ href: null, headerShown: false }} />
       </Tabs>
+
+      {/* Mandatory review whenever a new Terms/Privacy version is published */}
+      <LegalAcceptanceGate />
 
       {/* Create sheet opened by the center (+) button */}
       <Modal

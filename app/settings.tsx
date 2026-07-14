@@ -484,6 +484,30 @@ export default function SettingsScreen() {
             <Text className="text-ink-soft text-base">›</Text>
           </Pressable>
 
+          {/* Legal */}
+          <View className="rounded-2xl border border-cream-200 bg-white mb-4 overflow-hidden">
+            <Pressable
+              onPress={() => router.push('/legal/terms' as any)}
+              className="flex-row items-center gap-3 p-4 border-b border-cream-100 active:opacity-70"
+            >
+              <Ionicons name="document-text-outline" size={20} color="#386641" />
+              <Text className="flex-1 text-sm font-semibold text-ink">
+                {lang === 'en' ? 'Terms & Conditions' : 'Mga Tuntunin at Kundisyon'}
+              </Text>
+              <Text className="text-ink-soft text-base">›</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => router.push('/legal/privacy' as any)}
+              className="flex-row items-center gap-3 p-4 active:opacity-70"
+            >
+              <Ionicons name="shield-checkmark-outline" size={20} color="#386641" />
+              <Text className="flex-1 text-sm font-semibold text-ink">
+                {lang === 'en' ? 'Privacy Policy' : 'Patakaran sa Privacy'}
+              </Text>
+              <Text className="text-ink-soft text-base">›</Text>
+            </Pressable>
+          </View>
+
           {/* Logout */}
           <Pressable
             onPress={handleLogout}
