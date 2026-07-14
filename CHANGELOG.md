@@ -5,6 +5,22 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.20.0] — 2026-07-14
+
+Interactive nearby map, smarter search, real popularity ranking.
+
+### Added
+- **Nearby Map** — a "Map" button next to the radius chips on the Prices tab opens an interactive OpenStreetMap view: your location, a radius circle, and color-coded pins for markets (green) and independent stores (terracotta). Tapping a pin shows a detail card with distance, source/verified badge, "View prices," and Directions. Built on Leaflet/OSM — no API keys, works in Expo Go and standalone builds alike.
+
+### Changed
+- **"Popular This Week" is now actually weekly popularity** — recipes rank by real views in the last 7 days (boosted first, all-time saves as tiebreaker) instead of all-time save counts.
+- **Recipe search now looks inside ingredients and tags** — searching "manok" finds Chicken Tinola even though the title doesn't contain the word.
+- Profile header photo asset slimmed from 952 KB to 247 KB (faster load, smaller app).
+
+### Backend (same release)
+- Hourly `ulam:maintenance` job: seller-subscription renewal reminders (3 days ahead), expiry flips for ended subscriptions (with store-visibility re-sync) and boosts, stale OTP pruning.
+- New `TECHNICAL.md` operations guide in the backend repo: production cron setup, queue worker, deploy checklist, env vars, security runbook, EAS/FCM/maps instructions, backups.
+
 ## [1.19.0] — 2026-07-14
 
 Terms & Conditions and Privacy Policy, with mandatory acceptance.

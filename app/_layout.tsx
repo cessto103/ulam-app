@@ -240,6 +240,10 @@ function RouteGuard() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="market-map"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="my-reports"
         options={{ headerShown: false }}
       />

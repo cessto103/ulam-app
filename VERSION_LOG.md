@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-14 · **v1.19.0**
+Last updated: 2026-07-14 · **v1.20.0**
 
 ---
 
@@ -60,6 +60,7 @@ Last updated: 2026-07-14 · **v1.19.0**
 | react-native-safe-area-context | ~5.6.0 | 5.6.2 |
 | react-native-view-shot | 4.0.3 | 4.0.3 (recipe share-card capture, v1.13.0 — bundled with Expo Go, no dev client needed) |
 | react-native-gifted-charts | ^1.4.77 | 1.4.77 (My Insights dashboard graphs, v1.14.0 — SVG-based, no new native linking) |
+| react-native-webview | 13.15.0 | 13.15.0 (Leaflet/OSM nearby map, v1.20.0 — bundled with Expo Go, no API keys) |
 
 ### Data & Networking
 

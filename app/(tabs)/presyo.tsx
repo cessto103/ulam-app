@@ -273,6 +273,16 @@ export default function PresyoScreen() {
               </Pressable>
             );
           })}
+          <Pressable
+            onPress={() => router.push(`/market-map?lat=${gpsCoords.lat}&lng=${gpsCoords.lng}` as any)}
+            className="flex-row items-center gap-1.5 rounded-full px-3 py-1.5 active:opacity-80"
+            style={{ backgroundColor: '#E7653B', marginLeft: 'auto' }}
+          >
+            <Ionicons name="map-outline" size={13} color="#fff" />
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>
+              {lang === 'en' ? 'Map' : 'Mapa'}
+            </Text>
+          </Pressable>
         </View>
       )}
 

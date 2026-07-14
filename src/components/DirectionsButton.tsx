@@ -6,7 +6,7 @@ import { Linking, Pressable, Text } from 'react-native';
  * Opens turn-by-turn directions to a coordinate in Google Maps (app if
  * installed, browser otherwise). No API key needed — it's a plain deep link.
  */
-export default function DirectionsButton({ latitude, longitude }: { latitude: number; longitude: number }) {
+export default function DirectionsButton({ latitude, longitude, compact = false }: { latitude: number; longitude: number; compact?: boolean }) {
   const { lang } = useLanguage();
 
   const openDirections = () => {
@@ -21,7 +21,9 @@ export default function DirectionsButton({ latitude, longitude }: { latitude: nu
     >
       <Ionicons name="navigate" size={16} color="#fff" />
       <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
-        {lang === 'en' ? 'Get Directions (Google Maps)' : 'Kunin ang Direksyon (Google Maps)'}
+        {compact
+          ? (lang === 'en' ? 'Directions' : 'Direksyon')
+          : (lang === 'en' ? 'Get Directions (Google Maps)' : 'Kunin ang Direksyon (Google Maps)')}
       </Text>
     </Pressable>
   );
