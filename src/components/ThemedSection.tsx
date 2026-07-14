@@ -48,6 +48,10 @@ export function useSectionColors(sectionKey: string, fallback: [string, string])
  * compiled-in image/colors when the admin hasn't configured that section — same
  * pattern as BrandLogo for the app logo.
  */
+type RadiusStyle = Pick<ViewStyle,
+  'borderRadius' | 'borderTopLeftRadius' | 'borderTopRightRadius' | 'borderBottomLeftRadius' | 'borderBottomRightRadius'
+>;
+
 export default function ThemedSection({
   sectionKey,
   compiledImage,
@@ -63,7 +67,7 @@ export default function ThemedSection({
   compiledOverlayColors: string[];
   compiledFit?: 'cover' | 'contain';
   compiledFocal?: { x: number; y: number };
-  borderRadius?: number;
+  borderRadius?: number | RadiusStyle;
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
 }) {
@@ -82,19 +86,20 @@ export default function ThemedSection({
   const opacity = cfg?.overlay_opacity ?? 1;
   const colors = (cfg?.overlay_colors?.length ? cfg.overlay_colors : compiledOverlayColors)
     .map((c) => hexToRgba(c, opacity));
+  const radiusStyle: RadiusStyle = typeof borderRadius === 'number' ? { borderRadius } : borderRadius;
 
   return (
     <ImageBackground
       source={imageSource}
       resizeMode={fit}
-      style={[{ borderRadius, overflow: 'hidden' }, style]}
+      style={[{ overflow: 'hidden' }, radiusStyle, style]}
       imageStyle={fit === 'cover' ? {
-        borderRadius,
+        ...radiusStyle,
         width: '140%',
         height: '140%',
         left: `${-40 * (focalX / 100)}%`,
         top: `${-40 * (focalY / 100)}%`,
-      } as any : { borderRadius }}
+      } as any : radiusStyle}
     >
       {colors.length >= 2 ? (
         <LinearGradient

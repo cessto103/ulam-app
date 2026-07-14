@@ -5,6 +5,13 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.22.1] — 2026-07-15
+
+Closes a gap from v1.22.0: Profile and Awards & Achievements headers were forgotten from the theming rollout.
+
+### Changed
+- **Profile and Awards & Achievements headers are now admin-themeable too** — both already had their own photo+gradient hero header (shared "Profile hero header" section, separate control from the Menu Plan/Community/Prices header) but weren't wired into the Theme admin page. Now they are, with today's exact look as the fallback.
+
 ## [1.22.0] — 2026-07-15
 
 Admin-controlled theming, a real Premium gateway with streak trials, and recipe page upgrades.

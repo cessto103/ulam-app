@@ -1,7 +1,7 @@
 ﻿import client from '@/src/api/client';
 import FireXpBar from '@/src/components/FireXpBar';
 import { Skeleton, SkeletonListItem } from '@/src/components/Skeleton';
-import { useSectionColors } from '@/src/components/ThemedSection';
+import ThemedSection, { useSectionColors } from '@/src/components/ThemedSection';
 import { uploadAvatar } from '@/src/api/user';
 import { resizeForUpload } from '@/src/utils/uploadImage';
 import { HeaderWave } from '@/src/components/ULamLogo';
@@ -10,7 +10,6 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { API_URL } from '@/src/api/client';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -20,7 +19,6 @@ import {
   Alert,
   FlatList,
   Image,
-  ImageBackground,
   Modal,
   Pressable,
   RefreshControl,
@@ -563,18 +561,11 @@ export default function AwardsScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />
       }
     >
-      <ImageBackground
-        source={require('@/assets/profile-header-food.jpg')}
-        resizeMode="cover"
-        className="relative overflow-hidden"
+      <ThemedSection
+        sectionKey="header_hero"
+        compiledImage={require('@/assets/profile-header-food.jpg')}
+        compiledOverlayColors={['rgba(231,101,59,0.96)', 'rgba(231,101,59,0.78)', 'rgba(231,101,59,0.55)']}
       >
-        {/* Terracotta gradient over the photo — same treatment as the Profile header */}
-        <LinearGradient
-          colors={['rgba(231,101,59,0.96)', 'rgba(231,101,59,0.78)', 'rgba(231,101,59,0.55)']}
-          locations={[0, 0.55, 1]}
-          pointerEvents="none"
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        />
         {/* Back to profile (awards is no longer a tab) */}
         <Pressable
           onPress={() => router.back()}
@@ -635,7 +626,7 @@ export default function AwardsScreen() {
 
         </View>
         <HeaderWave fill="#FFF8E8" />
-      </ImageBackground>
+      </ThemedSection>
 
       <View className="px-4 pt-2">
       {false && <>

@@ -7,7 +7,7 @@ import { API_URL } from '@/src/api/client';
 import FireXpBar from '@/src/components/FireXpBar';
 import { Ionicons } from '@expo/vector-icons';
 import BrandLogo from '@/src/components/BrandLogo';
-import { LinearGradient } from 'expo-linear-gradient';
+import ThemedSection from '@/src/components/ThemedSection';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -16,7 +16,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  ImageBackground,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -131,21 +130,13 @@ export default function ProfileScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />}
     >
       {/* Food-photo curved header with terracotta overlay */}
-      <ImageBackground
-        source={require('@/assets/profile-header-food.jpg')}
-        resizeMode="cover"
-        className="items-center rounded-b-[32px] px-4 pb-6 mb-5 relative overflow-hidden"
-        imageStyle={{ borderBottomLeftRadius: 32, borderBottomRightRadius: 32 }}
-        style={{ paddingTop: insets.top + 10 }}
+      <ThemedSection
+        sectionKey="header_hero"
+        compiledImage={require('@/assets/profile-header-food.jpg')}
+        compiledOverlayColors={['rgba(231,101,59,0.96)', 'rgba(231,101,59,0.78)', 'rgba(231,101,59,0.55)']}
+        borderRadius={{ borderBottomLeftRadius: 32, borderBottomRightRadius: 32 }}
+        style={{ alignItems: 'center', paddingHorizontal: 16, paddingBottom: 24, marginBottom: 20, paddingTop: insets.top + 10 }}
       >
-        {/* Terracotta gradient over the photo — solid up top, food shows through toward the curve */}
-        <LinearGradient
-          colors={['rgba(231,101,59,0.96)', 'rgba(231,101,59,0.78)', 'rgba(231,101,59,0.55)']}
-          locations={[0, 0.55, 1]}
-          pointerEvents="none"
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        />
-
         {/* Logo + gear row, same layout as the other tab headers */}
         <View className="w-full flex-row items-center justify-between mb-3">
           <BrandLogo size={21} light />
@@ -203,7 +194,7 @@ export default function ProfileScreen() {
           </View>
           <FireXpBar progress={xpProgressPct} />
         </View>
-      </ImageBackground>
+      </ThemedSection>
 
       <View className="px-4">
       {/* Stats */}
