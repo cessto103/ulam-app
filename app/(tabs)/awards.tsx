@@ -1,6 +1,7 @@
 ﻿import client from '@/src/api/client';
 import FireXpBar from '@/src/components/FireXpBar';
 import { Skeleton, SkeletonListItem } from '@/src/components/Skeleton';
+import { useSectionColors } from '@/src/components/ThemedSection';
 import { uploadAvatar } from '@/src/api/user';
 import { resizeForUpload } from '@/src/utils/uploadImage';
 import { HeaderWave } from '@/src/components/ULamLogo';
@@ -139,6 +140,11 @@ function AwardsTab({
   const earnedCount = achievements?.filter((a) => a.is_earned).length ?? 0;
   const totalCount  = achievements?.length ?? 0;
 
+  const savedColors        = useSectionColors('awards_stat_saved', ['#F4B942', '#58200F']);
+  const mealPlansColors    = useSectionColors('awards_stat_meal_plans', ['#386641', '#FFFFFF']);
+  const postsColors        = useSectionColors('awards_stat_posts', ['#E7653B', '#FFFFFF']);
+  const achievementsColors = useSectionColors('awards_stat_achievements', ['#5E693F', '#FFFFFF']);
+
   return (
     <>
       {/* Stats — four distinct boxes */}
@@ -149,10 +155,10 @@ function AwardsTab({
           </Text>
           <View className="flex-row flex-wrap gap-2.5">
             {[
-              { label: lang === 'en' ? 'Saved' : 'Natipid',  val: `₱${Math.round(stats.total_saved).toLocaleString()}`, bg: '#F4B942', text: '#58200F', icon: '💰' },
-              { label: 'Meal Plans',                          val: String(stats.meal_plans_generated),                   bg: '#386641', text: '#FFFFFF', icon: '🍽️' },
-              { label: lang === 'en' ? 'Posts' : 'Mga Post',  val: String(stats.posts_count),                            bg: '#E7653B', text: '#FFFFFF', icon: '💬' },
-              { label: 'Achievements',                        val: `${earnedCount}/${totalCount}`,                       bg: '#5E693F', text: '#FFFFFF', icon: '🏆' },
+              { label: lang === 'en' ? 'Saved' : 'Natipid',  val: `₱${Math.round(stats.total_saved).toLocaleString()}`, bg: savedColors[0], text: savedColors[1], icon: '💰' },
+              { label: 'Meal Plans',                          val: String(stats.meal_plans_generated),                   bg: mealPlansColors[0], text: mealPlansColors[1], icon: '🍽️' },
+              { label: lang === 'en' ? 'Posts' : 'Mga Post',  val: String(stats.posts_count),                            bg: postsColors[0], text: postsColors[1], icon: '💬' },
+              { label: 'Achievements',                        val: `${earnedCount}/${totalCount}`,                       bg: achievementsColors[0], text: achievementsColors[1], icon: '🏆' },
             ].map((s) => (
               <View
                 key={s.label}

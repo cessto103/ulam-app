@@ -1,4 +1,5 @@
 import BrandLogo from '@/src/components/BrandLogo'
+import ThemedSection from '@/src/components/ThemedSection';
 import { HeaderWave } from '@/src/components/ULamLogo';
 import { LinearGradient } from 'expo-linear-gradient';
 import { type ReactNode } from 'react';
@@ -19,7 +20,11 @@ type GradientPageHeaderProps = {
   tabs?: HeaderTab[];
   children?: ReactNode;
   waveFill?: string;
+  /** Renders a photo background (admin-themeable) behind the gradient instead of a flat gradient. */
+  photo?: boolean;
 };
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'];
 
 export default function GradientPageHeader({
   title,
@@ -28,15 +33,24 @@ export default function GradientPageHeader({
   tabs,
   children,
   waveFill = '#FFF8E8',
+  photo = false,
 }: GradientPageHeaderProps) {
   const insets = useSafeAreaInsets();
+  const Wrapper = photo ? ThemedSection : LinearGradient;
+  const wrapperProps = photo
+    ? {
+        sectionKey: 'header',
+        compiledImage: require('@/assets/profile-header-food.jpg'),
+        compiledOverlayColors: HEADER_GRADIENT,
+      }
+    : {
+        colors: HEADER_GRADIENT,
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+      };
 
   return (
-    <LinearGradient
-      colors={['#CC5027', '#E7653B', '#EC8156']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <Wrapper {...(wrapperProps as any)}>
       <View
         className={tabs?.length ? 'px-4' : 'px-4 pb-1'}
         style={{ paddingTop: insets.top + 10 }}
@@ -94,6 +108,6 @@ export default function GradientPageHeader({
         ) : null}
       </View>
       {tabs?.length ? null : <HeaderWave fill={waveFill} />}
-    </LinearGradient>
+    </Wrapper>
   );
 }

@@ -326,6 +326,17 @@ function PlanView({ user }: { user: any }) {
         );
         return;
       }
+      if (e?.response?.data?.quota_exceeded) {
+        Alert.alert(
+          lang === 'en' ? "You're out of free AI plans" : 'Naubos na ang libreng AI plans mo',
+          e?.response?.data?.message ?? (lang === 'en' ? "You've used your 3 free AI meal plans this month." : 'Naubos na ang 3 libreng AI meal plans mo ngayong buwan.'),
+          [
+            { text: lang === 'en' ? 'Not now' : 'Huwag muna', style: 'cancel' },
+            { text: lang === 'en' ? 'Upgrade →' : 'I-upgrade →', onPress: () => router.push('/upgrade' as any) },
+          ],
+        );
+        return;
+      }
       Alert.alert(
         lang === 'en' ? 'Error' : 'Error',
         e?.response?.data?.message ?? (lang === 'en' ? 'Could not generate a meal plan. Try again.' : 'Hindi nagawa ang meal plan. Subukan ulit.'),
@@ -545,10 +556,23 @@ function PlanView({ user }: { user: any }) {
           </Text>
         )}
       </Pressable>
-      {!aiDisabled && user?.plan !== 'premium' && (
-        <Text className="mt-3 text-xs text-ink-soft">
-          {remaining} {lang === 'en' ? 'generations left' : 'generations ang natitira'}
-        </Text>
+      {!aiDisabled && (
+        user?.plan === 'premium' ? (
+          <Text className="mt-3 text-xs text-ink-soft">
+            {user?.premium_source === 'trial'
+              ? (lang === 'en' ? '🎁 Free trial — unlimited AI plans' : '🎁 Libreng trial — unlimited AI plans')
+              : (lang === 'en' ? '⭐ Premium — unlimited AI plans' : '⭐ Premium — unlimited AI plans')}
+          </Text>
+        ) : (
+          <Pressable onPress={() => router.push('/upgrade' as any)} className="mt-3 flex-row items-center gap-1 active:opacity-70">
+            <Text className="text-xs text-ink-soft">
+              {remaining} {lang === 'en' ? 'generations left' : 'generations ang natitira'}
+            </Text>
+            <Text className="text-xs font-semibold text-brand-600">
+              {lang === 'en' ? '· Go Premium →' : '· Mag-Premium →'}
+            </Text>
+          </Pressable>
+        )
       )}
     </View>
   );
@@ -930,6 +954,7 @@ export default function MealPlanScreen() {
           { key: 'recipes', label: 'Recipes', active: tab === 'recipes', onPress: () => setTab('recipes') },
           { key: 'saved', label: 'Bookmark', active: false, onPress: () => router.push('/recipe-book' as any) },
         ]}
+        photo
       />
 
       {false && <>

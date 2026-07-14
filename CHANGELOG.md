@@ -5,6 +5,28 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.22.0] — 2026-07-15
+
+Admin-controlled theming, a real Premium gateway with streak trials, and recipe page upgrades.
+
+### Added
+- **Admin Theme page** — the header (Menu Plan, Community, Prices), the 5 Home dashboard boxes (Meal Plan hero + My Recipes/Spending History/Awards/Recipe Book tiles), and the 4 Awards "your stats" boxes can now have their background photo (with a 9-point focal-point picker and cover/contain fit) and color overlay set from admin (Content → Theme), with the built-in look as the fallback until something is configured.
+- **Photo header on Menu Plan, Community, and Prices** — matches the photo+gradient treatment already used on Home and Awards.
+- **Recipe comments** — every recipe now has a comment thread at the bottom (reply, edit within 3 hours, delete your own), moderatable from admin (Recipes → Recipe Comments).
+- **Premium quota pill + upgrade prompt** — the Meal Plan screen now shows how many free AI plans are left (or Premium/Trial status) and links straight to Upgrade; hitting the monthly AI limit now offers an "Upgrade →" button instead of a dead-end alert.
+- **Streak-earned free Premium trials** — reaching a 3-day or 7-day activity streak now grants 3 or 7 free days of uLam Premium automatically, with a notification explaining why.
+
+### Changed
+- **Recipe share is text-only now** — shares the full recipe (ingredients, steps, tips) as text with hashtags and an "Install uLam App" line, instead of a captured image card. More reliable across apps and carries the actual recipe, not just a title card.
+- Recipe page's view count now sits below the category tags instead of above them.
+- The radio circle in "set recipe as meal" now has a visible border when unselected.
+
+### Fixed
+- My Stores' empty "price reports to review" state now shows a clearer ✅ instead of a stray 🏷️.
+
+### Removed
+- `expo-file-system`, `expo-sharing`, and `react-native-view-shot` — only used by the old image-capture share flow, now unused.
+
 ## [1.21.1] — 2026-07-14
 
 Profile editing consolidated into Settings; navigation cleanup.

@@ -1,17 +1,14 @@
 import ReportContentSheet from '@/src/components/ReportContentSheet';
-import client from '@/src/api/client';
+import client, { API_URL } from '@/src/api/client';
 import { BoostBadge, BoostButton } from '@/src/components/BoostButton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import StarRating from '@/src/components/StarRating';
 import { formatCount } from '@/src/utils/formatCount';
 import { Skeleton } from '@/src/components/Skeleton';
 import { usePopOnActivate } from '@/src/hooks/usePopOnActivate';
+import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import * as Haptics from 'expo-haptics';
-import { File, Paths } from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import { LinearGradient } from 'expo-linear-gradient';
-import { captureRef } from 'react-native-view-shot';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -27,11 +24,11 @@ import {
   Linking,
   Modal,
   PanResponder,
-  Platform,
   Pressable,
   ScrollView,
   Share,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -287,6 +284,24 @@ function extractYouTubeId(url: string): string | null {
   return match ? match[1] : null;
 }
 
+function commentInitials(name: string) {
+  return name.split(' ').slice(0, 2).map((w) => w[0] ?? '').join('').toUpperCase();
+}
+
+function commentTimeAgo(iso: string, lang: 'en' | 'tl' = 'tl') {
+  const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1)  return lang === 'en' ? 'Just now' : 'Kakalagay';
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  return d < 7 ? `${d}d` : new Date(iso).toLocaleDateString('default', { month: 'short', day: 'numeric' });
+}
+
+function commentIsEditable(iso: string) {
+  return (Date.now() - new Date(iso).getTime()) < 72 * 60 * 60 * 1000;
+}
+
 // ─── Components ───────────────────────────────────────────────────────────────
 
 function VoteButton({ emoji, active, activeColor, count, onPress }: {
@@ -305,57 +320,86 @@ function VoteButton({ emoji, active, activeColor, count, onPress }: {
   );
 }
 
-const SHARE_CARD_WIDTH = 340;
-const SHARE_CARD_HEIGHT = 425;
+type RecipeCommentUser = { id: number; name: string; username: string | null; avatar: string | null };
+type RecipeCommentItem = {
+  id: number; user_id: number; body: string; created_at: string;
+  user: RecipeCommentUser;
+  replies: RecipeCommentItem[];
+};
 
-/**
- * Rendered off-screen (never visible to the user) and captured to a real
- * image file just before sharing. Baking the title/cost/servings into the
- * pixels means the info always shows up regardless of platform — unlike
- * relying on the OS share sheet to carry caption text alongside an image,
- * which Android's share intent doesn't support and drops silently.
- */
-function ShareCard({ recipe, photoUri, lang, cost }: {
-  recipe: Recipe; photoUri: string | null; lang: 'en' | 'tl'; cost: string;
-}) {
-  return (
-    <View style={{ width: SHARE_CARD_WIDTH, height: SHARE_CARD_HEIGHT, backgroundColor: '#292522', overflow: 'hidden' }}>
-      {photoUri ? (
-        <Image source={{ uri: photoUri }} style={{ width: '100%', height: '100%', position: 'absolute' }} resizeMode="cover" />
-      ) : (
-        <View style={{ width: '100%', height: '100%', position: 'absolute', backgroundColor: '#E7653B' }} />
-      )}
-      <LinearGradient
-        colors={['transparent', 'rgba(41,37,34,0.55)', 'rgba(41,37,34,0.95)']}
-        locations={[0, 0.45, 1]}
-        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%' }}
-      />
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 }}>
-        <Text
-          style={{ fontFamily: 'Baloo2_800ExtraBold', fontSize: 24, color: '#fff', lineHeight: 28, marginBottom: 10 }}
-          numberOfLines={2}
-        >
-          {recipe.title}
-        </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          <View style={{ backgroundColor: '#E7653B', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 }}>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>{cost}</Text>
-          </View>
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
-            {lang === 'en' ? `serves ${recipe.servings}` : `para sa ${recipe.servings}`}
-          </Text>
-        </View>
-        <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginBottom: 10 }} />
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#F4B942' }}>
-          uLam <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
-            {lang === 'en' ? '— budget-friendly Filipino recipes' : '— mga murang recipe ng Pinoy'}
-          </Text>
-        </Text>
-      </View>
+function CommentAvatar({ user, size = 32 }: { user: RecipeCommentUser; size?: number }) {
+  const uri = user.avatar ? `${API_URL}${user.avatar}` : null;
+  return uri ? (
+    <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size / 2 }} />
+  ) : (
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
+      <Text style={{ fontSize: size * 0.35, fontFamily: 'NunitoSans_700Bold', color: '#386641' }}>
+        {commentInitials(user.name)}
+      </Text>
     </View>
   );
 }
 
+function RecipeCommentRow({
+  comment, myId, lang, onDelete, onEdit, onReply,
+}: {
+  comment: RecipeCommentItem;
+  myId: number;
+  lang: 'en' | 'tl';
+  onDelete: (id: number) => void;
+  onEdit: (id: number, currentBody: string) => void;
+  onReply: (user: RecipeCommentUser) => void;
+}) {
+  const renderComment = (c: RecipeCommentItem, isReply = false) => {
+    const isMine  = c.user_id === myId;
+    const canEdit = isMine && commentIsEditable(c.created_at);
+
+    return (
+      <View key={c.id} style={{ flexDirection: 'row', gap: 10, marginLeft: isReply ? 40 : 0, marginTop: isReply ? 8 : 0 }}>
+        <CommentAvatar user={c.user} size={isReply ? 28 : 32} />
+        <View style={{ flex: 1 }}>
+          <View style={{ backgroundColor: '#FFFCF5', borderRadius: 16, borderTopLeftRadius: 2, paddingHorizontal: 12, paddingVertical: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522' }}>{c.user.name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                  {commentTimeAgo(c.created_at, lang)}
+                </Text>
+                {canEdit && (
+                  <Pressable onPress={() => onEdit(c.id, c.body)} hitSlop={8} className="active:opacity-60">
+                    <Ionicons name="create-outline" size={13} color="#6F655A" />
+                  </Pressable>
+                )}
+                {isMine && (
+                  <Pressable onPress={() => onDelete(c.id)} hitSlop={8} className="active:opacity-60">
+                    <Ionicons name="close" size={14} color="#E24B4A" />
+                  </Pressable>
+                )}
+              </View>
+            </View>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', lineHeight: 20 }}>
+              {c.body}
+            </Text>
+          </View>
+          <Pressable onPress={() => onReply(c.user)} style={{ marginLeft: 8, marginTop: 4 }} className="active:opacity-60">
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+              {lang === 'en' ? 'Reply' : 'Tumugon'}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <View style={{ paddingVertical: 10 }}>
+      {renderComment(comment)}
+      {comment.replies?.map((reply) => (
+        <View key={reply.id} style={{ marginTop: 8 }}>{renderComment(reply, true)}</View>
+      ))}
+    </View>
+  );
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -412,11 +456,6 @@ export default function RecipeDetailScreen() {
   const [sharersOpen,    setSharersOpen]    = useState(false);
   const [sharers,        setSharers]        = useState<SharedByPost[]>([]);
   const [sharersLoading, setSharersLoading] = useState(false);
-
-  // Off-screen share card — rendered only while a share is in progress, then
-  // captured to a real image file (see shareToSocial below).
-  const shareCardRef = useRef<View>(null);
-  const [shareCardPhoto, setShareCardPhoto] = useState<string | null>(null);
 
   // Add-to-meal-plan modal
   const [mealModal,  setMealModal]  = useState(false);
@@ -481,6 +520,68 @@ export default function RecipeDetailScreen() {
     onError: () => Alert.alert('Error', 'Could not submit rating. Please try again.'),
   });
 
+  // ── Comments ──────────────────────────────────────────────────────────────
+  const { user: me } = useAuth();
+  const [commentBody,     setCommentBody]     = useState('');
+  const [replyTo,         setReplyTo]         = useState<RecipeCommentUser | null>(null);
+  const [editCommentId,   setEditCommentId]   = useState<number | null>(null);
+  const [editCommentBody, setEditCommentBody] = useState('');
+  const [savingComment,   setSavingComment]   = useState(false);
+  const commentInputRef = useRef<TextInput>(null);
+
+  const { data: commentsData } = useQuery<{ data: RecipeCommentItem[] }>({
+    queryKey: ['recipe-comments', id],
+    queryFn: () => client.get(`/recipes/${id}/comments`).then((r) => r.data),
+    enabled: !!id,
+  });
+  const comments = commentsData?.data ?? [];
+
+  const { mutate: submitComment, isPending: sendingComment } = useMutation({
+    mutationFn: (text: string) => client.post(`/recipes/${id}/comments`, { body: text }),
+    onSuccess: () => {
+      setCommentBody('');
+      setReplyTo(null);
+      qc.invalidateQueries({ queryKey: ['recipe-comments', id] });
+    },
+    onError: () => Alert.alert('Error', lang === 'en' ? 'Could not send comment. Please try again.' : 'Hindi ma-send ang komento. Subukan ulit.'),
+  });
+
+  const handleSendComment = () => {
+    const text = replyTo ? `@${replyTo.name.split(' ')[0]} ${commentBody.trim()}` : commentBody.trim();
+    if (text) submitComment(text);
+  };
+
+  const startEditComment = (commentId: number, currentBody: string) => {
+    setEditCommentId(commentId);
+    setEditCommentBody(currentBody);
+  };
+
+  const saveEditComment = async () => {
+    if (!editCommentBody.trim() || !editCommentId) return;
+    setSavingComment(true);
+    try {
+      await client.patch(`/recipe-comments/${editCommentId}`, { body: editCommentBody.trim() });
+      qc.invalidateQueries({ queryKey: ['recipe-comments', id] });
+      setEditCommentId(null);
+    } catch (e: any) {
+      Alert.alert('Error', e?.response?.data?.message ?? (lang === 'en' ? 'Could not edit comment.' : 'Hindi ma-edit ang komento.'));
+    } finally {
+      setSavingComment(false);
+    }
+  };
+
+  const { mutate: deleteComment } = useMutation({
+    mutationFn: (commentId: number) => client.delete(`/recipe-comments/${commentId}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['recipe-comments', id] }),
+  });
+
+  const confirmDeleteComment = (commentId: number) => {
+    Alert.alert(lang === 'en' ? 'Delete this comment?' : 'I-delete ang komento?', '', [
+      { text: lang === 'en' ? 'Cancel' : 'Huwag', style: 'cancel' },
+      { text: lang === 'en' ? 'Delete' : 'I-delete', style: 'destructive', onPress: () => deleteComment(commentId) },
+    ]);
+  };
+
   const toggleSave = async () => {
     if (savePending || !recipe) return;
     setSavePending(true);
@@ -522,71 +623,39 @@ export default function RecipeDetailScreen() {
   };
 
   // Share to any social app via the OS share sheet (FB, IG, TikTok, Messenger,
-  // etc — whatever the device has installed). Available on every recipe
-  // regardless of who owns it; all the data is already loaded on this screen.
+  // etc — whatever the device has installed). Text-only: the full recipe
+  // (ingredients/steps/tips) travels with the share regardless of which app
+  // picks it up, which an attached image can't guarantee (Android's share
+  // intent drops caption text alongside an image).
   const shareToSocial = async () => {
     if (!recipe) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const cost = BUDGET_LABEL[recipe.budget_tag] ?? `₱${Math.round(recipe.estimated_cost)}`;
-    const message = lang === 'en'
-      ? `🍽️ ${recipe.title}\n${cost} · serves ${recipe.servings}\n\n${recipe.description ?? ''}\n\nMade with uLam — budget-friendly Filipino recipes.`.trim()
-      : `🍽️ ${recipe.title}\n${cost} · para sa ${recipe.servings}\n\n${recipe.description ?? ''}\n\nGawa gamit ang uLam — mga murang recipe ng Pinoy.`.trim();
 
-    const photoUrl = recipe.image_urls?.[0] ?? recipe.image_url ?? null;
-    let localPhotoUri: string | null = null;
-    if (photoUrl) {
-      try {
-        const downloaded = await File.downloadFileAsync(photoUrl, Paths.cache, { idempotent: true });
-        localPhotoUri = downloaded.uri;
-      } catch {
-        // No local copy — the card still renders with a plain brand-color
-        // background instead of the photo.
-      }
-    }
+    const category = recipe.tags?.[0] ?? 'Ulam';
+    const tagify = (s: string) => s.replace(/[^a-zA-Z0-9]/g, '');
+    const hashtags = `#ulam${tagify(category)} #${tagify(recipe.title)} #moreDailyUlam #uLamPH${tagify(category)}`;
 
-    // Render the share card off-screen with this recipe's info baked in, give
-    // the Image a moment to actually paint, then capture it to a real file.
-    // This is what fixes the original bug: relying on the OS to carry caption
-    // text alongside an attached image doesn't work on Android at all (it
-    // silently drops the text), so the recipe's title/cost/servings need to
-    // be part of the image pixels themselves, not passed as separate text.
-    let cardUri: string | null = null;
-    try {
-      setShareCardPhoto(localPhotoUri);
-      await new Promise((resolve) => setTimeout(resolve, 350));
-      if (shareCardRef.current) {
-        cardUri = await captureRef(shareCardRef, { format: 'jpg', quality: 0.92 });
-      }
-    } catch {
-      cardUri = null;
-    }
+    const ingredientsList = recipe.ingredients
+      .map((ing) => `• ${[ing.quantity, ing.unit, ing.name].filter(Boolean).join(' ')}`)
+      .join('\n');
+    const stepsList = recipe.steps.map((step, i) => `${i + 1}. ${step}`).join('\n');
+    const tipsList = recipe.tips?.length ? recipe.tips.map((tip) => `• ${tip}`).join('\n') : '';
+
+    const message = [
+      `🍽️ ${recipe.title}`,
+      `${lang === 'en' ? 'Ingredients' : 'Sangkap'}:\n${ingredientsList}`,
+      `${lang === 'en' ? 'Instructions' : 'Paraan'}:\n${stepsList}`,
+      tipsList ? `Tips:\n${tipsList}` : '',
+      hashtags,
+      lang === 'en'
+        ? 'Install uLam App at Play Store for more uLam Tips.'
+        : 'I-install ang uLam App sa Play Store para sa mas maraming uLam Tips.',
+    ].filter(Boolean).join('\n\n');
 
     try {
-      if (cardUri) {
-        if (Platform.OS === 'ios') {
-          // iOS can carry a local image + caption text together — a bonus
-          // on top of the card, since some apps (Messages, Mail) show both.
-          await Share.share({ url: cardUri, message, title: recipe.title });
-        } else {
-          // Android's Share API silently drops the `url` field — it never
-          // attaches an image. expo-sharing drives Android's native
-          // image-share intent instead.
-          const canShareFile = await Sharing.isAvailableAsync();
-          if (canShareFile) {
-            await Sharing.shareAsync(cardUri, { dialogTitle: recipe.title, mimeType: 'image/jpeg' });
-          } else {
-            await Share.share({ title: recipe.title, message });
-          }
-        }
-        return;
-      }
-      // Card capture failed outright — fall back to a plain text share so
-      // sharing still works, just without an image.
       await Share.share({ title: recipe.title, message });
     } catch {
       // User cancelled the share sheet — nothing to do.
-    } finally {
-      setShareCardPhoto(null);
     }
   };
 
@@ -716,12 +785,6 @@ export default function RecipeDetailScreen() {
         <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: '#292522', lineHeight: 28, marginBottom: 2 }}>
           {recipe.title}
         </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
-          <Ionicons name="eye-outline" size={13} color="#B0A18C" />
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
-            {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
-          </Text>
-        </View>
         {wasEdited && (
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 4 }}>{editedLabel()}</Text>
         )}
@@ -747,7 +810,7 @@ export default function RecipeDetailScreen() {
 
         {/* Tags */}
         {recipe.tags?.length > 0 && (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
             {recipe.tags.map((tag) => (
               <View key={tag} style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 10, paddingVertical: 3 }}>
                 <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#5E693F' }}>
@@ -757,6 +820,13 @@ export default function RecipeDetailScreen() {
             ))}
           </View>
         )}
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <Ionicons name="eye-outline" size={13} color="#B0A18C" />
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
+          </Text>
+        </View>
       </View>
 
       {/* ── Vote + Save row ── */}
@@ -1205,20 +1275,96 @@ export default function RecipeDetailScreen() {
           </>
         )}
 
+        {/* ── Comments ── */}
+        <View style={{ marginTop: 24 }}>
+          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 4 }}>
+            {lang === 'en' ? 'Comments' : 'Mga Komento'} ({comments.length})
+          </Text>
+
+          {editCommentId !== null && (
+            <View style={{ backgroundColor: '#FDEFC9', borderRadius: 12, padding: 10, marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <TextInput
+                style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 80 }}
+                value={editCommentBody}
+                onChangeText={setEditCommentBody}
+                multiline
+                autoFocus
+              />
+              <Pressable onPress={saveEditComment} disabled={savingComment} style={{ backgroundColor: '#386641', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 }}>
+                {savingComment ? <ActivityIndicator color="white" size="small" /> : <Text style={{ color: 'white', fontFamily: 'NunitoSans_700Bold', fontSize: 12 }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
+              </Pressable>
+              <Pressable onPress={() => setEditCommentId(null)}>
+                <Text style={{ color: '#6F655A', fontSize: 14 }}>✕</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {comments.length === 0 ? (
+            <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+              <Text style={{ fontSize: 26, marginBottom: 6 }}>💬</Text>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
+                {lang === 'en' ? 'No comments yet. Be the first!' : 'Wala pang komento. Maging una!'}
+              </Text>
+            </View>
+          ) : (
+            comments.map((c) => (
+              <RecipeCommentRow
+                key={c.id}
+                comment={c}
+                myId={me?.id ?? -1}
+                lang={lang === 'en' ? 'en' : 'tl'}
+                onDelete={confirmDeleteComment}
+                onEdit={startEditComment}
+                onReply={(user) => { setReplyTo(user); commentInputRef.current?.focus(); }}
+              />
+            ))
+          )}
+
+          {replyTo && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#EFF4EC', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, marginTop: 8 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#386641', flex: 1 }}>
+                ↩ {lang === 'en' ? 'Replying to' : 'Tumutugon kay'} <Text style={{ fontFamily: 'NunitoSans_700Bold' }}>{replyTo.name.split(' ')[0]}</Text>
+              </Text>
+              <Pressable onPress={() => setReplyTo(null)} hitSlop={8}>
+                <Ionicons name="close" size={15} color="#6F655A" />
+              </Pressable>
+            </View>
+          )}
+
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 10 }}>
+            {me && (
+              <CommentAvatar
+                user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }}
+                size={32}
+              />
+            )}
+            <TextInput
+              ref={commentInputRef}
+              style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#292522', maxHeight: 100 }}
+              placeholder={
+                replyTo
+                  ? (lang === 'en' ? `Reply to ${replyTo.name.split(' ')[0]}...` : `Tumugon kay ${replyTo.name.split(' ')[0]}...`)
+                  : (lang === 'en' ? 'Write a comment...' : 'Sumulat ng komento...')
+              }
+              placeholderTextColor="#B0A18C"
+              value={commentBody}
+              onChangeText={setCommentBody}
+              multiline
+              returnKeyType="send"
+              onSubmitEditing={handleSendComment}
+            />
+            <Pressable
+              onPress={handleSendComment}
+              disabled={!commentBody.trim() || sendingComment}
+              style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: '#C45E3A', alignItems: 'center', justifyContent: 'center', opacity: !commentBody.trim() || sendingComment ? 0.4 : 1 }}
+            >
+              {sendingComment ? <ActivityIndicator color="white" size="small" /> : <Ionicons name="arrow-up" size={17} color="#fff" />}
+            </Pressable>
+          </View>
+        </View>
+
       </View>
     <ReportContentSheet visible={reportSheetOpen} onClose={() => setReportSheetOpen(false)} contentType="recipe" contentId={recipe.id} />
-
-    {/* Off-screen share card — never visible, captured to an image on share */}
-    <View style={{ position: 'absolute', top: 0, left: -9999 }} pointerEvents="none">
-      <View ref={shareCardRef} collapsable={false}>
-        <ShareCard
-          recipe={recipe}
-          photoUri={shareCardPhoto}
-          lang={lang === 'en' ? 'en' : 'tl'}
-          cost={BUDGET_LABEL[recipe.budget_tag] ?? `₱${Math.round(recipe.estimated_cost)}`}
-        />
-      </View>
-    </View>
     </ScrollView>
   );
 }

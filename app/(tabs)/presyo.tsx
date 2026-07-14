@@ -209,6 +209,7 @@ export default function PresyoScreen() {
         title={lang === 'en' ? 'Prices' : 'Presyo'}
         subtitle={lang === 'en' ? 'Compare prices and help the community.' : 'Maghambing ng presyo at tumulong sa komunidad.'}
         rightSlot={<HeaderIconRow />}
+        photo
       />
 
       <ScrollView

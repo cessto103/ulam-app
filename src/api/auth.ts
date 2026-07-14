@@ -10,10 +10,14 @@ export type User = {
   avatar: string | null;
   bio: string | null;
   plan: 'libre' | 'premium';
+  is_premium: boolean;
+  premium_expires_at: string | null;
+  premium_source: 'paid' | 'trial' | null;
   xp: number;
   level: number;
   streak_days: number;
   ai_meal_plans_used_this_month: number;
+  ai_plans_remaining: number | null;
   household_size: number | null;
   barangay: string | null;
   municipality: string | null;

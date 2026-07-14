@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-14 · **v1.21.1**
+Last updated: 2026-07-15 · **v1.22.0**
 
 ---
 
@@ -42,8 +42,6 @@ Last updated: 2026-07-14 · **v1.21.1**
 | expo-secure-store | ~15.0.8 | 15.0.8 |
 | expo-status-bar | ~3.0.9 | 3.0.9 |
 | expo-haptics | ~15.0.7 | 15.0.7 (press/reaction feedback, v1.10.0) |
-| expo-file-system | ~19.0.23 | 19.0.23 (download recipe photo for sharing, v1.12.0) |
-| expo-sharing | ~14.0.8 | 14.0.8 (Android image-share intent, v1.12.0) |
 | expo-location | ~19.0.8 | 19.0.8 (Settings GPS location pin + reverse geocoding, v1.14.0 — was already installed for store listing) |
 
 ### UI & Styling
@@ -58,7 +56,6 @@ Last updated: 2026-07-14 · **v1.21.1**
 | @react-native-async-storage/async-storage | 2.2.0 | 2.2.0 (shopping-list persistence) |
 | react-native-screens | ~4.16.0 | 4.16.0 |
 | react-native-safe-area-context | ~5.6.0 | 5.6.2 |
-| react-native-view-shot | 4.0.3 | 4.0.3 (recipe share-card capture, v1.13.0 — bundled with Expo Go, no dev client needed) |
 | react-native-gifted-charts | ^1.4.77 | 1.4.77 (My Insights dashboard graphs, v1.14.0 — SVG-based, no new native linking) |
 | react-native-webview | 13.15.0 | 13.15.0 (Leaflet/OSM nearby map, v1.20.0 — bundled with Expo Go, no API keys) |
 

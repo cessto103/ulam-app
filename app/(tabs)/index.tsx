@@ -8,11 +8,11 @@ import HeaderIconRow from '@/src/components/HeaderIconRow';
 import { Ionicons } from '@expo/vector-icons';
 import { Skeleton, SkeletonBudgetCard, SkeletonMealCard, SkeletonStatsRow, SkeletonStreakCard } from '@/src/components/Skeleton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
-import { LinearGradient } from 'expo-linear-gradient';
+import ThemedSection from '@/src/components/ThemedSection';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, ImageBackground, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -292,11 +292,13 @@ function PickerRecipeCard({
           <View style={{
             width: 28, height: 28, borderRadius: 14,
             backgroundColor: selected ? '#6E7B4A' : '#F9EDD3',
+            borderWidth: selected ? 0 : 1.5,
+            borderColor: '#B0A18C',
             alignItems: 'center', justifyContent: 'center',
           }}>
-            <Text style={{ fontSize: 14, color: selected ? '#fff' : '#B0A18C' }}>
-              {selected ? '✓' : '○'}
-            </Text>
+            {selected ? (
+              <Text style={{ fontSize: 14, color: '#fff' }}>✓</Text>
+            ) : null}
           </View>
         </View>
 
@@ -626,18 +628,13 @@ export default function HomeScreen() {
         onPress={() => router.push('/(tabs)/meal-plan' as any)}
         className="mb-3 active:opacity-90"
       >
-        <ImageBackground
-          source={require('@/assets/profile-header-food.jpg')}
-          resizeMode="cover"
-          style={{ borderRadius: 18, overflow: 'hidden' }}
-          imageStyle={{ borderRadius: 18 }}
+        <ThemedSection
+          sectionKey="dashboard_meal_plan"
+          compiledImage={require('@/assets/profile-header-food.jpg')}
+          compiledOverlayColors={['rgba(44,52,30,0.88)', 'rgba(199,80,39,0.82)', 'rgba(231,101,59,0.78)']}
+          borderRadius={18}
         >
-          <LinearGradient
-            colors={['rgba(44,52,30,0.88)', 'rgba(199,80,39,0.82)', 'rgba(231,101,59,0.78)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}
-          >
+          <View style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ flex: 1 }}>
               <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}>
                 Budget Meal Plan
@@ -652,30 +649,31 @@ export default function HomeScreen() {
               </View>
             </View>
             <Text style={{ fontSize: 46, marginLeft: 8 }}>🍲</Text>
-          </LinearGradient>
-        </ImageBackground>
+          </View>
+        </ThemedSection>
       </Pressable>
 
       {/* ── Quick nav — photo tiles with color washes, white icons, bold labels ── */}
       <View className="flex-row gap-2.5 mb-4">
         {([
-          { icon: 'restaurant-outline' as const, label: lang === 'en' ? 'My Recipes' : 'Aking Recipes', route: '/(tabs)/meal-plan?tab=recipes&filter=mine', img: require('@/assets/tiles/tile-1.jpg'), wash: 'rgba(196,94,58,0.78)' },
-          { icon: 'bar-chart-outline' as const, label: lang === 'en' ? 'Spending History' : 'Gastos History', route: '/spending-history', img: require('@/assets/tiles/tile-2.jpg'), wash: 'rgba(227,163,42,0.72)' },
-          { icon: 'trophy-outline' as const, label: lang === 'en' ? 'My Awards & Achievements' : 'Mga Award ko', route: '/(tabs)/awards', img: require('@/assets/tiles/tile-3.jpg'), wash: 'rgba(56,102,65,0.78)' },
-          { icon: 'book-outline' as const, label: lang === 'en' ? 'My Recipe Book' : 'Aking Recipe Book', route: '/recipe-book', img: require('@/assets/tiles/tile-4.jpg'), wash: 'rgba(60,58,47,0.78)' },
+          { icon: 'restaurant-outline' as const, label: lang === 'en' ? 'My Recipes' : 'Aking Recipes', route: '/(tabs)/meal-plan?tab=recipes&filter=mine', img: require('@/assets/tiles/tile-1.jpg'), wash: 'rgba(196,94,58,0.78)', sectionKey: 'dashboard_my_recipes' },
+          { icon: 'bar-chart-outline' as const, label: lang === 'en' ? 'Spending History' : 'Gastos History', route: '/spending-history', img: require('@/assets/tiles/tile-2.jpg'), wash: 'rgba(227,163,42,0.72)', sectionKey: 'dashboard_spending_history' },
+          { icon: 'trophy-outline' as const, label: lang === 'en' ? 'My Awards & Achievements' : 'Mga Award ko', route: '/(tabs)/awards', img: require('@/assets/tiles/tile-3.jpg'), wash: 'rgba(56,102,65,0.78)', sectionKey: 'dashboard_awards' },
+          { icon: 'book-outline' as const, label: lang === 'en' ? 'My Recipe Book' : 'Aking Recipe Book', route: '/recipe-book', img: require('@/assets/tiles/tile-4.jpg'), wash: 'rgba(60,58,47,0.78)', sectionKey: 'dashboard_recipe_book' },
         ]).map((item) => (
           <Pressable
             key={item.label}
             onPress={() => router.push(item.route as any)}
             className="flex-1 active:opacity-80"
           >
-            <ImageBackground
-              source={item.img}
-              resizeMode="cover"
-              style={{ aspectRatio: 1, borderRadius: 16, overflow: 'hidden', marginBottom: 6 }}
-              imageStyle={{ borderRadius: 16 }}
+            <ThemedSection
+              sectionKey={item.sectionKey}
+              compiledImage={item.img}
+              compiledOverlayColors={[item.wash]}
+              borderRadius={16}
+              style={{ aspectRatio: 1, marginBottom: 6 }}
             >
-              <View style={{ flex: 1, backgroundColor: item.wash, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons
                   name={item.icon}
                   size={26}
@@ -683,7 +681,7 @@ export default function HomeScreen() {
                   style={{ textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
                 />
               </View>
-            </ImageBackground>
+            </ThemedSection>
             <Text
               style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522', textAlign: 'center' }}
               numberOfLines={2}
@@ -818,7 +816,7 @@ export default function HomeScreen() {
               <View className="flex-row justify-between items-end mb-3">
                 <View>
                   <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 26, color: '#386641', lineHeight: 30 }}>
-                    ₱{historyBudget.spent.toLocaleString()}
+                    ₱{Number(historyBudget.spent ?? 0).toLocaleString()}
                   </Text>
                   <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
                     {t('history_spent')}
@@ -826,7 +824,7 @@ export default function HomeScreen() {
                 </View>
                 <View className="items-end gap-1">
                   <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522' }}>
-                    Budget: ₱{historyBudget.budget.toLocaleString()}
+                    Budget: ₱{Number(historyBudget.budget ?? 0).toLocaleString()}
                   </Text>
                   {historyBudget.has_logged ? (
                     <View className="rounded-full bg-leaf-50 px-2.5 py-0.5">
@@ -845,16 +843,16 @@ export default function HomeScreen() {
                 <View
                   className="h-1.5 rounded-full"
                   style={{
-                    width: `${Math.min(100, Math.round((historyBudget.spent / (historyBudget.budget || 1)) * 100))}%`,
-                    backgroundColor: historyBudget.spent > historyBudget.budget ? '#E24B4A' : '#4E7A47',
+                    width: `${Math.min(100, Math.round((Number(historyBudget.spent ?? 0) / (Number(historyBudget.budget ?? 0) || 1)) * 100))}%`,
+                    backgroundColor: Number(historyBudget.spent ?? 0) > Number(historyBudget.budget ?? 0) ? '#E24B4A' : '#4E7A47',
                   }}
                 />
               </View>
 
               <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
-                {historyBudget.spent > historyBudget.budget
-                  ? `${t('overspent')} ₱${(historyBudget.spent - historyBudget.budget).toLocaleString()}`
-                  : `${t('saved')} ₱${(historyBudget.budget - historyBudget.spent).toLocaleString()}`}
+                {Number(historyBudget.spent ?? 0) > Number(historyBudget.budget ?? 0)
+                  ? `${t('overspent')} ₱${(Number(historyBudget.spent ?? 0) - Number(historyBudget.budget ?? 0)).toLocaleString()}`
+                  : `${t('saved')} ₱${(Number(historyBudget.budget ?? 0) - Number(historyBudget.spent ?? 0)).toLocaleString()}`}
               </Text>
 
               {historyBudget.notes ? (
@@ -966,7 +964,7 @@ export default function HomeScreen() {
                   <View>
                     <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 2 }}>{t('food_budget_today')}</Text>
                     <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 28, color: '#386641', lineHeight: 34 }}>
-                      ₱{budget.remaining.toLocaleString()}
+                      ₱{Number(budget.remaining ?? 0).toLocaleString()}
                     </Text>
                     <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{t('remaining')}</Text>
                     {endDate ? (
@@ -997,7 +995,7 @@ export default function HomeScreen() {
 
                 <View className="flex-row justify-between items-center">
                   <Text className="text-xs text-ink-soft">
-                    ₱{budget.spent.toLocaleString()} {lang === 'en' ? 'spent' : 'nagastos'}
+                    ₱{Number(budget.spent ?? 0).toLocaleString()} {lang === 'en' ? 'spent' : 'nagastos'}
                     {hasLoggedToday ? (lang === 'en' ? ' · logged ✓' : ' · na-log ✓') : ''}
                   </Text>
                   <Pressable

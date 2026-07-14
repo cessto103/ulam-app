@@ -323,6 +323,7 @@ export default function KomunidadScreen() {
         title={lang === 'en' ? 'Community' : 'Komunidad'}
         subtitle={lang === 'en' ? 'Tips, prices, and favorite recipes from your neighbors.' : 'Mga tip, presyo, at paboritong recipe ng kapitbahay.'}
         rightSlot={<HeaderIconRow />}
+        photo
       />
 
       {/* Feed mode tabs (Lahat | Sinusundan) */}
