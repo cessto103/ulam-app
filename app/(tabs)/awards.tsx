@@ -627,24 +627,6 @@ export default function AwardsScreen() {
             <FireXpBar progress={progress} />
           </View>
 
-          <View className="flex-row gap-2 w-full mb-1">
-            <Pressable
-              onPress={() => router.push('/edit-profile' as any)}
-              className="flex-1 flex-row rounded-xl py-2.5 items-center justify-center gap-1.5 active:opacity-80"
-              style={{ backgroundColor: '#FFFCF5' }}
-            >
-              <Ionicons name="pencil" size={13} color="#C45E3A" />
-              <Text className="text-[12px] font-bold" style={{ color: '#C45E3A' }}>{lang === 'en' ? 'Edit' : 'I-edit'}</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => router.push('/connections' as any)}
-              className="flex-1 flex-row rounded-xl py-2.5 items-center justify-center gap-1.5 active:opacity-80"
-              style={{ backgroundColor: '#FFFCF5' }}
-            >
-              <Ionicons name="people" size={14} color="#C45E3A" />
-              <Text className="text-[12px] font-bold" style={{ color: '#C45E3A' }}>{lang === 'en' ? 'Connections' : 'Koneksyon'}</Text>
-            </Pressable>
-          </View>
         </View>
         <HeaderWave fill="#FFF8E8" />
       </ImageBackground>

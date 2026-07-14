@@ -178,7 +178,7 @@ export default function ProfileScreen() {
             {uploading ? (
               <ActivityIndicator color="white" size="small" />
             ) : (
-              <Ionicons name="pencil-outline" size={14} color="white" />
+              <Ionicons name="camera-outline" size={14} color="white" />
             )}
           </View>
         </Pressable>
@@ -220,6 +220,20 @@ export default function ProfileScreen() {
           </View>
         ))}
       </View>
+
+      {/* Connections (relocated from the Awards header) */}
+      <Pressable
+        onPress={() => router.push('/connections' as any)}
+        className="flex-row items-center gap-3 rounded-2xl border border-cream-200 bg-white p-4 mb-4 active:opacity-70"
+      >
+        <View className="w-10 h-10 rounded-xl bg-brand-50 items-center justify-center">
+          <Text className="text-lg">👥</Text>
+        </View>
+        <Text className="flex-1 text-sm font-semibold text-ink">
+          {lang === 'en' ? 'Connections' : 'Mga Koneksyon'}
+        </Text>
+        <Text className="text-ink-soft text-base">›</Text>
+      </Pressable>
 
       {/* Awards & Achievements (relocated from the tab bar) */}
       <Pressable

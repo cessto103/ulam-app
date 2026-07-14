@@ -34,11 +34,47 @@ function SectionCard({ title, children }: { title: string; children: React.React
   );
 }
 
+const DIETARY_OPTIONS = [
+  { key: 'vegetarian', label: '🥗 Vegetarian' },
+  { key: 'vegan',      label: '🌿 Vegan' },
+  { key: 'halal',      label: '🟢 Halal' },
+  { key: 'diabetic',   label: '💊 Diabetic-friendly' },
+  { key: 'low_sodium', label: '🧂 Low Sodium' },
+  { key: 'gluten_free',label: '🌾 Gluten-free' },
+];
+
 export default function SettingsScreen() {
   const { user, signOut, refreshUser } = useAuth();
   const { lang, setLang } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  // ── Profile (relocated here from the old Edit Profile screen) ─────────
+  const [name, setName]                   = useState(user?.name ?? '');
+  const [username, setUsername]           = useState(user?.username ?? '');
+  const [bio, setBio]                     = useState(user?.bio ?? '');
+  const [householdSize, setHouseholdSize] = useState(user?.household_size ?? 1);
+  const [dietaryPrefs, setDietaryPrefs]   = useState<string[]>(user?.dietary_preferences ?? []);
+
+  const toggleDietary = (key: string) => {
+    setDietaryPrefs((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  };
+
+  const { mutate: saveProfile, isPending: savingProfile } = useMutation({
+    mutationFn: async () =>
+      client.patch('/user/profile', {
+        name: name.trim(),
+        username: username.trim() || undefined,
+        bio: bio.trim() || null,
+        household_size: householdSize,
+        dietary_preferences: dietaryPrefs,
+      }),
+    onSuccess: async () => {
+      await refreshUser();
+      Alert.alert(lang === 'en' ? 'Saved' : 'Na-save', lang === 'en' ? 'Profile updated.' : 'Na-update ang profile.');
+    },
+    onError: (e: any) => Alert.alert(lang === 'en' ? "Couldn't save" : 'Hindi na-save', errorMessage(e, 'Something went wrong.')),
+  });
 
   // ── Location ──────────────────────────────────────────────────────────
   const [municipality, setMunicipality] = useState(user?.municipality ?? '');
@@ -243,6 +279,93 @@ export default function SettingsScreen() {
         </View>
 
         <ScrollView contentContainerClassName="px-4 pt-4 pb-12" keyboardShouldPersistTaps="handled">
+          {/* Profile */}
+          <SectionCard title={lang === 'en' ? 'Profile' : 'Profile'}>
+            <Text className="text-xs font-medium text-ink-soft mb-1.5">{lang === 'en' ? 'Name' : 'Pangalan'}</Text>
+            <TextInput
+              className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink mb-3 border border-cream-200"
+              placeholder={lang === 'en' ? 'Full name' : 'Buong pangalan'}
+              placeholderTextColor="#B0A18C"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+            />
+
+            <Text className="text-xs font-medium text-ink-soft mb-1.5">Username</Text>
+            <View className="flex-row items-center bg-cream-50 rounded-xl border border-cream-200 mb-3 overflow-hidden">
+              <Text className="text-sm text-ink-faint pl-4">@</Text>
+              <TextInput
+                className="flex-1 px-2 py-3.5 text-sm text-ink"
+                placeholder="username"
+                placeholderTextColor="#B0A18C"
+                value={username}
+                onChangeText={(v) => setUsername(v.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+
+            <Text className="text-xs font-medium text-ink-soft mb-1.5">Bio</Text>
+            <TextInput
+              className="bg-cream-50 rounded-xl px-4 py-3 text-sm text-ink mb-1 border border-cream-200 min-h-[72px]"
+              placeholder={lang === 'en' ? 'Write something about yourself...' : 'Isulat ang tungkol sa iyo...'}
+              placeholderTextColor="#B0A18C"
+              value={bio}
+              onChangeText={setBio}
+              multiline
+              maxLength={300}
+            />
+            <Text className="text-xs text-ink-soft text-right mb-3">{bio.length}/300</Text>
+
+            <Text className="text-xs font-medium text-ink-soft mb-2">{lang === 'en' ? 'Household Size' : 'Laki ng Pamilya'}</Text>
+            <View className="flex-row items-center gap-4 mb-4">
+              <Pressable
+                onPress={() => setHouseholdSize((s) => Math.max(1, s - 1))}
+                className="w-10 h-10 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
+              >
+                <Text className="text-lg text-ink">−</Text>
+              </Pressable>
+              <Text className="text-lg font-semibold text-ink min-w-[32px] text-center">{householdSize}</Text>
+              <Pressable
+                onPress={() => setHouseholdSize((s) => Math.min(20, s + 1))}
+                className="w-10 h-10 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
+              >
+                <Text className="text-lg text-ink">+</Text>
+              </Pressable>
+              <Text className="text-xs text-ink-soft">
+                {lang === 'en' ? (householdSize === 1 ? 'person' : 'people') : 'tao'}
+              </Text>
+            </View>
+
+            <Text className="text-xs font-medium text-ink-soft mb-2">Dietary Preferences</Text>
+            <View className="flex-row flex-wrap gap-2 mb-4">
+              {DIETARY_OPTIONS.map((opt) => {
+                const active = dietaryPrefs.includes(opt.key);
+                return (
+                  <Pressable
+                    key={opt.key}
+                    onPress={() => toggleDietary(opt.key)}
+                    className={`rounded-full px-3 py-1.5 ${active ? 'bg-olive-400' : 'bg-cream-200'}`}
+                  >
+                    <Text className={`text-xs font-medium ${active ? 'text-white' : 'text-ink-soft'}`}>{opt.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Pressable
+              onPress={() => saveProfile()}
+              disabled={savingProfile || !name.trim()}
+              className="w-full rounded-xl bg-brand-600 py-3.5 items-center active:opacity-80 disabled:opacity-60"
+            >
+              {savingProfile ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <Text className="text-sm font-semibold text-white">{lang === 'en' ? 'Save Profile' : 'I-save ang Profile'}</Text>
+              )}
+            </Pressable>
+          </SectionCard>
+
           {/* Language */}
           <SectionCard title={lang === 'en' ? 'Language' : 'Wika'}>
             <View className="flex-row bg-cream-100 rounded-xl p-1">

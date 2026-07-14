@@ -274,7 +274,7 @@ export default function UserProfileScreen() {
               {/* Follow / Message button */}
               {user.is_me ? (
                 <Pressable
-                  onPress={() => router.push('/edit-profile' as any)}
+                  onPress={() => router.push('/settings' as any)}
                   className="w-full rounded-xl border border-cream-300 py-2.5 items-center active:opacity-70"
                 >
                   <Text className="text-xs font-medium text-ink-soft">✏️ Edit Profile</Text>

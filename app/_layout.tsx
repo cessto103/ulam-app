@@ -141,17 +141,6 @@ function RouteGuard() {
         }}
       />
       <Stack.Screen
-        name="edit-profile"
-        options={{
-          presentation: 'modal',
-          headerTitle: lang === 'en' ? 'Edit Profile' : 'I-edit ang Profile',
-          headerTitleStyle: HEADER_TITLE_STYLE,
-          headerStyle: { backgroundColor: '#E7653B' },
-          headerShadowVisible: false,
-          headerTintColor: '#fff',
-        }}
-      />
-      <Stack.Screen
         name="notifications"
         options={{
           headerTitle: lang === 'en' ? 'Notifications' : 'Mga Notipikasyon',

@@ -5,6 +5,15 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.21.1] — 2026-07-14
+
+Profile editing consolidated into Settings; navigation cleanup.
+
+### Changed
+- **Edit Profile moved into Settings** — name, username, bio, household size, and dietary preferences now live in a Profile section at the top of Settings, together with Location, Language, and Secondary Email. The separate Edit Profile screen (and the Edit button on the Awards header) is gone — one place to change everything about your account.
+- **Connections is now a Profile row** — moved out of the Awards header into the Profile page, styled like the other rows (My Stores, Seller Subscription, My Insights), placed above Awards & Achievements.
+- Profile avatar badge icon changed from a pencil to a **camera outline** — it changes your photo, so it should look like it.
+
 ## [1.21.0] — 2026-07-14
 
 Home visual refresh, permanent budget explainer, and admin-replaceable logo.
