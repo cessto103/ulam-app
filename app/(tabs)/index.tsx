@@ -1,8 +1,7 @@
 import client from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
-import { ULamScriptLogo } from '@/src/components/ULamLogo';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import BrandLogo from '@/src/components/BrandLogo';
 import BudgetExplainerSheet from '@/src/components/BudgetExplainerSheet';
 import DailyTaskRow from '@/src/components/DailyTaskRow';
 import HeaderIconRow from '@/src/components/HeaderIconRow';
@@ -13,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, ImageBackground, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -408,29 +407,12 @@ export default function HomeScreen() {
     staleTime: 60_000,
   });
 
-  // ── Budget explainer (first-time only, AsyncStorage-flagged) ────────────────
+  // ── Budget explainer — always available via the (!) badge on the budget card ──
   const [explainerOpen, setExplainerOpen] = useState(false);
 
-  const openBudgetSetup = async () => {
-    try {
-      const seen = await AsyncStorage.getItem('budget_explainer_seen');
-      if (!seen) {
-        setExplainerOpen(true);
-        return;
-      }
-    } catch {}
-    router.push('/budget-setup' as any);
-  };
-
-  const proceedFromExplainer = async () => {
-    try { await AsyncStorage.setItem('budget_explainer_seen', '1'); } catch {}
+  const proceedFromExplainer = () => {
     setExplainerOpen(false);
     router.push('/budget-setup' as any);
-  };
-
-  const dismissExplainer = async () => {
-    try { await AsyncStorage.setItem('budget_explainer_seen', '1'); } catch {}
-    setExplainerOpen(false);
   };
 
   // ── Recipe picker state ───────────────────────────────────────────────────────
@@ -552,7 +534,7 @@ export default function HomeScreen() {
       {/* Cream header — logo, icons, greeting, search (app-redesign mockup) */}
       <View className="px-4 pb-3" style={{ paddingTop: insets.top + 10 }}>
         <View className="flex-row justify-between items-center mb-3">
-          <ULamScriptLogo size={20} />
+          <BrandLogo size={20} />
           <HeaderIconRow tone="cream" />
         </View>
 
@@ -639,52 +621,71 @@ export default function HomeScreen() {
 
       <View className="px-4 pt-1">
 
-      {/* ── Budget Meal Plan hero (app-redesign mockup) ── */}
+      {/* ── Budget Meal Plan hero — food photo under a dark-olive→terracotta wash ── */}
       <Pressable
         onPress={() => router.push('/(tabs)/meal-plan' as any)}
         className="mb-3 active:opacity-90"
       >
-        <LinearGradient
-          colors={['#E7653B', '#EC8156']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ borderRadius: 18, padding: 16, flexDirection: 'row', alignItems: 'center' }}
+        <ImageBackground
+          source={require('@/assets/profile-header-food.jpg')}
+          resizeMode="cover"
+          style={{ borderRadius: 18, overflow: 'hidden' }}
+          imageStyle={{ borderRadius: 18 }}
         >
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#fff' }}>
-              Budget Meal Plan
-            </Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.88)', marginBottom: 10 }}>
-              {lang === 'en' ? 'Good meals for less' : 'Masarap na pagkain, mas mura'}
-            </Text>
-            <View className="self-start rounded-full px-3.5 py-2" style={{ backgroundColor: '#40482B' }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>
-                {lang === 'en' ? 'View Meal Plans' : 'Tingnan ang Meal Plans'}
+          <LinearGradient
+            colors={['rgba(44,52,30,0.88)', 'rgba(199,80,39,0.82)', 'rgba(231,101,59,0.78)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}>
+                Budget Meal Plan
               </Text>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12.5, color: 'rgba(255,255,255,0.95)', marginBottom: 10, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }}>
+                {lang === 'en' ? 'Good meals for less' : 'Masarap na pagkain, mas mura'}
+              </Text>
+              <View className="self-start rounded-full px-3.5 py-2" style={{ backgroundColor: '#40482B' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>
+                  {lang === 'en' ? 'View Meal Plans' : 'Tingnan ang Meal Plans'}
+                </Text>
+              </View>
             </View>
-          </View>
-          <Text style={{ fontSize: 46, marginLeft: 8 }}>🍲</Text>
-        </LinearGradient>
+            <Text style={{ fontSize: 46, marginLeft: 8 }}>🍲</Text>
+          </LinearGradient>
+        </ImageBackground>
       </Pressable>
 
-      {/* ── Quick nav ── */}
-      <View className="flex-row mb-4">
+      {/* ── Quick nav — photo tiles with color washes, white icons, bold labels ── */}
+      <View className="flex-row gap-2.5 mb-4">
         {([
-          { icon: 'restaurant-outline' as const, label: lang === 'en' ? 'My Recipes' : 'Aking Recipes', route: '/(tabs)/meal-plan?tab=recipes&filter=mine' },
-          { icon: 'bar-chart-outline' as const, label: lang === 'en' ? 'Spending History' : 'Gastos History', route: '/spending-history' },
-          { icon: 'trophy-outline' as const, label: lang === 'en' ? 'My Awards & Achievements' : 'Mga Award ko', route: '/(tabs)/awards' },
-          { icon: 'book-outline' as const, label: lang === 'en' ? 'My Recipe Book' : 'Aking Recipe Book', route: '/recipe-book' },
+          { icon: 'restaurant-outline' as const, label: lang === 'en' ? 'My Recipes' : 'Aking Recipes', route: '/(tabs)/meal-plan?tab=recipes&filter=mine', img: require('@/assets/tiles/tile-1.jpg'), wash: 'rgba(196,94,58,0.78)' },
+          { icon: 'bar-chart-outline' as const, label: lang === 'en' ? 'Spending History' : 'Gastos History', route: '/spending-history', img: require('@/assets/tiles/tile-2.jpg'), wash: 'rgba(227,163,42,0.72)' },
+          { icon: 'trophy-outline' as const, label: lang === 'en' ? 'My Awards & Achievements' : 'Mga Award ko', route: '/(tabs)/awards', img: require('@/assets/tiles/tile-3.jpg'), wash: 'rgba(56,102,65,0.78)' },
+          { icon: 'book-outline' as const, label: lang === 'en' ? 'My Recipe Book' : 'Aking Recipe Book', route: '/recipe-book', img: require('@/assets/tiles/tile-4.jpg'), wash: 'rgba(60,58,47,0.78)' },
         ]).map((item) => (
           <Pressable
             key={item.label}
             onPress={() => router.push(item.route as any)}
-            className="flex-1 items-center active:opacity-70"
+            className="flex-1 active:opacity-80"
           >
-            <View className="w-12 h-12 rounded-full bg-cream-50 border border-cream-300 items-center justify-center mb-1.5">
-              <Ionicons name={item.icon} size={19} color="#E7653B" />
-            </View>
+            <ImageBackground
+              source={item.img}
+              resizeMode="cover"
+              style={{ aspectRatio: 1, borderRadius: 16, overflow: 'hidden', marginBottom: 6 }}
+              imageStyle={{ borderRadius: 16 }}
+            >
+              <View style={{ flex: 1, backgroundColor: item.wash, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons
+                  name={item.icon}
+                  size={26}
+                  color="#fff"
+                  style={{ textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
+                />
+              </View>
+            </ImageBackground>
             <Text
-              style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12.5, color: '#6F655A', textAlign: 'center' }}
+              style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522', textAlign: 'center' }}
               numberOfLines={2}
             >
               {item.label}
@@ -1013,10 +1014,21 @@ export default function HomeScreen() {
                 </View>
               </>
             ) : (
-              <Pressable onPress={openBudgetSetup} className="items-center py-2">
-                <Text className="text-xs text-ink-soft mb-1">{t('no_budget')}</Text>
-                <Text className="text-xs font-semibold text-brand-600">{t('setup_budget_cta')}</Text>
-              </Pressable>
+              <View>
+                {/* (!) — opens the "what is a budget?" explainer anytime */}
+                <Pressable
+                  onPress={() => setExplainerOpen(true)}
+                  hitSlop={10}
+                  style={{ position: 'absolute', top: -4, right: -4, zIndex: 2 }}
+                  className="active:opacity-60"
+                >
+                  <Ionicons name="information-circle" size={24} color="#E3A32A" />
+                </Pressable>
+                <Pressable onPress={() => router.push('/budget-setup' as any)} className="items-center py-2">
+                  <Text className="text-xs text-ink-soft mb-1">{t('no_budget')}</Text>
+                  <Text className="text-xs font-semibold text-brand-600">{t('setup_budget_cta')}</Text>
+                </Pressable>
+              </View>
             )}
           </Pressable>
 
@@ -1278,10 +1290,10 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
-      {/* First-time budget explainer */}
+      {/* Budget explainer — opened by the (!) badge on the empty budget card */}
       <BudgetExplainerSheet
         visible={explainerOpen}
-        onClose={dismissExplainer}
+        onClose={() => setExplainerOpen(false)}
         onProceed={proceedFromExplainer}
       />
       </View>

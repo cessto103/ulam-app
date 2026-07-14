@@ -6,7 +6,7 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { API_URL } from '@/src/api/client';
 import FireXpBar from '@/src/components/FireXpBar';
 import { Ionicons } from '@expo/vector-icons';
-import { ULamScriptLogo } from '@/src/components/ULamLogo';
+import BrandLogo from '@/src/components/BrandLogo';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
@@ -148,7 +148,7 @@ export default function ProfileScreen() {
 
         {/* Logo + gear row, same layout as the other tab headers */}
         <View className="w-full flex-row items-center justify-between mb-3">
-          <ULamScriptLogo size={21} light />
+          <BrandLogo size={21} light />
           <Pressable
             onPress={() => router.push('/settings' as any)}
             hitSlop={10}

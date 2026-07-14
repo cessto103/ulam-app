@@ -1,6 +1,7 @@
 import { login } from '@/src/api/auth';
 import LanguageSwitcher from '@/src/components/LanguageSwitcher';
-import { FoodDoodles, ULamScriptLogo } from '@/src/components/ULamLogo';
+import BrandLogo from '@/src/components/BrandLogo';
+import { FoodDoodles } from '@/src/components/ULamLogo';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useAuth } from '@/src/context/AuthContext';
 import Constants from 'expo-constants';
@@ -71,7 +72,7 @@ export default function LoginScreen() {
 
         {/* Logo */}
         <View className="items-center mt-4 mb-8">
-          <ULamScriptLogo size={52} />
+          <BrandLogo size={52} />
         </View>
 
         <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 27, color: '#292522', marginBottom: 2 }}>{t('welcome_back')}</Text>

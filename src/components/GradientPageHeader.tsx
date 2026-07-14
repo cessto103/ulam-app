@@ -1,4 +1,5 @@
-import { HeaderWave, ULamScriptLogo } from '@/src/components/ULamLogo';
+import BrandLogo from '@/src/components/BrandLogo'
+import { HeaderWave } from '@/src/components/ULamLogo';
 import { LinearGradient } from 'expo-linear-gradient';
 import { type ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -41,7 +42,7 @@ export default function GradientPageHeader({
         style={{ paddingTop: insets.top + 10 }}
       >
         <View className="flex-row items-center justify-between">
-          <ULamScriptLogo size={21} light />
+          <BrandLogo size={21} light />
           {rightSlot}
         </View>
 

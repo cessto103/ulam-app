@@ -1,6 +1,6 @@
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import LegalAcceptanceGate from '@/src/components/LegalAcceptanceGate';
-import { ULamScriptLogo } from '@/src/components/ULamLogo';
+import BrandLogo from '@/src/components/BrandLogo';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
@@ -59,7 +59,7 @@ export default function TabLayout() {
           headerShadowVisible: false,
           headerTitle: () => (
             <View style={{ paddingLeft: 4 }}>
-              <ULamScriptLogo size={17} light />
+              <BrandLogo size={17} light />
             </View>
           ),
           tabBarStyle: {

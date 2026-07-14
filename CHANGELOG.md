@@ -5,6 +5,17 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.21.0] — 2026-07-14
+
+Home visual refresh, permanent budget explainer, and admin-replaceable logo.
+
+### Added
+- **Replaceable logo** — the logo everywhere in the app (welcome, login, Home header, Profile, page headers, tab headers) can now be swapped from the admin dashboard (Content → Branding) with no app update: two slots, one for light backgrounds and one white version for terracotta headers. Empty slots fall back to the built-in uLam script logo.
+- **Budget explainer is now permanent** — a gold (!) info badge on the empty-budget card opens the "what is a food budget?" sheet anytime (replaces the show-once behavior).
+
+### Changed
+- **Home visual refresh per the new mockup** — the Budget Meal Plan hero now sits on a food photo under a dark-olive→terracotta gradient, and the four quick actions (My Recipes, Spending History, Awards, Recipe Book) became photo tiles with distinct color washes (terracotta/gold/leaf/charcoal), bright white icons with shadows, and bolder dark labels.
+
 ## [1.20.1] — 2026-07-14
 
 Home screen fixes from on-device testing.

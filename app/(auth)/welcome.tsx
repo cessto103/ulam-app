@@ -1,5 +1,6 @@
 import LanguageSwitcher from '@/src/components/LanguageSwitcher';
-import { FoodDoodles, ULamScriptLogo } from '@/src/components/ULamLogo';
+import BrandLogo from '@/src/components/BrandLogo';
+import { FoodDoodles } from '@/src/components/ULamLogo';
 import { useLanguage } from '@/src/context/LanguageContext';
 import Constants from 'expo-constants';
 import { Link } from 'expo-router';
@@ -22,7 +23,7 @@ export default function WelcomeScreen() {
 
         {/* Hero: script wordmark + tagline */}
         <View className="items-center px-6">
-          <ULamScriptLogo size={82} />
+          <BrandLogo size={82} />
           <Text
             style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 15, color: '#292522', marginTop: 30 }}
           >

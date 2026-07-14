@@ -1,5 +1,6 @@
 import client from '@/src/api/client';
-import { FoodDoodles, ULamScriptLogo } from '@/src/components/ULamLogo';
+import BrandLogo from '@/src/components/BrandLogo';
+import { FoodDoodles } from '@/src/components/ULamLogo';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -81,7 +82,7 @@ export default function ForgotPasswordScreen() {
         </Pressable>
 
         <View className="items-center mt-2 mb-8">
-          <ULamScriptLogo size={44} />
+          <BrandLogo size={44} />
         </View>
 
         {step === 'email' && (
