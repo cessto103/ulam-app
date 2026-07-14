@@ -254,13 +254,36 @@ export default function ProfileScreen() {
         <Text className="text-ink-soft text-base">›</Text>
       </Pressable>
 
+      {/* uLam Premium */}
+      <Pressable
+        onPress={() => router.push('/upgrade' as any)}
+        className="flex-row items-center gap-3 rounded-2xl border border-cream-200 bg-white p-4 mb-4 active:opacity-70"
+      >
+        <View className="w-10 h-10 rounded-xl bg-gold-50 items-center justify-center">
+          <Text className="text-lg">✨</Text>
+        </View>
+        <View className="flex-1">
+          <Text className="text-sm font-semibold text-ink">
+            {lang === 'en' ? 'uLam Premium' : 'uLam Premium'}
+          </Text>
+          <Text className={`text-xs mt-0.5 ${user?.plan === 'premium' ? 'text-leaf-600 font-medium' : 'text-ink-soft'}`}>
+            {user?.plan === 'premium'
+              ? (user?.premium_source === 'trial'
+                  ? (lang === 'en' ? '🎁 Free trial active' : '🎁 Aktibo ang libreng trial')
+                  : (lang === 'en' ? '✓ Premium' : '✓ Premium'))
+              : (lang === 'en' ? 'Free — tap to upgrade' : 'Free — i-tap para mag-upgrade')}
+          </Text>
+        </View>
+        <Text className="text-ink-soft text-base">›</Text>
+      </Pressable>
+
       {/* Seller Subscription */}
       <Pressable
         onPress={() => router.push('/subscription' as any)}
         className="flex-row items-center gap-3 rounded-2xl border border-cream-200 bg-white p-4 mb-4 active:opacity-70"
       >
         <View className="w-10 h-10 rounded-xl bg-brand-50 items-center justify-center">
-          <Text className="text-lg">⭐</Text>
+          <Text className="text-lg">🏪</Text>
         </View>
         <View className="flex-1">
           <Text className="text-sm font-semibold text-ink">

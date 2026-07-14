@@ -5,6 +5,11 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.23.2] — 2026-07-15
+
+### Added
+- **uLam Premium link on Profile page** — a new row (above Seller Subscription) links straight to the Upgrade screen, showing current status (Free / Premium / free trial). Previously the only path there was a buried row on the Awards page.
+
 ## [1.23.1] — 2026-07-15
 
 ### Changed
