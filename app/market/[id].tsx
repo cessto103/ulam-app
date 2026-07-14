@@ -156,14 +156,14 @@ export default function MarketDetailScreen() {
             onPress={() => router.back()}
             className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
           >
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#3C3A2F" />
           </Pressable>
           <View className="flex-1">
             {isLoading ? (
               <View className="h-5 w-40 bg-cream-200 rounded" />
             ) : (
               <>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#3C3A2F' }} numberOfLines={1}>
                   {data?.market.name ?? '—'}
                 </Text>
                 <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
@@ -172,45 +172,6 @@ export default function MarketDetailScreen() {
               </>
             )}
           </View>
-          {/* Refresh prices button */}
-          {!isLoading && (
-            <Pressable
-              onPress={() => refresh()}
-              disabled={refreshing}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 4,
-                backgroundColor: refreshing ? '#F9EDD3' : '#EFF4EC',
-                borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
-              }}
-            >
-              {refreshing
-                ? <ActivityIndicator size="small" color="#386641" style={{ width: 12, height: 12 }} />
-                : <Text style={{ fontSize: 12 }}>🤖</Text>}
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
-                {refreshing
-                  ? (lang === 'en' ? 'Searching...' : 'Hinahanap...')
-                  : (lang === 'en' ? 'Refresh prices' : 'I-refresh')}
-              </Text>
-            </Pressable>
-          )}
-          {/* Report button */}
-          {!isLoading && data && (
-            <Pressable
-              onPress={() => setReportOpen(true)}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 4,
-                backgroundColor: '#FCEBEB',
-                borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
-                marginLeft: 6,
-              }}
-              className="active:opacity-70"
-            >
-              <Text style={{ fontSize: 12 }}>🚩</Text>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#E24B4A' }}>
-                {lang === 'en' ? 'Report' : 'I-report'}
-              </Text>
-            </Pressable>
-          )}
         </View>
       </View>
 
@@ -247,9 +208,41 @@ export default function MarketDetailScreen() {
                   🌐 {lang === 'en' ? 'Location data from OpenStreetMap' : 'Lokasyon mula sa OpenStreetMap'}
                 </Text>
               )}
-              {data.market.latitude != null && data.market.longitude != null && (
-                <DirectionsButton latitude={data.market.latitude} longitude={data.market.longitude} />
-              )}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                {data.market.latitude != null && data.market.longitude != null && (
+                  <View style={{ flex: 1 }}>
+                    <DirectionsButton latitude={data.market.latitude} longitude={data.market.longitude} compact />
+                  </View>
+                )}
+                <Pressable
+                  onPress={() => refresh()}
+                  disabled={refreshing}
+                  accessibilityLabel={lang === 'en' ? 'Refresh prices' : 'I-refresh ang presyo'}
+                  style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: refreshing ? '#F9EDD3' : '#EFF4EC',
+                  }}
+                >
+                  {refreshing
+                    ? <ActivityIndicator size="small" color="#6E7B4A" />
+                    : <Ionicons name="refresh" size={20} color="#6E7B4A" />}
+                </Pressable>
+                {data && (
+                  <Pressable
+                    onPress={() => setReportOpen(true)}
+                    accessibilityLabel={lang === 'en' ? 'Report this market' : 'I-report ang palengkeng ito'}
+                    className="active:opacity-70"
+                    style={{
+                      width: 44, height: 44, borderRadius: 12,
+                      alignItems: 'center', justifyContent: 'center',
+                      backgroundColor: '#FCEBEB',
+                    }}
+                  >
+                    <Ionicons name="flag-outline" size={19} color="#E24B4A" />
+                  </Pressable>
+                )}
+              </View>
             </View>
           )}
 
@@ -276,13 +269,13 @@ export default function MarketDetailScreen() {
                         paddingHorizontal: 12,
                         paddingVertical: 5,
                         borderRadius: 20,
-                        backgroundColor: active ? '#386641' : '#F9EDD3',
+                        backgroundColor: active ? '#6E7B4A' : '#F9EDD3',
                       }}
                     >
                       <Text style={{
                         fontFamily: 'NunitoSans_600SemiBold',
                         fontSize: 12,
-                        color: active ? '#fff' : '#292522',
+                        color: active ? '#fff' : '#3C3A2F',
                       }}>
                         {CAT_EMOJI[cat] ?? '📦'} {catLabel(cat)}
                       </Text>
@@ -297,7 +290,7 @@ export default function MarketDetailScreen() {
           <ScrollView
             style={{ flex: 1 }}
             contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
-            refreshControl={<RefreshControl refreshing={pullRefreshing} onRefresh={onPullRefresh} tintColor="#386641" />}
+            refreshControl={<RefreshControl refreshing={pullRefreshing} onRefresh={onPullRefresh} tintColor="#6E7B4A" />}
           >
             {categories.length === 0 ? (
               <View className="bg-white rounded-2xl border border-cream-200 p-8 items-center">
@@ -332,7 +325,7 @@ export default function MarketDetailScreen() {
                         }}
                       >
                         <View style={{ flex: 1 }}>
-                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522' }}>
+                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#3C3A2F' }}>
                             {item.item_name}
                           </Text>
                           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 1 }}>
@@ -340,7 +333,7 @@ export default function MarketDetailScreen() {
                           </Text>
                         </View>
                         <View style={{ alignItems: 'flex-end' }}>
-                          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: isCheap ? '#386641' : '#292522' }}>
+                          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: isCheap ? '#6E7B4A' : '#3C3A2F' }}>
                             ₱{Number(item.price).toFixed(2)}
                           </Text>
                           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
@@ -348,7 +341,7 @@ export default function MarketDetailScreen() {
                           </Text>
                           {isCheap && arr.length > 1 && (
                             <View style={{ backgroundColor: '#EFF4EC', borderRadius: 10, paddingHorizontal: 7, paddingVertical: 1, marginTop: 2 }}>
-                              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
+                              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6E7B4A' }}>
                                 {t('cheapest')}
                               </Text>
                             </View>
@@ -368,14 +361,14 @@ export default function MarketDetailScreen() {
             >
               <Text style={{ fontSize: 20 }}>📢</Text>
               <View className="flex-1">
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6E7B4A' }}>
                   {t('report_price')}
                 </Text>
                 <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
                   {lang === 'en' ? 'Help the community · +15 XP' : 'Tumulong sa komunidad · +15 XP'}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color="#386641" />
+              <Ionicons name="chevron-forward" size={16} color="#6E7B4A" />
             </Pressable>
           </ScrollView>
         </View>

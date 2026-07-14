@@ -17,7 +17,7 @@ export default function DirectionsButton({ latitude, longitude, compact = false 
     <Pressable
       onPress={openDirections}
       className="flex-row items-center justify-center gap-2 rounded-xl py-3 active:opacity-80"
-      style={{ backgroundColor: '#386641' }}
+      style={{ backgroundColor: '#6E7B4A' }}
     >
       <Ionicons name="navigate" size={16} color="#fff" />
       <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>

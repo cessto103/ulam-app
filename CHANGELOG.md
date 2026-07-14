@@ -5,6 +5,20 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.23.0] — 2026-07-15
+
+Color palette fixes, Market page layout cleanup, and an admin-editable Premium features list.
+
+### Added
+- **uLam Premium's "Included in Premium" list is now admin-editable** (Content → Monetization) — edit titles, descriptions, emoji, and free/premium status without an app release. Falls back to the current built-in list until the admin saves something.
+
+### Changed
+- **Market page header decluttered** — "Refresh prices" and "Report" moved out of the title row (where they were squeezing the market name) down to the Get Directions row, as compact icon buttons.
+- **Filipino Color Palette applied** to the Upgrade (Premium) screen, the Market page, and the Store page — replaced the old leaf-green (`#386641`) and off-palette Tailwind amber accents with the app's actual brand tokens (terracotta `#C45E3A`, olive `#6E7B4A`, charcoal `#3C3A2F`, tan `#E5A26F`).
+
+### Fixed
+- **My Stores empty state** — the checkmark was rendering as literal text (`✅`) instead of a checkmark, from an encoding slip in the previous release. Now a proper `Ionicons` checkmark icon (no more emoji-encoding risk in that spot).
+
 ## [1.22.1] — 2026-07-15
 
 Closes a gap from v1.22.0: Profile and Awards & Achievements headers were forgotten from the theming rollout.

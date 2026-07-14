@@ -2,11 +2,16 @@
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import * as WebBrowser from 'expo-web-browser';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
-const FEATURES: { emoji: string; titleEn: string; titleTl: string; descEn: string; descTl: string; free: boolean }[] = [
+type Feature = { emoji: string; titleEn: string; titleTl: string; descEn: string; descTl: string; free: boolean };
+type RemoteFeature = { emoji: string; title_en: string; title_tl: string; desc_en: string; desc_tl: string; free: boolean };
+
+// Compiled-in fallback — shown until the admin sets a custom list (Content → Monetization).
+const DEFAULT_FEATURES: Feature[] = [
   { emoji: '🍳', titleEn: 'AI Meal Planning',   titleTl: 'AI Meal Planning', descEn: 'Get a meal plan every day',                     descTl: 'Humingi ng meal plan araw-araw',            free: false },
   { emoji: '📊', titleEn: 'Budget Tracking',    titleTl: 'Budget Tracking',  descEn: 'Log expenses, track your savings',              descTl: 'Mag-log ng gastos, tingnan ang savings',    free: true  },
   { emoji: '📢', titleEn: 'Price Reporting',    titleTl: 'Price Reporting',  descEn: 'Report and check prices',                       descTl: 'Mag-report at makita ang presyo',           free: true  },
@@ -22,6 +27,19 @@ export default function UpgradeScreen() {
   const { user, refreshUser } = useAuth();
   const { lang } = useLanguage();
   const [loading, setLoading] = useState<'monthly' | 'yearly' | null>(null);
+
+  const { data: remoteFeatures } = useQuery({
+    queryKey: ['premium-features'],
+    queryFn: async () => (await client.get<{ features: RemoteFeature[] }>('/premium-features')).data.features,
+    staleTime: 30 * 60_000,
+    retry: 1,
+  });
+
+  const FEATURES: Feature[] = remoteFeatures?.length
+    ? remoteFeatures.map((f) => ({
+        emoji: f.emoji, titleEn: f.title_en, titleTl: f.title_tl, descEn: f.desc_en, descTl: f.desc_tl, free: f.free,
+      }))
+    : DEFAULT_FEATURES;
 
   const handleCheckout = async (plan: 'monthly' | 'yearly') => {
     setLoading(plan);
@@ -73,7 +91,7 @@ export default function UpgradeScreen() {
       {/* Hero */}
       <View
         className="px-6 pt-14 pb-8 items-center"
-        style={{ backgroundColor: '#386641' }}
+        style={{ backgroundColor: '#C45E3A' }}
       >
         <Pressable
           onPress={() => router.back()}
@@ -104,17 +122,17 @@ export default function UpgradeScreen() {
           </View>
           {/* Yearly — highlighted */}
           <View
-            className="flex-1 rounded-2xl p-4 border-2 border-amber-400"
-            style={{ backgroundColor: 'rgba(251,191,36,0.15)' }}
+            className="flex-1 rounded-2xl p-4"
+            style={{ backgroundColor: 'rgba(229,162,111,0.18)', borderWidth: 2, borderColor: '#E5A26F' }}
           >
             <View className="flex-row items-center justify-between mb-1">
-              <Text className="text-xs text-amber-300">{lang === 'en' ? 'Yearly' : 'Taon-taon'}</Text>
-              <View className="rounded-full bg-amber-400 px-1.5 py-0.5">
-                <Text className="text-[12px] font-bold text-amber-900">{lang === 'en' ? 'SAVE' : 'MATIPID'}</Text>
+              <Text style={{ fontSize: 12, color: '#E5A26F' }}>{lang === 'en' ? 'Yearly' : 'Taon-taon'}</Text>
+              <View className="rounded-full px-1.5 py-0.5" style={{ backgroundColor: '#E5A26F' }}>
+                <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#3C3A2F' }}>{lang === 'en' ? 'SAVE' : 'MATIPID'}</Text>
               </View>
             </View>
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: 'white' }}>₱499</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#FCD34D' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#E5A26F' }}>
               {lang === 'en' ? '₱41.58/month' : '₱41.58/buwan'}
             </Text>
           </View>
@@ -157,7 +175,7 @@ export default function UpgradeScreen() {
           onPress={() => handleCheckout('yearly')}
           disabled={!!loading}
           className="w-full rounded-xl bg-brand-600 py-3.5 items-center mb-3 active:opacity-80 disabled:opacity-60"
-          style={{ shadowColor: '#386641', shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }}
+          style={{ shadowColor: '#C45E3A', shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 }}
         >
           {loading === 'yearly'
             ? <ActivityIndicator color="white" />
@@ -173,7 +191,7 @@ export default function UpgradeScreen() {
           className="w-full rounded-xl border border-cream-300 py-3.5 items-center mb-6 active:opacity-70 disabled:opacity-60"
         >
           {loading === 'monthly'
-            ? <ActivityIndicator color="#386641" />
+            ? <ActivityIndicator color="#6E7B4A" />
             : <Text className="text-sm font-medium text-ink-soft">
                 {lang === 'en' ? 'Monthly — ₱59/month' : 'Buwanin — ₱59/buwan'}
               </Text>

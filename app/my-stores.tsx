@@ -168,7 +168,7 @@ export default function MyStoresScreen() {
           <View className="mb-5">
             {pendingReports.length === 0 && (
               <View className="bg-white rounded-2xl border border-cream-200 p-8 items-center">
-                <Text className="text-3xl mb-2">\u2705</Text>
+                <Ionicons name="checkmark-circle" size={30} color="#4E7A47" style={{ marginBottom: 8 }} />
                 <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
                   {lang === 'en' ? 'No price reports to review.' : 'Walang price report na irereview.'}
                 </Text>
