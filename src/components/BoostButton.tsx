@@ -96,11 +96,11 @@ export function BoostButton({
         <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(41,37,34,0.5)' }}>
           <View className="bg-white rounded-t-3xl px-5 pt-5 pb-8">
             <View className="flex-row items-center justify-between mb-4">
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522' }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000' }}>
                 {lang === 'en' ? 'Boost this' : 'I-boost ito'}
               </Text>
               <Pressable onPress={() => setOpen(false)} className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center">
-                <Ionicons name="close" size={16} color="#292522" />
+                <Ionicons name="close" size={16} color="#000000" />
               </Pressable>
             </View>
 

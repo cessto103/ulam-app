@@ -20,7 +20,7 @@ export default function DirectionsButton({ latitude, longitude, compact = false 
       style={{ backgroundColor: '#6E7B4A' }}
     >
       <Ionicons name="navigate" size={16} color="#fff" />
-      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
+      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>
         {compact
           ? (lang === 'en' ? 'Directions' : 'Direksyon')
           : (lang === 'en' ? 'Get Directions (Google Maps)' : 'Kunin ang Direksyon (Google Maps)')}

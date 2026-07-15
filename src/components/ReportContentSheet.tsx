@@ -62,10 +62,10 @@ export default function ReportContentSheet({ visible, onClose, contentType, cont
           style={{ backgroundColor: '#FFFCF5', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 34 }}
         >
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#F0DEBB', marginBottom: 14 }} />
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000' }}>
             {lang === 'en' ? 'Report this' : 'I-report ito'}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 12 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 12 }}>
             {lang === 'en' ? "Tell us what's wrong. Reports are anonymous to the author." : 'Sabihin kung ano ang mali. Hindi makikita ng may-ari kung sino ang nag-report.'}
           </Text>
 
@@ -87,7 +87,7 @@ export default function ReportContentSheet({ visible, onClose, contentType, cont
                 >
                   {selected && <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#FFF8E8' }} />}
                 </View>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>
                   {opt[lang]}
                 </Text>
               </Pressable>
@@ -97,7 +97,7 @@ export default function ReportContentSheet({ visible, onClose, contentType, cont
           <TextInput
             style={{
               marginTop: 10, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB',
-              paddingHorizontal: 14, paddingVertical: 10, fontSize: 13, color: '#292522',
+              paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#000000',
               fontFamily: 'NunitoSans_400Regular', minHeight: 48, textAlignVertical: 'top',
             }}
             placeholder={lang === 'en' ? 'Add details (optional)…' : 'Dagdag na detalye (opsyonal)…'}

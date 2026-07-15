@@ -75,7 +75,7 @@ const TYPE_META: Record<string, { label: string; bg: string; text: string; emoji
   recipe_share: { label: 'Recipe',     bg: '#EFF4EC', text: '#386641', emoji: '🍲' },
   price_tip:    { label: 'Price Tip',  bg: '#EFF4EC', text: '#386641', emoji: '💰' },
   budget_win:   { label: 'Budget Win', bg: '#EFF4EC', text: '#2C5234', emoji: '🏆' },
-  general:      { label: 'General',    bg: '#F9EDD3', text: '#292522', emoji: '💬' },
+  general:      { label: 'General',    bg: '#F9EDD3', text: '#000000', emoji: '💬' },
 };
 
 function timeAgo(iso: string, lang: 'en' | 'tl'): string {
@@ -208,7 +208,7 @@ export default function KomunidadScreen() {
         <View className="flex-row items-center gap-3 mb-3">
           <Pressable
             onPress={() => router.push(`/user/${post.user.id}` as any)}
-            className="w-9 h-9 rounded-full bg-cream-200 items-center justify-center overflow-hidden active:opacity-70"
+            className="w-10 h-10 rounded-full bg-cream-200 items-center justify-center overflow-hidden active:opacity-70"
           >
             {post.user.avatar ? (
               <Image source={{ uri: `${API_URL}${post.user.avatar}` }} style={{ width: '100%', height: '100%' }} />
@@ -254,16 +254,16 @@ export default function KomunidadScreen() {
             </View>
             {/* Footer bar */}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fff' }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522', flex: 1 }} numberOfLines={1}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000', flex: 1 }} numberOfLines={1}>
                 {post.recipe.title}
               </Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 8 }}>
                 <View style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 2 }}>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
                     {BUDGET_LABEL[post.recipe.budget_tag] ?? post.recipe.budget_tag}
                   </Text>
                 </View>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>View →</Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>View →</Text>
               </View>
             </View>
           </Pressable>
@@ -311,7 +311,7 @@ export default function KomunidadScreen() {
             <Text className="text-xs text-ink-soft">{formatCount(post.views_count ?? 0)}</Text>
           </View>
           <View style={{ flex: 1 }} />
-          <Text style={{ fontSize: 12, color: '#6F655A', alignSelf: 'center' }}>Read more →</Text>
+          <Text style={{ fontSize: 13, color: '#6F655A', alignSelf: 'center' }}>Read more →</Text>
         </View>
       </Pressable>
     );
@@ -344,7 +344,7 @@ export default function KomunidadScreen() {
                 size={13}
                 color={active ? '#fff' : '#B0A18C'}
               />
-              <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_600SemiBold', fontSize: 12, color: active ? '#fff' : '#6F655A' }}>
+              <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#6F655A' }}>
                 {m.label}
               </Text>
             </Pressable>

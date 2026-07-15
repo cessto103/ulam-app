@@ -70,7 +70,7 @@ const TYPE_META: Record<string, { labelEn: string; labelTl: string; bg: string; 
   recipe_share: { labelEn: 'Recipe',     labelTl: 'Recipe',     bg: '#FDEFC9', text: '#9A6A12', emoji: '🍲' },
   price_tip:    { labelEn: 'Price Tip',  labelTl: 'Presyo',     bg: '#EFF4EC', text: '#386641', emoji: '💰' },
   budget_win:   { labelEn: 'Budget Win', labelTl: 'Budget Win', bg: '#EFF4EC', text: '#2C5234', emoji: '🏆' },
-  general:      { labelEn: 'General',    labelTl: 'General',    bg: '#F9EDD3', text: '#292522', emoji: '💬' },
+  general:      { labelEn: 'General',    labelTl: 'General',    bg: '#F9EDD3', text: '#000000', emoji: '💬' },
 };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -222,9 +222,9 @@ export default function UserProfileScreen() {
             <View className="bg-white p-5 mb-3 border-b border-cream-200">
               <View className="flex-row gap-4 items-center mb-4">
                 {avatarUri ? (
-                  <Image source={{ uri: avatarUri }} className="w-16 h-16 rounded-full bg-cream-300" />
+                  <Image source={{ uri: avatarUri }} className="w-[72px] h-[72px] rounded-full bg-cream-300" />
                 ) : (
-                  <View className="w-16 h-16 rounded-full bg-leaf-50 items-center justify-center">
+                  <View className="w-[72px] h-[72px] rounded-full bg-leaf-50 items-center justify-center">
                     <Text className="text-xl font-semibold text-ink">{initials(user.name)}</Text>
                   </View>
                 )}
@@ -333,20 +333,20 @@ export default function UserProfileScreen() {
                         </Text>
                       )}
                       <Text
-                        style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#292522', marginBottom: 2 }}
+                        style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000', marginBottom: 2 }}
                         numberOfLines={2}
                       >
                         {st.name}{st.is_verified ? ' \u2705' : ''}
                       </Text>
-                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                         {[st.barangay, st.municipality].filter(Boolean).join(', ')}
                       </Text>
                       <View className="flex-row items-center justify-between mt-2">
-                        <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#4E7A47' }}>
+                        <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#4E7A47' }}>
                           {st.item_count} {lang === 'en' ? 'items' : 'items'}
                         </Text>
                         {st.last_updated ? (
-                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                             {timeAgo(st.last_updated, lang)}
                           </Text>
                         ) : null}

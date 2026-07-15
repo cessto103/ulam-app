@@ -51,39 +51,53 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
   const initials = (user?.name ?? 'U').split(' ').map((w) => w[0]).slice(0, 2).join('');
   const avatarUri = user?.avatar ? `${API_URL}${user.avatar}` : null;
   const circleBg = dark ? 'rgba(255,255,255,0.12)' : '#F9EDD3';
-  const iconColor = dark ? '#fff' : '#292522';
+  const iconColor = dark ? '#fff' : '#000000';
+
+  const iconShadow = {
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  } as const;
+
+  const circleShadow = {
+    shadowColor: '#000',
+    shadowOpacity: 0.22,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+  } as const;
 
   return (
-    <View className="flex-row gap-2 items-center">
+    <View className="flex-row gap-2.5 items-center">
       <Pressable
         onPress={() => router.push('/search' as any)}
-        className="w-10 h-10 rounded-full items-center justify-center active:opacity-70"
-        style={{ backgroundColor: circleBg }}
+        className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
+        style={{ backgroundColor: circleBg, ...circleShadow }}
       >
-        <Ionicons name="search" size={19} color={iconColor} />
+        <Ionicons name="search" size={22} color={iconColor} style={iconShadow} />
       </Pressable>
       <Pressable
         onPress={() => router.push('/my-reports' as any)}
-        className="w-10 h-10 rounded-full items-center justify-center active:opacity-70"
-        style={{ backgroundColor: circleBg }}
+        className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
+        style={{ backgroundColor: circleBg, ...circleShadow }}
       >
-        <Ionicons name="receipt-outline" size={18} color={iconColor} />
+        <Ionicons name="receipt-outline" size={21} color={iconColor} style={iconShadow} />
       </Pressable>
       {hasStore && (
         <Pressable
           onPress={() => router.push('/my-stores' as any)}
-          className="w-10 h-10 rounded-full items-center justify-center active:opacity-70"
-          style={{ backgroundColor: circleBg }}
+          className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
+          style={{ backgroundColor: circleBg, ...circleShadow }}
         >
-          <Ionicons name="storefront-outline" size={18} color={iconColor} />
+          <Ionicons name="storefront-outline" size={21} color={iconColor} style={iconShadow} />
         </Pressable>
       )}
       <Pressable
         onPress={() => router.push('/notifications' as any)}
-        className="w-10 h-10 rounded-full items-center justify-center active:opacity-70"
-        style={{ backgroundColor: circleBg }}
+        className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
+        style={{ backgroundColor: circleBg, ...circleShadow }}
       >
-        <Ionicons name="notifications-outline" size={20} color={iconColor} />
+        <Ionicons name="notifications-outline" size={23} color={iconColor} style={iconShadow} />
         {unreadCount > 0 && (
           <View className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-red-500 items-center justify-center px-1">
             <Text className="text-white text-[11px] font-bold">
@@ -94,17 +108,18 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
       </Pressable>
       <Pressable
         onPress={() => router.push('/(tabs)/profile' as any)}
-        className="w-10 h-10 rounded-full items-center justify-center overflow-hidden active:opacity-70"
+        className="w-11 h-11 rounded-full items-center justify-center overflow-hidden active:opacity-70"
         style={{
           backgroundColor: avatarUri ? '#F9EDD3' : dark ? 'rgba(255,255,255,0.22)' : '#E7653B',
-          borderWidth: 1.5,
-          borderColor: dark ? 'rgba(255,255,255,0.4)' : '#E7653B',
+          borderWidth: 2,
+          borderColor: dark ? 'rgba(255,255,255,0.55)' : '#E7653B',
+          ...circleShadow,
         }}
       >
         {avatarUri ? (
           <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} />
         ) : (
-          <Text className="text-xs font-bold text-white">{initials}</Text>
+          <Text className="text-sm font-bold text-white">{initials}</Text>
         )}
       </Pressable>
     </View>

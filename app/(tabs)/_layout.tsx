@@ -67,7 +67,7 @@ export default function TabLayout() {
             borderTopColor: '#F0DEBB',
             borderTopWidth: 0.5,
           },
-          tabBarLabelStyle: { fontFamily: 'NunitoSans_600SemiBold', fontSize: 12 },
+          tabBarLabelStyle: { fontFamily: 'NunitoSans_600SemiBold', fontSize: 13 },
           tabBarActiveTintColor: ACTIVE,
           tabBarInactiveTintColor: INACTIVE,
         }}
@@ -175,7 +175,7 @@ export default function TabLayout() {
             <View
               style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#F0DEBB', marginBottom: 14 }}
             />
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#292522', marginBottom: 12 }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000', marginBottom: 12 }}>
               {lang === 'en' ? 'Create' : 'Gumawa'}
             </Text>
 
@@ -191,7 +191,7 @@ export default function TabLayout() {
                 <View className="w-11 h-11 rounded-full bg-brand-50 items-center justify-center">
                   <Ionicons name={a.icon} size={19} color="#E7653B" />
                 </View>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>
                   {a.label}
                 </Text>
               </Pressable>

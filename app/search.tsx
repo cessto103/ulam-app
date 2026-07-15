@@ -40,7 +40,7 @@ type Row =
 
 // ─── Avatar initials ──────────────────────────────────────────────────────────
 
-function Avatar({ name, size = 44 }: { name: string; size?: number }) {
+function Avatar({ name, size = 48 }: { name: string; size?: number }) {
   const initials = name
     .split(' ')
     .map(w => w[0] ?? '')
@@ -145,7 +145,7 @@ export default function SearchScreen() {
           />
           {query.length > 0 && (
             <Pressable onPress={() => { setQuery(''); setUsers([]); setRecipes([]); }} className="p-1">
-              <Text style={{ fontSize: 13, color: '#6F655A' }}>✕</Text>
+              <Text style={{ fontSize: 14, color: '#6F655A' }}>✕</Text>
             </Pressable>
           )}
         </View>
@@ -158,10 +158,10 @@ export default function SearchScreen() {
       {showPrompt && (
         <View className="flex-1 items-center justify-center px-8">
           <Text style={{ fontSize: 48, marginBottom: 12 }}>🔍</Text>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 6, textAlign: 'center' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 6, textAlign: 'center' }}>
             {lang === 'en' ? 'Search uLam' : 'Maghanap sa uLam'}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', lineHeight: 20 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', lineHeight: 20 }}>
             {lang === 'en'
               ? 'Find recipes by name or ingredient ("manok", "monggo"), or people by name or username.'
               : 'Maghanap ng recipe gamit ang pangalan o sangkap ("manok", "monggo"), o mga tao gamit ang pangalan o username.'}
@@ -173,10 +173,10 @@ export default function SearchScreen() {
       {showEmpty && (
         <View className="flex-1 items-center justify-center px-8">
           <Text style={{ fontSize: 40, marginBottom: 12 }}>🔍</Text>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 6, textAlign: 'center' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 6, textAlign: 'center' }}>
             {lang === 'en' ? 'No results found' : 'Walang nahanap'}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center' }}>
             {lang === 'en' ? 'Try a different word — a dish, an ingredient, or a name.' : 'Subukan ang ibang salita — ulam, sangkap, o pangalan.'}
           </Text>
         </View>
@@ -192,7 +192,7 @@ export default function SearchScreen() {
           renderItem={({ item: row }) => {
             if (row.kind === 'header') {
               return (
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 }}>
                   {row.title}
                 </Text>
               );
@@ -209,10 +209,10 @@ export default function SearchScreen() {
                     <Text style={{ fontSize: 20 }}>🍲</Text>
                   </View>
                   <View className="flex-1 ml-3">
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }} numberOfLines={1}>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }} numberOfLines={1}>
                       {r.title}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                       {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toFixed(0)}` : '—'}
                       {r.servings ? ` · ${r.servings} ${lang === 'en' ? 'servings' : 'tao'}` : ''}
                       {r.source === 'official' ? ' · uLam' : ''}
@@ -232,10 +232,10 @@ export default function SearchScreen() {
               >
                 <Avatar name={user.name} size={44} />
                 <View className="flex-1 ml-3">
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>
                     {user.name}
                   </Text>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                     @{user.username}
                     {user.municipality ? ` · ${user.municipality}` : ''}
                     {' · '}Lv.{user.level}
@@ -246,7 +246,7 @@ export default function SearchScreen() {
                   className={`px-4 py-1.5 rounded-full border active:opacity-70 ${isFollowing ? 'border-cream-300 bg-cream-50' : 'border-brand-600 bg-brand-600'}`}
                 >
                   <Text style={{
-                    fontFamily: 'NunitoSans_600SemiBold', fontSize: 12,
+                    fontFamily: 'NunitoSans_600SemiBold', fontSize: 13,
                     color: isFollowing ? '#6F655A' : 'white',
                   }}>
                     {isFollowing

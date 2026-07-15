@@ -136,20 +136,20 @@ function SourceBadge({ source, isMine }: { source: string; isMine: boolean }) {
   if (isMine) {
     return (
       <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 0.5, borderColor: '#E3A32A' }}>
-        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#9A6A12' }}>My Recipe</Text>
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12' }}>My Recipe</Text>
       </View>
     );
   }
   if (source === 'official') {
     return (
       <View style={{ backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 0.5, borderColor: '#5DCAA5' }}>
-        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#2C5234' }}>Official</Text>
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#2C5234' }}>Official</Text>
       </View>
     );
   }
   return (
     <View style={{ backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 0.5, borderColor: '#85B7EB' }}>
-      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#0C447C' }}>Community</Text>
+      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#0C447C' }}>Community</Text>
     </View>
   );
 }
@@ -219,10 +219,10 @@ function PlanMealCard({
           justifyContent: 'space-between',
         }}
       >
-        <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 12, color: '#FFFFFF', letterSpacing: 0.8 }}>
+        <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#FFFFFF', letterSpacing: 0.8 }}>
           {label.toUpperCase()}
         </Text>
-        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: 'rgba(255,255,255,0.82)' }}>
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: 'rgba(255,255,255,0.82)' }}>
           {time}
         </Text>
       </View>
@@ -248,7 +248,7 @@ function PlanMealCard({
             style={{
               flex: 1,
               fontFamily: 'NunitoSans_700Bold',
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 18,
               color: colors.accent,
             }}
@@ -395,10 +395,10 @@ function PlanView({ user }: { user: any }) {
           <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
             <Text style={{ fontSize: 17, marginRight: 8 }}>💡</Text>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 12, color: '#9A6A12' }}>
+              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#9A6A12' }}>
                 {lang === 'en' ? "Today's total cost" : 'Kabuuang gastos ngayon'}
               </Text>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#9A6A12', marginTop: 2 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#9A6A12', marginTop: 2 }}>
                 {lang === 'en'
                   ? 'Use the monggo soup broth to stretch it further — two meals from one cook!'
                   : 'Gamitin ang sabaw ng monggo para mag-extend — dalawang kain, isang luto!'}
@@ -407,7 +407,7 @@ function PlanView({ user }: { user: any }) {
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#9A6A12' }}>
               ₱{planCost.toFixed(0)}
             </Text>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#9A6A12', marginLeft: 4, marginTop: 5 }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12', marginLeft: 4, marginTop: 5 }}>
               · {remaining}
             </Text>
           </View>
@@ -429,12 +429,12 @@ function PlanView({ user }: { user: any }) {
           >
             <Text style={{ fontSize: 17, marginRight: 8 }}>{isOverBudget ? '⚠️' : '✅'}</Text>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 12, color: isOverBudget ? '#E24B4A' : '#065F46' }}>
+              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: isOverBudget ? '#E24B4A' : '#065F46' }}>
                 {isOverBudget
                   ? (lang === 'en' ? `Over budget by ₱${Math.abs(budgetDiff).toFixed(0)}` : `Lagpas ng ₱${Math.abs(budgetDiff).toFixed(0)} sa budget`)
                   : (lang === 'en' ? `₱${budgetDiff.toFixed(0)} remaining after this plan` : `₱${budgetDiff.toFixed(0)} remaining after this plan`)}
               </Text>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: isOverBudget ? '#E24B4A' : '#6F655A', marginTop: 2 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: isOverBudget ? '#E24B4A' : '#6F655A', marginTop: 2 }}>
                 {lang === 'en'
                   ? `Daily: ₱${budget!.budget.toFixed(0)} · Plan cost: ₱${planCost.toFixed(0)}`
                   : `Daily: ₱${budget!.budget.toFixed(0)} · Plan cost: ₱${planCost.toFixed(0)}`}
@@ -483,18 +483,18 @@ function PlanView({ user }: { user: any }) {
               <View key={type} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: colors.band, marginRight: 8 }} />
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
                     {lang === 'en' ? meta.labelEn : meta.labelTl}
                   </Text>
                 </View>
-                <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 12, color: '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#000000' }}>
                   ₱{subtotal.toFixed(0)}
                 </Text>
               </View>
             );
           })}
           <View style={{ marginTop: 8, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F9EDD3', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#292522' }}>
+            <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#000000' }}>
               {lang === 'en' ? 'Total' : 'Kabuuan'}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -511,7 +511,7 @@ function PlanView({ user }: { user: any }) {
             <LinearGradient colors={['#5E693F', '#6E7B4A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
               <View style={{ paddingVertical: 13, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}>
                 <Text style={{ fontSize: 14 }}>🧾</Text>
-                <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#FFFFFF' }}>
+                <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#FFFFFF' }}>
                   {lang === 'en' ? 'Open Shopping List' : 'Buksan ang Shopping List'}
                 </Text>
               </View>
@@ -731,52 +731,52 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
                   {r.user.name.substring(0, 2).toUpperCase()}
                 </Text>
               </View>
-              <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
-                by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#292522' }}>{r.user.name}</Text>
+              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
+                by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{r.user.name}</Text>
               </Text>
             </View>
           )}
 
           {/* Title + description */}
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
             {r.title}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
             {r.description}
           </Text>
 
           {/* Meta chips */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#9A6A12' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12' }}>
                 {BUDGET_LABEL[r.budget_tag] ?? r.budget_tag}
               </Text>
             </View>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{r.servings} servings</Text>
-            {totalMin > 0 && <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{totalMin} min</Text>}
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.servings} servings</Text>
+            {totalMin > 0 && <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{totalMin} min</Text>}
           </View>
 
           {/* Reactions + share row */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 10, paddingTop: 8, borderTopWidth: 0.5, borderTopColor: '#F0DEBB' }}>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>👍 {r.vote_up_count ?? 0}</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>👎 {r.vote_down_count ?? 0}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>👍 {r.vote_up_count ?? 0}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>👎 {r.vote_down_count ?? 0}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <Ionicons name="bookmark-outline" size={12} color="#6F655A" />
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{r.save_count}</Text>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.save_count}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <Ionicons name="eye-outline" size={12} color="#6F655A" />
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{formatCount(r.views_count ?? 0)}</Text>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{formatCount(r.views_count ?? 0)}</Text>
             </View>
             {(r.share_count ?? 0) > 0 && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <Ionicons name="paper-plane-outline" size={12} color="#6F655A" />
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{r.share_count}</Text>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.share_count}</Text>
               </View>
             )}
             {isMine && (
               <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {r.is_published ? 'Public' : 'Private'}
                 </Text>
                 <ShareToggle
@@ -794,12 +794,12 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
               {r.is_published ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
                   <Ionicons name="checkmark" size={10} color="#5E693F" />
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#5E693F' }}>Public – visible to community</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#5E693F' }}>Public – visible to community</Text>
                 </View>
               ) : (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#F9EDD3', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
                   <Ionicons name="lock-closed-outline" size={10} color="#6F655A" />
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#6F655A' }}>Private – only you can see this</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A' }}>Private – only you can see this</Text>
                 </View>
               )}
             </View>
@@ -816,7 +816,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', paddingHorizontal: 12, paddingVertical: 10 }}>
           <Ionicons name="search-outline" size={15} color="#B0A18C" style={{ marginRight: 6 }} />
           <TextInput
-            style={{ flex: 1, fontSize: 13, color: '#292522', padding: 0 }}
+            style={{ flex: 1, fontSize: 14, color: '#000000', padding: 0 }}
             placeholder="Search recipes..."
             placeholderTextColor="#B0A18C"
             value={search}
@@ -841,7 +841,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
               }}
             >
               <Text style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular',
                 color: active ? '#5E693F' : '#B0A18C',
               }}>
@@ -873,7 +873,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
                 borderColor: active ? '#6E7B4A' : '#F0DEBB',
               }}
             >
-              <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_600SemiBold', color: active ? '#fff' : '#6F655A' }}>
+              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_600SemiBold', color: active ? '#fff' : '#6F655A' }}>
                 {f.label}
               </Text>
             </Pressable>
@@ -902,7 +902,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
       stickySectionHeadersEnabled={false}
       renderSectionHeader={({ section }) => (
         <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4 }}>
-          <Text style={{ fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: '#6F655A' }}>
+          <Text style={{ fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: '#6F655A' }}>
             {section.title}
           </Text>
         </View>
@@ -911,7 +911,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
       ListEmptyComponent={
         <View style={{ alignItems: 'center', paddingTop: 48, paddingHorizontal: 32 }}>
           <Text style={{ fontSize: 36, marginBottom: 12 }}>🍽️</Text>
-          <Text style={{ fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
+          <Text style={{ fontSize: 14, color: '#6F655A', textAlign: 'center' }}>
             {search
               ? 'No recipes found.'
               : sourceFilter === 'mine'
@@ -981,7 +981,7 @@ export default function MealPlanScreen() {
               className="px-3 py-2 rounded-t-2xl"
               style={{ backgroundColor: tab === t.key ? '#FFF8E8' : 'transparent' }}
             >
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: tab === t.key ? '#5E693F' : 'rgba(255,255,255,0.6)' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: tab === t.key ? '#5E693F' : 'rgba(255,255,255,0.6)' }}>
                 {t.label}
               </Text>
             </Pressable>
@@ -990,7 +990,7 @@ export default function MealPlanScreen() {
             onPress={() => router.push('/recipe-book' as any)}
             className="px-3 py-2 rounded-t-2xl"
           >
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
               🔖 Saved
             </Text>
           </Pressable>
@@ -1012,7 +1012,7 @@ export default function MealPlanScreen() {
               className={`flex-1 rounded-lg py-2 items-center ${tab === t.key ? 'bg-white' : ''}`}
               style={tab === t.key ? { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 } : {}}
             >
-              <Text style={{ fontFamily: tab === t.key ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 12, color: tab === t.key ? '#5E693F' : '#B0A18C' }}>
+              <Text style={{ fontFamily: tab === t.key ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 13, color: tab === t.key ? '#5E693F' : '#B0A18C' }}>
                 {t.label}
               </Text>
             </Pressable>
@@ -1024,7 +1024,7 @@ export default function MealPlanScreen() {
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <Ionicons name="bookmark-outline" size={12} color="#B0A18C" />
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>Bookmark</Text>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>Bookmark</Text>
             </View>
           </Pressable>
         </View>

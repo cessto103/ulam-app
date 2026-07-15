@@ -113,7 +113,7 @@ function BarChart({ data }: { data: DayEntry[] }) {
           return (
             <View key={d.date} className="flex-1 items-center">
               {show && (
-                <Text className="text-ink-soft" style={{ fontSize: 12 }}>{day}</Text>
+                <Text className="text-ink-soft" style={{ fontSize: 13 }}>{day}</Text>
               )}
             </View>
           );
@@ -211,7 +211,7 @@ export default function PriceHistoryScreen() {
                 ].map((s) => (
                   <View key={s.label} className="flex-1 items-center">
                     <Text className={`text-base font-semibold ${s.color}`}>{s.val}</Text>
-                    <Text className="text-xs text-ink-soft text-center" style={{ fontSize: 12 }}>{s.label}</Text>
+                    <Text className="text-xs text-ink-soft text-center" style={{ fontSize: 13 }}>{s.label}</Text>
                   </View>
                 ))}
               </View>
@@ -221,20 +221,20 @@ export default function PriceHistoryScreen() {
           {/* Official DA/DTI reference prices */}
           {(data?.official?.length ?? 0) > 0 && (
             <View className="bg-leaf-50 rounded-2xl border border-cream-200 p-4 mb-4">
-              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 12, color: '#386641', marginBottom: 8 }}>
+              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#386641', marginBottom: 8 }}>
                 🏛️ {lang === 'en' ? 'Official Reference' : 'Opisyal na Sanggunian'}
               </Text>
               {data!.official.map((ref) => (
                 <View key={ref.id} className="flex-row items-center justify-between py-1.5">
                   <View className="flex-1 pr-2">
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000' }}>
                       {OFFICIAL_SOURCE_LABEL[ref.source]?.[lang] ?? ref.source}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                       {ref.region}{ref.bulletin_date ? ` · ${ref.bulletin_date}` : ''}
                     </Text>
                   </View>
-                  <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#386641' }}>
+                  <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#386641' }}>
                     {ref.price_min === ref.price_max
                       ? `₱${ref.price_min}/${ref.unit}`
                       : `₱${ref.price_min}–₱${ref.price_max}/${ref.unit}`}

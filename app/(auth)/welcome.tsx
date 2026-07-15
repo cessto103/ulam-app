@@ -25,7 +25,7 @@ export default function WelcomeScreen() {
         <View className="items-center px-6">
           <BrandLogo size={82} />
           <Text
-            style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 15, color: '#292522', marginTop: 30 }}
+            style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 15, color: '#000000', marginTop: 30 }}
           >
             {t('welcome_tag1')}
           </Text>
@@ -53,10 +53,10 @@ export default function WelcomeScreen() {
             </Link>
             <Link href="/(auth)/login" asChild>
               <Pressable className="w-full rounded-2xl border border-cream-300 bg-cream-50 py-4 items-center active:opacity-70">
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 15, color: '#292522' }}>{t('have_account')}</Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 15, color: '#000000' }}>{t('have_account')}</Text>
               </Pressable>
             </Link>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#D3C5AB', textAlign: 'center', marginTop: 2 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#D3C5AB', textAlign: 'center', marginTop: 2 }}>
               v{APP_VERSION}
             </Text>
           </View>

@@ -166,7 +166,7 @@ function AwardsTab({
                 <Text style={{ fontSize: 34 }}>{s.icon}</Text>
                 <View className="flex-1">
                   <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: s.text }} numberOfLines={1} adjustsFontSizeToFit>{s.val}</Text>
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: s.text, opacity: 0.9 }}>{s.label}</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: s.text, opacity: 0.9 }}>{s.label}</Text>
                 </View>
               </View>
             ))}
@@ -236,9 +236,9 @@ function AwardsTab({
             <Text className="text-sm font-semibold text-ink-soft w-5 text-center">
               {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : entry.rank}
             </Text>
-            <View className="w-8 h-8 rounded-full bg-leaf-50 items-center justify-center">
+            <View className="w-9 h-9 rounded-full bg-leaf-50 items-center justify-center">
               {entry.user.avatar ? (
-                <Image source={{ uri: `${API_URL}${entry.user.avatar}` }} className="w-8 h-8 rounded-full" />
+                <Image source={{ uri: `${API_URL}${entry.user.avatar}` }} className="w-9 h-9 rounded-full" />
               ) : (
                 <Text className="text-xs font-semibold text-ink">{initials(entry.user.name)}</Text>
               )}
@@ -366,7 +366,7 @@ function RecipeBookTab() {
                 style={{ backgroundColor: '#386641' }}
               >
                 <Ionicons name="add-circle-outline" size={16} color="#fff" />
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
                   {lang === 'en' ? 'Add to Meal Plan' : 'Idagdag sa Plan'}
                 </Text>
               </Pressable>
@@ -376,7 +376,7 @@ function RecipeBookTab() {
                 style={{ borderColor: '#F0DEBB', backgroundColor: '#FFFCF5' }}
               >
                 <Ionicons name="trash-outline" size={14} color="#C45E3A" />
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A' }}>
                   {lang === 'en' ? 'Remove' : 'Alisin'}
                 </Text>
               </Pressable>
@@ -399,11 +399,11 @@ function RecipeBookTab() {
         <View style={{ flex: 1, backgroundColor: '#FFF8E8' }}>
           <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
                 {lang === 'en' ? "Add to Today's Meal Plan" : "Idagdag sa Meal Plan Ngayon"}
               </Text>
               {addingRecipe && (
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
                   {addingRecipe.title}
                 </Text>
               )}
@@ -414,7 +414,7 @@ function RecipeBookTab() {
           </View>
 
           <ScrollView contentContainerStyle={{ padding: 20, gap: 8 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 }}>
               {lang === 'en' ? 'Pick meal type' : 'Pumili ng meal type'}
             </Text>
             {MEAL_TYPE_OPTIONS.map((mt) => {
@@ -426,7 +426,7 @@ function RecipeBookTab() {
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 14, borderWidth: 1.5, borderColor: active ? '#6E7B4A' : '#F0DEBB', backgroundColor: active ? '#EFF4EC' : '#fff', marginBottom: 8 }}
                 >
                   <Text style={{ fontSize: 20 }}>{mt.emoji}</Text>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#292522', flex: 1 }}>{mt.label}</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#000000', flex: 1 }}>{mt.label}</Text>
                   {active && <Ionicons name="checkmark-circle" size={20} color="#6E7B4A" />}
                 </Pressable>
               );
@@ -579,9 +579,9 @@ export default function AwardsScreen() {
           <Pressable onPress={showPhotoOptions} className="relative mb-3">
             <View style={{ padding: 3, borderRadius: 999, backgroundColor: '#FFFCF5' }}>
               {avatarUri ? (
-                <Image source={{ uri: avatarUri }} style={{ width: 72, height: 72, borderRadius: 9999, backgroundColor: '#F0DEBB' }} />
+                <Image source={{ uri: avatarUri }} style={{ width: 84, height: 84, borderRadius: 9999, backgroundColor: '#F0DEBB' }} />
               ) : (
-                <View style={{ width: 72, height: 72, borderRadius: 9999, backgroundColor: '#292522', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 84, height: 84, borderRadius: 9999, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center' }}>
                   <Text className="text-2xl font-semibold text-white">{initials(user?.name ?? 'U')}</Text>
                 </View>
               )}
@@ -589,7 +589,7 @@ export default function AwardsScreen() {
             <View className="absolute -bottom-1 -right-1 rounded-full px-2 py-0.5 border-2" style={{ backgroundColor: '#386641', borderColor: '#FFFCF5' }}>
               {uploading
                 ? <ActivityIndicator color="white" size="small" />
-                : <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 12, color: '#fff' }}>Lv.{myLevel}</Text>
+                : <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#fff' }}>Lv.{myLevel}</Text>
               }
             </View>
           </Pressable>
@@ -604,13 +604,13 @@ export default function AwardsScreen() {
               className="rounded-full px-3.5 py-1.5"
               style={{ backgroundColor: sellerPlanActive ? '#386641' : '#FFFCF5' }}
             >
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: sellerPlanActive ? '#fff' : '#292522' }}>{planPillLabel}</Text>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: sellerPlanActive ? '#fff' : '#000000' }}>{planPillLabel}</Text>
             </View>
             <View className="rounded-full px-3.5 py-1.5" style={{ backgroundColor: '#FFFCF5' }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#292522' }}>🔥 {user?.streak_days ?? 0}d</Text>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>🔥 {user?.streak_days ?? 0}d</Text>
             </View>
             <View className="rounded-full px-3.5 py-1.5" style={{ backgroundColor: '#FFFCF5' }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#292522' }}>⚡ Lv.{myLevel}</Text>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>⚡ Lv.{myLevel}</Text>
             </View>
           </View>
 

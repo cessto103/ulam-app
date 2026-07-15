@@ -31,7 +31,7 @@ module.exports = {
           400: '#E3CA9B',
         },
         ink: {
-          DEFAULT: '#292522',
+          DEFAULT: '#000000',
           soft:    '#6F655A',
           faint:   '#B0A18C',
         },
@@ -111,6 +111,16 @@ module.exports = {
         body:          ['NunitoSans_400Regular'],
         'body-semi':   ['NunitoSans_600SemiBold'],
         'body-bold':   ['NunitoSans_700Bold'],
+      },
+      // Bumped one notch up from Tailwind's stock scale (2026-07-15) — other
+      // apps read easier because their body text runs a bit bigger than ours did.
+      fontSize: {
+        xs:   ['13px', { lineHeight: '17px' }],
+        sm:   ['15px', { lineHeight: '20px' }],
+        base: ['17px', { lineHeight: '24px' }],
+        lg:   ['19px', { lineHeight: '26px' }],
+        xl:   ['22px', { lineHeight: '28px' }],
+        '2xl':['25px', { lineHeight: '31px' }],
       },
     },
   },

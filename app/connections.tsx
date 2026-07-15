@@ -43,9 +43,9 @@ function UserRow({ u, isFollowing }: { u: ConnUser; isFollowing: boolean }) {
       className="flex-row items-center gap-3 px-4 py-3 border-b border-cream-200 active:bg-cream-50"
     >
       {avatarUri ? (
-        <Image source={{ uri: avatarUri }} className="w-10 h-10 rounded-full bg-cream-300" />
+        <Image source={{ uri: avatarUri }} className="w-11 h-11 rounded-full bg-cream-300" />
       ) : (
-        <View className="w-10 h-10 rounded-full bg-leaf-50 items-center justify-center">
+        <View className="w-11 h-11 rounded-full bg-leaf-50 items-center justify-center">
           <Text className="text-xs font-semibold text-ink">{initials(u.name)}</Text>
         </View>
       )}

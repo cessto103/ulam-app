@@ -157,21 +157,21 @@ export default function LogSpendingScreen() {
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', paddingHorizontal: 32 }}>
         <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
         <Text style={{ fontSize: 48, marginBottom: 16 }}>✅</Text>
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#292522', marginBottom: 8, textAlign: 'center' }}>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#000000', marginBottom: 8, textAlign: 'center' }}>
           {lang === 'en' ? 'Logged!' : 'Nai-log na!'}
         </Text>
-        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', marginBottom: 6, lineHeight: 20 }}>
+        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', marginBottom: 6, lineHeight: 20 }}>
           {lang === 'en' ? `You spent today: ₱${total.toFixed(0)}` : `Nagastos mo ngayon: ₱${total.toFixed(0)}`}
         </Text>
         {savedAmt > 0 && (
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C', textAlign: 'center', marginBottom: 16 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#C4881C', textAlign: 'center', marginBottom: 16 }}>
             {lang === 'en' ? `🎉 You saved ₱${savedAmt.toFixed(0)} today!` : `🎉 Natipid mo ang ₱${savedAmt.toFixed(0)} ngayon!`}
           </Text>
         )}
         {xpEarned > 0 && (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#FEF6E3', borderRadius: 999, paddingHorizontal: 16, paddingVertical: 8, marginBottom: 24 }}>
             <Text>⭐</Text>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#9A6A12' }}>+{xpEarned} XP earned</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#9A6A12' }}>+{xpEarned} XP earned</Text>
           </View>
         )}
         <Pressable
@@ -202,10 +202,10 @@ export default function LogSpendingScreen() {
             <Text style={{ fontSize: 20 }}>←</Text>
           </Pressable>
           <View>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#292522' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>
               {lang === 'en' ? 'Log Spending' : 'I-log ang Gastos'}
             </Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               {lang === 'en' ? "Tap any amount to edit it" : "I-tap ang halaga para baguhin"}
             </Text>
           </View>
@@ -217,7 +217,7 @@ export default function LogSpendingScreen() {
         {/* Meal plan section */}
         {mealRows.length > 0 ? (
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
               {lang === 'en' ? "Today's Meal Plan" : 'Meal plan ngayon'}
             </Text>
             <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 0.5, borderColor: '#F0DEBB', overflow: 'hidden' }}>
@@ -236,20 +236,20 @@ export default function LogSpendingScreen() {
                     {/* Emoji + name */}
                     <Text style={{ fontSize: 16, marginRight: 10 }}>{meta.emoji}</Text>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522' }} numberOfLines={1}>
+                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }} numberOfLines={1}>
                         {row.dish_name}
                       </Text>
-                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                         {lang === 'en' ? meta.labelEn : meta.labelTl}
                       </Text>
                     </View>
 
                     {/* Editable amount */}
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
-                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginRight: 2 }}>₱</Text>
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', marginRight: 2 }}>₱</Text>
                       <TextInput
                         style={{
-                          fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522',
+                          fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000',
                           textAlign: 'right', minWidth: 56, paddingHorizontal: 6, paddingVertical: 4,
                           borderRadius: 8, borderWidth: 1, borderColor: '#F0DEBB',
                           backgroundColor: '#FFFCF5',
@@ -276,7 +276,7 @@ export default function LogSpendingScreen() {
         ) : (
           !initialized && (
             <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 16, alignItems: 'center' }}>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                 {lang === 'en' ? 'No meal plan for today yet' : 'Wala pang meal plan ngayon'}
               </Text>
             </View>
@@ -284,21 +284,21 @@ export default function LogSpendingScreen() {
         )}
 
         {/* Others / extra expenses */}
-        <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
+        <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
           {lang === 'en' ? 'Other expenses' : 'Iba pang gastos'}
         </Text>
         <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 0.5, borderColor: '#F0DEBB', overflow: 'hidden', marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12 }}>
             <Text style={{ fontSize: 16, marginRight: 10 }}>🛒</Text>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522', flex: 1 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000', flex: 1 }}>
               {lang === 'en' ? 'Others (snacks, transport, etc.)' : 'Iba pa (meryenda, pasahe, atbp.)'}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginRight: 2 }}>₱</Text>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', marginRight: 2 }}>₱</Text>
               <TextInput
                 ref={otherRef}
                 style={{
-                  fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522',
+                  fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000',
                   textAlign: 'right', minWidth: 56, paddingHorizontal: 6, paddingVertical: 4,
                   borderRadius: 8, borderWidth: 1, borderColor: '#F0DEBB',
                   backgroundColor: '#FFFCF5',
@@ -325,12 +325,12 @@ export default function LogSpendingScreen() {
           }}>
             <Text style={{ fontSize: 18 }}>{over ? '⚠️' : '✅'}</Text>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: over ? '#E24B4A' : '#386641' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: over ? '#E24B4A' : '#386641' }}>
                 {over
                   ? (lang === 'en' ? `Over budget by ₱${Math.abs(diff).toFixed(0)}` : `Lumampas sa budget ng ₱${Math.abs(diff).toFixed(0)}`)
                   : (lang === 'en' ? `₱${diff.toFixed(0)} remaining in budget` : `₱${diff.toFixed(0)} pa ang natitira sa budget`)}
               </Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: over ? '#E24B4A' : '#6F655A', marginTop: 2 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: over ? '#E24B4A' : '#6F655A', marginTop: 2 }}>
                 {lang === 'en'
                   ? `Daily budget: ₱${dailyBudget.toFixed(0)} · Total logged: ₱${total.toFixed(0)}`
                   : `Daily budget: ₱${dailyBudget.toFixed(0)} · Kabuuan: ₱${total.toFixed(0)}`}
@@ -352,7 +352,7 @@ export default function LogSpendingScreen() {
         {/* Note input */}
         <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 0.5, borderColor: '#F0DEBB', paddingHorizontal: 14, paddingVertical: 10, marginBottom: 16 }}>
           <TextInput
-            style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', minHeight: 52, textAlignVertical: 'top' }}
+            style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', minHeight: 52, textAlignVertical: 'top' }}
             placeholder={lang === 'en' ? 'Add a note (optional)... e.g. sale at the market' : 'Dagdag na tala (opsyonal)... e.g. nag-sale ang palengke'}
             placeholderTextColor="#B0A18C"
             value={note}
@@ -380,7 +380,7 @@ export default function LogSpendingScreen() {
           )}
         </Pressable>
 
-        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', textAlign: 'center', marginTop: 10 }}>
+        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', marginTop: 10 }}>
           {lang === 'en' ? '+10 XP for your first log today' : '+10 XP sa unang log ngayon'}
         </Text>
 

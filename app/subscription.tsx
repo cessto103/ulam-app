@@ -114,9 +114,9 @@ export default function SubscriptionScreen() {
       <View style={{ paddingTop: insets.top + 8 }} className="px-4 pb-3 bg-white border-b border-cream-200">
         <View className="flex-row items-center gap-3">
           <Pressable onPress={() => router.back()} className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center">
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000', flex: 1 }}>
             {lang === 'en' ? 'Seller Subscription' : 'Seller Subscription'}
           </Text>
           <Pressable onPress={() => catalog.refetch()} disabled={catalog.isFetching}>
@@ -137,7 +137,7 @@ export default function SubscriptionScreen() {
               <Text style={{ fontSize: 26 }}>{planEmoji[current?.plan_slug ?? 'free'] ?? '🏪'}</Text>
               <View className="flex-1">
                 <Text className="text-xs text-ink-soft">{lang === 'en' ? 'Current plan' : 'Kasalukuyang plan'}</Text>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 19, color: '#292522' }}>{current?.plan_name}</Text>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 19, color: '#000000' }}>{current?.plan_name}</Text>
                 <Text className="text-xs text-ink-soft">Status: {current?.status.replace('_', ' ')}</Text>
               </View>
             </View>
@@ -172,7 +172,7 @@ export default function SubscriptionScreen() {
             )}
           </View>
 
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#292522', marginBottom: 10 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000', marginBottom: 10 }}>
             {lang === 'en' ? 'Choose a seller plan' : 'Pumili ng seller plan'}
           </Text>
 
@@ -180,7 +180,7 @@ export default function SubscriptionScreen() {
             <View key={plan.slug} className="bg-white rounded-2xl border border-cream-200 p-4 mb-3">
               <View className="flex-row items-center gap-2 mb-1">
                 <Text style={{ fontSize: 21 }}>{planEmoji[plan.slug] ?? '🏪'}</Text>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522', flex: 1 }}>{plan.name}</Text>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000', flex: 1 }}>{plan.name}</Text>
                 {current?.plan_slug === plan.slug && <Text className="text-[12px] font-bold text-leaf-700">CURRENT</Text>}
               </View>
               {!!plan.tagline && <Text className="text-xs text-ink-soft mb-1">{plan.tagline}</Text>}

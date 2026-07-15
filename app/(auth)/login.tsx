@@ -75,7 +75,7 @@ export default function LoginScreen() {
           <BrandLogo size={52} />
         </View>
 
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 27, color: '#292522', marginBottom: 2 }}>{t('welcome_back')}</Text>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 27, color: '#000000', marginBottom: 2 }}>{t('welcome_back')}</Text>
         <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6E7B4A', marginBottom: 28 }}>{t('login_subtitle')}</Text>
 
         {error ? (

@@ -5,6 +5,21 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.24.0] — 2026-07-15
+
+Readability pass: bigger everything, real black body text, header elements that pop.
+
+### Changed
+- **Header icons are bigger and pop against the colored header** — search, price reports, notifications bell, settings gear, and the avatar icon all grew (40px → 44px circles, larger glyphs) and now cast a drop shadow so they read clearly against terracotta/photo headers instead of blending in.
+- **Menu Plan tabs (Plan / Recipes / Bookmark) are bigger**, and the inactive tab's label now carries a text shadow so it stays legible sitting directly on the gradient/photo header (the active tab already sits on a solid cream pill, so it didn't need one).
+- **Page header titles and subtitles are bigger** (title 22→26px, subtitle 12→14px) with a text shadow for the same reason.
+- **Body text is bigger app-wide** — bumped Tailwind's type scale one notch (`text-xs` 12→13px, `sm` 14→15px, `base` 16→17px, etc.) and bumped the two smallest inline text sizes (12px/13px, the most common caption/meta sizes) by 1px across the app.
+- **Main body text is now true black** (`#000000`) instead of the softer charcoal (`#292522`) — every `text-ink` usage and every inline charcoal text color switched over, app-wide.
+- **Avatars are bigger everywhere they appear** — profile page (96→112px), Awards header (72→84px) and leaderboard rows, public user profile (64→72px), community feed cards (36→40px), post/recipe comment threads, the "shared by" avatar stack, the sharers list, connections list, search results, and the top-nav avatar icon.
+
+### Note
+This reverses the earlier "charcoal, not black — softer and warmer" text-color decision, per explicit request after comparing readability against other apps.
+
 ## [1.23.2] — 2026-07-15
 
 ### Added

@@ -151,9 +151,9 @@ export default function EditStoreScreen() {
             onPress={() => router.back()}
             className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
           >
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
             {lang === 'en' ? 'Edit Store Info' : 'I-edit ang Impormasyon ng Tindahan'}
           </Text>
         </View>
@@ -182,7 +182,7 @@ export default function EditStoreScreen() {
 
             {/* Name */}
             <View className="mb-4">
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Name' : 'Pangalan'}
               </Text>
               <TextInput
@@ -195,7 +195,7 @@ export default function EditStoreScreen() {
 
             {/* Description */}
             <View className="mb-4">
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Description (optional)' : 'Deskripsyon (opsyonal)'}
               </Text>
               <TextInput
@@ -212,7 +212,7 @@ export default function EditStoreScreen() {
 
             {/* Contact number */}
             <View className="mb-4">
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Contact number (optional)' : 'Numero ng Kontak (opsyonal)'}
               </Text>
               <TextInput
@@ -228,7 +228,7 @@ export default function EditStoreScreen() {
             {/* Store hours */}
             <View className="mb-4">
               <View className="flex-row items-center justify-between mb-2">
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000' }}>
                   {lang === 'en' ? 'Store hours (optional)' : 'Oras ng Bukas (opsyonal)'}
                 </Text>
                 <Pressable
@@ -252,13 +252,13 @@ export default function EditStoreScreen() {
 
             {/* Location */}
             <View className="mb-6">
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Location' : 'Lokasyon'}
               </Text>
 
               <View style={{ flexDirection: 'row', gap: 8, backgroundColor: '#FEF6E3', borderRadius: 12, padding: 10, marginBottom: 10 }}>
                 <Text style={{ fontSize: 14 }}>📌</Text>
-                <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#92700A', lineHeight: 16 }}>
+                <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#92700A', lineHeight: 16 }}>
                   {lang === 'en'
                     ? 'You should be at your store to pin its exact location.'
                     : 'Dapat nasa iyong tindahan ka para tumpak ang pag-pin ng lokasyon.'}
@@ -266,7 +266,7 @@ export default function EditStoreScreen() {
               </View>
 
               {!newCoords && (stall?.barangay || stall?.municipality) && (
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 8 }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 8 }}>
                   {lang === 'en' ? 'Current: ' : 'Kasalukuyan: '}
                   {[stall?.barangay, stall?.municipality].filter(Boolean).join(', ')}
                 </Text>
@@ -282,7 +282,7 @@ export default function EditStoreScreen() {
                 ) : (
                   <Text style={{ fontSize: 14 }}>📍</Text>
                 )}
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#386641' }}>
                   {locating
                     ? (lang === 'en' ? 'Locating...' : 'Hinahanap...')
                     : (lang === 'en' ? 'Update my location' : 'I-update ang lokasyon')}
@@ -290,8 +290,8 @@ export default function EditStoreScreen() {
               </Pressable>
               {newCoords && (
                 <View className="flex-row items-center gap-1.5 mt-2">
-                  <Text style={{ fontSize: 12 }}>✅</Text>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
+                  <Text style={{ fontSize: 13 }}>✅</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
                     {lang === 'en' ? 'New location captured' : 'Nakuha ang bagong lokasyon'}
                   </Text>
                 </View>

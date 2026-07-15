@@ -224,7 +224,7 @@ export default function PresyoScreen() {
 
       {/* ── Markets ── */}
       <View className="flex-row justify-between items-center mb-2">
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#292522' }}>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000' }}>
           {t('nearby_markets')}
         </Text>
         <View className="flex-row items-center gap-2">
@@ -246,7 +246,7 @@ export default function PresyoScreen() {
                 ? <ActivityIndicator size="small" color="#fff" style={{ transform: [{ scale: 0.7 }] }} />
                 : <Ionicons name="locate" size={13} color="#fff" />}
             </View>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
               {locating ? t('locating') : (gpsCoords ? t('near_gps') : t('near_you'))}
             </Text>
           </Pressable>
@@ -257,7 +257,7 @@ export default function PresyoScreen() {
       {gpsCoords && (
         <View className="flex-row items-center gap-2 mb-3">
           <Ionicons name="navigate-circle-outline" size={16} color="#6F655A" />
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
             {lang === 'en' ? 'Within' : 'Sa loob ng'}
           </Text>
           {RADIUS_OPTIONS.map((r) => {
@@ -268,7 +268,7 @@ export default function PresyoScreen() {
                 onPress={() => setRadiusKm(r)}
                 className={`rounded-full px-3 py-1.5 ${active ? 'bg-leaf-600' : 'bg-white border border-cream-300'}`}
               >
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: active ? '#fff' : '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: active ? '#fff' : '#6F655A' }}>
                   {r} km
                 </Text>
               </Pressable>
@@ -280,7 +280,7 @@ export default function PresyoScreen() {
             style={{ backgroundColor: '#E7653B', marginLeft: 'auto' }}
           >
             <Ionicons name="map-outline" size={13} color="#fff" />
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
               {lang === 'en' ? 'Map' : 'Mapa'}
             </Text>
           </Pressable>
@@ -325,7 +325,7 @@ export default function PresyoScreen() {
                   )}
                 </View>
                 <Text
-                  style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#292522', marginBottom: 2 }}
+                  style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000', marginBottom: 2 }}
                   numberOfLines={2}
                 >
                   {market.name}
@@ -339,25 +339,25 @@ export default function PresyoScreen() {
                     ✓ {lang === 'en' ? 'Verified on uLam' : 'Beripikado sa uLam'}
                   </Text>
                 ) : null}
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                   {market.barangay}
                 </Text>
                 {isStore && (
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginTop: 1 }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginTop: 1 }}>
                     {lang === 'en' ? 'Independent store' : 'Sariling tindahan'}
                   </Text>
                 )}
                 <View className="flex-row items-center justify-between mt-2">
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#4E7A47' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#4E7A47' }}>
                     {market.item_count} {t('items')}
                   </Text>
                   {!isStore && (
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                       {market.stall_count} {t('stalls')}
                     </Text>
                   )}
                 </View>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 3 }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 3 }}>
                   {timeAgo(market.last_updated, lang)}
                 </Text>
               </Pressable>
@@ -368,7 +368,7 @@ export default function PresyoScreen() {
 
       {/* ── Price checker ── */}
       <View className="flex-row justify-between items-center mb-3">
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#292522' }}>{t('price_checker')}</Text>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000' }}>{t('price_checker')}</Text>
       </View>
 
       {/* Search bar */}
@@ -398,20 +398,20 @@ export default function PresyoScreen() {
       {/* Official DA/DTI reference prices */}
       {data && data.official.length > 0 && (
         <View className="bg-leaf-50 rounded-2xl border border-cream-200 p-4 mb-3">
-          <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 12, color: '#386641', marginBottom: 8 }}>
+          <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#386641', marginBottom: 8 }}>
             🏛️ {lang === 'en' ? 'Official Reference' : 'Opisyal na Sanggunian'}
           </Text>
           {data.official.map((ref) => (
             <View key={ref.id} className="flex-row items-center justify-between py-1.5">
               <View className="flex-1 pr-2">
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000' }}>
                   {OFFICIAL_SOURCE_LABEL[ref.source]?.[lang] ?? ref.source}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {ref.region}{ref.bulletin_date ? ` · ${ref.bulletin_date}` : ''}
                 </Text>
               </View>
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#386641' }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#386641' }}>
                 {ref.price_min === ref.price_max
                   ? `₱${ref.price_min}/${ref.unit}`
                   : `₱${ref.price_min}–₱${ref.price_max}/${ref.unit}`}
@@ -457,15 +457,15 @@ export default function PresyoScreen() {
                       onPress={() => castVote(entry.id, 'up')}
                       className={`flex-row items-center gap-1 rounded-full px-2.5 py-0.5 ${myVote === 'up' ? 'bg-olive-400' : 'bg-cream-200'} active:opacity-70`}
                     >
-                      <Text style={{ fontSize: 12, color: myVote === 'up' ? '#fff' : '#6F655A' }}>👍</Text>
-                      <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_600SemiBold', color: myVote === 'up' ? '#fff' : '#6F655A' }}>{lang === 'en' ? 'Correct' : 'Tama'}</Text>
+                      <Text style={{ fontSize: 13, color: myVote === 'up' ? '#fff' : '#6F655A' }}>👍</Text>
+                      <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_600SemiBold', color: myVote === 'up' ? '#fff' : '#6F655A' }}>{lang === 'en' ? 'Correct' : 'Tama'}</Text>
                     </Pressable>
                     <Pressable
                       onPress={() => castVote(entry.id, 'down')}
                       className={`flex-row items-center gap-1 rounded-full px-2.5 py-0.5 ${myVote === 'down' ? 'bg-red-500' : 'bg-cream-200'} active:opacity-70`}
                     >
-                      <Text style={{ fontSize: 12, color: myVote === 'down' ? '#fff' : '#6F655A' }}>👎</Text>
-                      <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_600SemiBold', color: myVote === 'down' ? '#fff' : '#6F655A' }}>{lang === 'en' ? 'Wrong' : 'Mali'}</Text>
+                      <Text style={{ fontSize: 13, color: myVote === 'down' ? '#fff' : '#6F655A' }}>👎</Text>
+                      <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_600SemiBold', color: myVote === 'down' ? '#fff' : '#6F655A' }}>{lang === 'en' ? 'Wrong' : 'Mali'}</Text>
                     </Pressable>
                   </View>
                 )}

@@ -124,9 +124,9 @@ export default function MarketMapScreen() {
       >
         <View className="flex-row items-center gap-3">
           <Pressable onPress={() => router.back()} className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70">
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
             {lang === 'en' ? 'Nearby Map' : 'Mapa ng Malapit'}
           </Text>
           {isLoading && <ActivityIndicator size="small" color="#386641" />}
@@ -141,11 +141,11 @@ export default function MarketMapScreen() {
                 onPress={() => { setRadiusKm(r); setSelected(null); }}
                 className={`rounded-full px-3 py-1.5 ${active ? 'bg-leaf-600' : 'bg-cream-100 border border-cream-300'}`}
               >
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: active ? '#fff' : '#6F655A' }}>{r} km</Text>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: active ? '#fff' : '#6F655A' }}>{r} km</Text>
               </Pressable>
             );
           })}
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginLeft: 'auto' }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginLeft: 'auto' }}>
             {places.length} {lang === 'en' ? 'found' : 'nahanap'}
           </Text>
         </View>
@@ -196,8 +196,8 @@ export default function MarketMapScreen() {
           <View className="flex-row items-start gap-3">
             <Text style={{ fontSize: 28 }}>{(selected.kind ?? 'market') === 'tindahan' ? '🛒' : '🏪'}</Text>
             <View className="flex-1">
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }} numberOfLines={2}>{selected.name}</Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }} numberOfLines={2}>{selected.name}</Text>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                 {[selected.barangay, selected.municipality].filter(Boolean).join(', ')}
                 {selected.distance_km != null ? ` · ${selected.distance_km < 1 ? Math.round(selected.distance_km * 1000) + ' m' : selected.distance_km.toFixed(1) + ' km'}` : ''}
               </Text>
@@ -222,7 +222,7 @@ export default function MarketMapScreen() {
               style={{ backgroundColor: '#E7653B' }}
             >
               <Ionicons name="storefront-outline" size={15} color="#fff" />
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>
                 {lang === 'en' ? 'View prices' : 'Tingnan ang presyo'}
               </Text>
             </Pressable>

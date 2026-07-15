@@ -36,7 +36,7 @@ async function pickImage(aspect: [number, number], lang: 'en' | 'tl'): Promise<s
 export default function StorePhotoPicker({ lang, coverUri, photoUri, onPickCover, onPickPhoto }: Props) {
   return (
     <View className="mb-4">
-      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
         {lang === 'en' ? 'Photos (optional)' : 'Mga Litrato (opsyonal)'}
       </Text>
 
@@ -58,7 +58,7 @@ export default function StorePhotoPicker({ lang, coverUri, photoUri, onPickCover
             <Image source={{ uri: coverUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
             <View style={{ position: 'absolute', right: 8, bottom: 8, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(41,37,34,0.65)', borderRadius: 14, paddingHorizontal: 8, paddingVertical: 4 }}>
               <Ionicons name="camera-outline" size={12} color="#FFF8E8" />
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#FFF8E8' }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#FFF8E8' }}>
                 {lang === 'en' ? 'Change' : 'Palitan'}
               </Text>
             </View>
@@ -66,7 +66,7 @@ export default function StorePhotoPicker({ lang, coverUri, photoUri, onPickCover
         ) : (
           <View style={{ alignItems: 'center', gap: 4 }}>
             <Ionicons name="image-outline" size={24} color="#B0A18C" />
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
               {lang === 'en' ? 'Add header photo' : 'Magdagdag ng header photo'}
             </Text>
           </View>
@@ -93,7 +93,7 @@ export default function StorePhotoPicker({ lang, coverUri, photoUri, onPickCover
             <Ionicons name="storefront-outline" size={24} color="#B0A18C" />
           )}
         </Pressable>
-        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', flex: 1 }}>
+        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', flex: 1 }}>
           {lang === 'en'
             ? 'Store photo (logo or storefront). Tap to change.'
             : 'Litrato ng tindahan (logo o harapan). I-tap para palitan.'}

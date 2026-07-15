@@ -232,7 +232,7 @@ function ZoomableGallery({
 
       {/* Hint */}
       <View style={{ position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' }}>
-        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 12 }}>Pinch to zoom · Swipe to navigate</Text>
+        <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13 }}>Pinch to zoom · Swipe to navigate</Text>
       </View>
     </View>
   );
@@ -327,7 +327,7 @@ type RecipeCommentItem = {
   replies: RecipeCommentItem[];
 };
 
-function CommentAvatar({ user, size = 32 }: { user: RecipeCommentUser; size?: number }) {
+function CommentAvatar({ user, size = 36 }: { user: RecipeCommentUser; size?: number }) {
   const uri = user.avatar ? `${API_URL}${user.avatar}` : null;
   return uri ? (
     <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size / 2 }} />
@@ -356,13 +356,13 @@ function RecipeCommentRow({
 
     return (
       <View key={c.id} style={{ flexDirection: 'row', gap: 10, marginLeft: isReply ? 40 : 0, marginTop: isReply ? 8 : 0 }}>
-        <CommentAvatar user={c.user} size={isReply ? 28 : 32} />
+        <CommentAvatar user={c.user} size={isReply ? 32 : 36} />
         <View style={{ flex: 1 }}>
           <View style={{ backgroundColor: '#FFFCF5', borderRadius: 16, borderTopLeftRadius: 2, paddingHorizontal: 12, paddingVertical: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522' }}>{c.user.name}</Text>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}>{c.user.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {commentTimeAgo(c.created_at, lang)}
                 </Text>
                 {canEdit && (
@@ -377,12 +377,12 @@ function RecipeCommentRow({
                 )}
               </View>
             </View>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', lineHeight: 20 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', lineHeight: 20 }}>
               {c.body}
             </Text>
           </View>
           <Pressable onPress={() => onReply(c.user)} style={{ marginLeft: 8, marginTop: 4 }} className="active:opacity-60">
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
               {lang === 'en' ? 'Reply' : 'Tumugon'}
             </Text>
           </Pressable>
@@ -782,14 +782,14 @@ export default function RecipeDetailScreen() {
             />
           </View>
         )}
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: '#292522', lineHeight: 28, marginBottom: 2 }}>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: '#000000', lineHeight: 28, marginBottom: 2 }}>
           {recipe.title}
         </Text>
         {wasEdited && (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 4 }}>{editedLabel()}</Text>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 4 }}>{editedLabel()}</Text>
         )}
         {recipe.description ? (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 20, marginBottom: 8 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', lineHeight: 20, marginBottom: 8 }}>
             {recipe.description}
           </Text>
         ) : null}
@@ -798,12 +798,12 @@ export default function RecipeDetailScreen() {
         {!isMine && recipe.user && (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
+              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
                 {recipe.user.name.substring(0, 2).toUpperCase()}
               </Text>
             </View>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
-              by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#292522' }}>{recipe.user.name}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+              by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{recipe.user.name}</Text>
             </Text>
           </View>
         )}
@@ -813,7 +813,7 @@ export default function RecipeDetailScreen() {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
             {recipe.tags.map((tag) => (
               <View key={tag} style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 10, paddingVertical: 3 }}>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#5E693F' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#5E693F' }}>
                   {TAG_EMOJI[tag] ? `${TAG_EMOJI[tag]} ` : ''}{tag}
                 </Text>
               </View>
@@ -823,7 +823,7 @@ export default function RecipeDetailScreen() {
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Ionicons name="eye-outline" size={13} color="#B0A18C" />
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
             {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
           </Text>
         </View>
@@ -860,7 +860,7 @@ export default function RecipeDetailScreen() {
           style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: 12 }}
         >
           <Ionicons name="paper-plane-outline" size={20} color="#6F655A" />
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
             {recipe.share_count ?? 0}
           </Text>
         </Pressable>
@@ -869,7 +869,7 @@ export default function RecipeDetailScreen() {
           {savePending ? <ActivityIndicator color="#6E7B4A" size="small" /> : (
             <>
               <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={22} color={isSaved ? '#F4B942' : '#D3C5AB'} />
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                 {recipe.save_count ?? 0} saved
               </Text>
             </>
@@ -888,7 +888,7 @@ export default function RecipeDetailScreen() {
       {/* ── Photo gallery ── */}
       {photos.length > 1 && (
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', paddingHorizontal: 20, marginBottom: 8 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', paddingHorizontal: 20, marginBottom: 8 }}>
             Photos
           </Text>
           <ScrollView
@@ -932,7 +932,7 @@ export default function RecipeDetailScreen() {
       {/* ── YouTube video ── */}
       {videoId && (
         <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 8 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 8 }}>
             Video
           </Text>
           <Pressable
@@ -953,7 +953,7 @@ export default function RecipeDetailScreen() {
               </View>
               {/* Label */}
               <View style={{ position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#fff' }}>Watch on YouTube</Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#fff' }}>Watch on YouTube</Text>
               </View>
             </View>
           </Pressable>
@@ -970,7 +970,7 @@ export default function RecipeDetailScreen() {
         ].map((s, i) => (
           <View key={s.label} style={{ flex: 1, alignItems: 'center', paddingVertical: 16, borderRightWidth: i < 3 ? 1 : 0, borderRightColor: '#F9EDD3' }}>
             <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#5E693F' }}>{s.val}</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }}>{s.label}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }}>{s.label}</Text>
           </View>
         ))}
       </View>
@@ -978,7 +978,7 @@ export default function RecipeDetailScreen() {
       <View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
 
         {/* ── Ingredients ── */}
-        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>Ingredients</Text>
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000', marginBottom: 10 }}>Ingredients</Text>
         <View style={{ backgroundColor: '#FFFCF5', borderRadius: 16, padding: 16, marginBottom: 20 }}>
           {recipe.ingredients?.map((ing, i) => (
             <View
@@ -986,37 +986,37 @@ export default function RecipeDetailScreen() {
               style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: i < recipe.ingredients.length - 1 ? 1 : 0, borderBottomColor: '#F9EDD3' }}
             >
               <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#292522' }}>{ing.name}</Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>{ing.name}</Text>
                 {ing.quantity && (
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                     {ing.quantity} {ing.unit}
                   </Text>
                 )}
               </View>
               {ing.estimated_price > 0 && (
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A', marginLeft: 12 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#C45E3A', marginLeft: 12 }}>
                   ~₱{Number(ing.estimated_price).toFixed(0)}
                 </Text>
               )}
             </View>
           ))}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, marginTop: 4, borderTopWidth: 1, borderTopColor: '#F0DEBB' }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>Total cost</Text>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C' }}>~₱{Number(recipe.estimated_cost).toFixed(0)}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#6F655A' }}>Total cost</Text>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#C4881C' }}>~₱{Number(recipe.estimated_cost).toFixed(0)}</Text>
           </View>
         </View>
 
         {/* ── Instructions ── */}
         {recipeSteps.length > 0 && (
           <>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>Instructions</Text>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000', marginBottom: 10 }}>Instructions</Text>
             <View style={{ marginBottom: 20 }}>
               {recipeSteps.map((step, i) => (
                 <View key={i} style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
                   <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: '#6E7B4A', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>{i + 1}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>{i + 1}</Text>
                   </View>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#292522', lineHeight: 22, flex: 1 }}>{step}</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', lineHeight: 22, flex: 1 }}>{step}</Text>
                 </View>
               ))}
             </View>
@@ -1026,12 +1026,12 @@ export default function RecipeDetailScreen() {
         {/* ── Tips ── */}
         {recipe.tips?.length > 0 && (
           <>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>{lang === 'en' ? '💡 Tips' : '💡 Mga Tip'}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000', marginBottom: 10 }}>{lang === 'en' ? '💡 Tips' : '💡 Mga Tip'}</Text>
             <View style={{ backgroundColor: '#FEF6E3', borderRadius: 16, padding: 16, marginBottom: 20 }}>
               {recipe.tips.map((tip, i) => (
                 <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: i < recipe.tips.length - 1 ? 8 : 0 }}>
-                  <Text style={{ color: '#E3A32A', fontSize: 12, marginTop: 2 }}>•</Text>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#9A6A12', lineHeight: 20, flex: 1 }}>{tip}</Text>
+                  <Text style={{ color: '#E3A32A', fontSize: 13, marginTop: 2 }}>•</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#9A6A12', lineHeight: 20, flex: 1 }}>{tip}</Text>
                 </View>
               ))}
             </View>
@@ -1082,9 +1082,9 @@ export default function RecipeDetailScreen() {
           <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
             <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>Add to Today's Meal Plan</Text>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>Add to Today's Meal Plan</Text>
                 {recipe && (
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
                     {recipe.title}
                   </Text>
                 )}
@@ -1095,7 +1095,7 @@ export default function RecipeDetailScreen() {
             </View>
 
             <ScrollView contentContainerStyle={{ padding: 20, gap: 10 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 }}>
                 Pick meal type
               </Text>
               {MEAL_TYPES.map((mt) => {
@@ -1107,7 +1107,7 @@ export default function RecipeDetailScreen() {
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 14, borderWidth: 1.5, borderColor: active ? '#6E7B4A' : '#F0DEBB', backgroundColor: active ? '#EFF4EC' : '#fff', marginBottom: 8 }}
                   >
                     <Text style={{ fontSize: 20 }}>{mt.emoji}</Text>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#292522', flex: 1 }}>{mt.label}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#000000', flex: 1 }}>{mt.label}</Text>
                     {active && <Ionicons name="checkmark-circle" size={20} color="#6E7B4A" />}
                   </Pressable>
                 );
@@ -1135,7 +1135,7 @@ export default function RecipeDetailScreen() {
         {data?.shared_by && data.shared_by.length > 0 && (
           <>
             <View style={{ marginTop: 24, paddingBottom: 8 }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 10 }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000', marginBottom: 10 }}>
                 Shared by{(recipe.share_count ?? 0) > 0 ? ` (${recipe.share_count})` : ''}
               </Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 0 }}>
@@ -1145,7 +1145,7 @@ export default function RecipeDetailScreen() {
                     key={post.id}
                     onPress={() => router.push(`/user/${post.user?.id}`)}
                     style={{
-                      width: 38, height: 38, borderRadius: 19,
+                      width: 42, height: 42, borderRadius: 21,
                       backgroundColor: '#EFF4EC',
                       alignItems: 'center', justifyContent: 'center',
                       overflow: 'hidden',
@@ -1154,9 +1154,9 @@ export default function RecipeDetailScreen() {
                     }}
                   >
                     {post.user?.avatar ? (
-                      <Image source={{ uri: post.user.avatar }} style={{ width: 38, height: 38 }} />
+                      <Image source={{ uri: post.user.avatar }} style={{ width: 42, height: 42 }} />
                     ) : (
-                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#5E693F' }}>
+                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#5E693F' }}>
                         {(post.user?.name ?? '??').substring(0, 2).toUpperCase()}
                       </Text>
                     )}
@@ -1177,7 +1177,7 @@ export default function RecipeDetailScreen() {
                     }}
                     style={{ marginLeft: 8, flexDirection: 'row', alignItems: 'center', gap: 2 }}
                   >
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#5E693F' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#5E693F' }}>
                       and {(recipe.share_count ?? 0) - data.shared_by.length} more
                     </Text>
                     <Ionicons name="chevron-forward" size={14} color="#5E693F" />
@@ -1217,7 +1217,7 @@ export default function RecipeDetailScreen() {
                 {/* Handle + header */}
                 <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#F0DEBB', alignSelf: 'center', marginBottom: 12 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
                     Shared by {recipe.share_count ?? 0} {(recipe.share_count ?? 0) === 1 ? 'person' : 'people'}
                   </Text>
                   <Pressable onPress={() => setSharersOpen(false)} hitSlop={10}>
@@ -1238,11 +1238,11 @@ export default function RecipeDetailScreen() {
                         style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 }}
                       >
                         <View style={{
-                          width: 44, height: 44, borderRadius: 22,
+                          width: 48, height: 48, borderRadius: 24,
                           backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                         }}>
                           {post.user?.avatar ? (
-                            <Image source={{ uri: post.user.avatar }} style={{ width: 44, height: 44 }} />
+                            <Image source={{ uri: post.user.avatar }} style={{ width: 48, height: 48 }} />
                           ) : (
                             <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#5E693F' }}>
                               {(post.user?.name ?? '??').substring(0, 2).toUpperCase()}
@@ -1250,11 +1250,11 @@ export default function RecipeDetailScreen() {
                           )}
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }}>
+                          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>
                             {post.user?.name ?? 'Unknown'}
                           </Text>
                           {post.user?.username ? (
-                            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                               @{post.user.username}
                             </Text>
                           ) : null}
@@ -1264,7 +1264,7 @@ export default function RecipeDetailScreen() {
                     )}
                     ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: '#FFFCF5' }} />}
                     ListEmptyComponent={
-                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', paddingVertical: 24 }}>
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', paddingVertical: 24 }}>
                         No sharers yet.
                       </Text>
                     }
@@ -1277,21 +1277,21 @@ export default function RecipeDetailScreen() {
 
         {/* ── Comments ── */}
         <View style={{ marginTop: 24 }}>
-          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522', marginBottom: 4 }}>
+          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000', marginBottom: 4 }}>
             {lang === 'en' ? 'Comments' : 'Mga Komento'} ({comments.length})
           </Text>
 
           {editCommentId !== null && (
             <View style={{ backgroundColor: '#FDEFC9', borderRadius: 12, padding: 10, marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <TextInput
-                style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 80 }}
+                style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 80 }}
                 value={editCommentBody}
                 onChangeText={setEditCommentBody}
                 multiline
                 autoFocus
               />
               <Pressable onPress={saveEditComment} disabled={savingComment} style={{ backgroundColor: '#386641', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 }}>
-                {savingComment ? <ActivityIndicator color="white" size="small" /> : <Text style={{ color: 'white', fontFamily: 'NunitoSans_700Bold', fontSize: 12 }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
+                {savingComment ? <ActivityIndicator color="white" size="small" /> : <Text style={{ color: 'white', fontFamily: 'NunitoSans_700Bold', fontSize: 13 }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
               </Pressable>
               <Pressable onPress={() => setEditCommentId(null)}>
                 <Text style={{ color: '#6F655A', fontSize: 14 }}>✕</Text>
@@ -1302,7 +1302,7 @@ export default function RecipeDetailScreen() {
           {comments.length === 0 ? (
             <View style={{ alignItems: 'center', paddingVertical: 20 }}>
               <Text style={{ fontSize: 26, marginBottom: 6 }}>💬</Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center' }}>
                 {lang === 'en' ? 'No comments yet. Be the first!' : 'Wala pang komento. Maging una!'}
               </Text>
             </View>
@@ -1322,7 +1322,7 @@ export default function RecipeDetailScreen() {
 
           {replyTo && (
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#EFF4EC', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, marginTop: 8 }}>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#386641', flex: 1 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#386641', flex: 1 }}>
                 ↩ {lang === 'en' ? 'Replying to' : 'Tumutugon kay'} <Text style={{ fontFamily: 'NunitoSans_700Bold' }}>{replyTo.name.split(' ')[0]}</Text>
               </Text>
               <Pressable onPress={() => setReplyTo(null)} hitSlop={8}>
@@ -1335,12 +1335,12 @@ export default function RecipeDetailScreen() {
             {me && (
               <CommentAvatar
                 user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }}
-                size={32}
+                size={36}
               />
             )}
             <TextInput
               ref={commentInputRef}
-              style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#292522', maxHeight: 100 }}
+              style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, fontFamily: 'NunitoSans_400Regular', color: '#000000', maxHeight: 100 }}
               placeholder={
                 replyTo
                   ? (lang === 'en' ? `Reply to ${replyTo.name.split(' ')[0]}...` : `Tumugon kay ${replyTo.name.split(' ')[0]}...`)

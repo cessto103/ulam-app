@@ -288,14 +288,14 @@ export default function ShoppingListScreen() {
           <Pressable onPress={() => router.back()} className="p-2 active:opacity-60">
             <Text style={{ fontSize: 20 }}>←</Text>
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#292522' }}>Shopping List</Text>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>Shopping List</Text>
         </View>
         <View className="flex-1 items-center justify-center px-8">
           <Text style={{ fontSize: 48, marginBottom: 16 }}>🛒</Text>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 8, textAlign: 'center' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 8, textAlign: 'center' }}>
             {lang === 'en' ? 'No meal plan yet' : 'Walang meal plan pa'}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', lineHeight: 20 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', lineHeight: 20 }}>
             {lang === 'en'
               ? 'Generate a meal plan on the Meal Plan tab first to see your shopping list.'
               : 'Gumawa muna ng meal plan sa Meal Plan tab para makita ang shopping list.'}
@@ -313,14 +313,14 @@ export default function ShoppingListScreen() {
           <Text style={{ fontSize: 20 }}>←</Text>
         </Pressable>
         <View className="flex-1">
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#292522' }}>Shopping List</Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>Shopping List</Text>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
             {checkedCount}/{allIngredients.length} {lang === 'en' ? 'bought' : 'na nabili'} · ₱{total.toFixed(0)} {lang === 'en' ? 'total' : 'kabuuan'}
           </Text>
         </View>
         {checkedCount > 0 && (
           <Pressable onPress={() => setChecked({})} className="px-3 py-1.5 rounded-full bg-cream-200 active:opacity-70">
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
               {lang === 'en' ? 'Reset' : 'I-reset'}
             </Text>
           </Pressable>
@@ -340,10 +340,10 @@ export default function ShoppingListScreen() {
               return (
                 <View className="flex-row items-center gap-2 mb-2">
                   <Text style={{ fontSize: 14 }}>{cat.emoji}</Text>
-                  <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#292522' }}>
+                  <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000' }}>
                     {lang === 'en' ? cat.labelEn : cat.labelTl}
                   </Text>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', flex: 1 }}>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', flex: 1 }}>
                     · {items.length} {lang === 'en' ? 'item' : 'item'}
                   </Text>
                   {/* Check all in this category */}
@@ -356,11 +356,11 @@ export default function ShoppingListScreen() {
                     hitSlop={8}
                     className="flex-row items-center gap-1.5 active:opacity-70"
                   >
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
                       {lang === 'en' ? 'Check all' : 'Lahat'}
                     </Text>
                     <View style={{ width: 18, height: 18, borderRadius: 4, borderWidth: 2, alignItems: 'center', justifyContent: 'center', backgroundColor: allDone ? '#386641' : 'transparent', borderColor: allDone ? '#386641' : '#D3C5AB' }}>
-                      {allDone && <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>{'\u2713'}</Text>}
+                      {allDone && <Text style={{ color: 'white', fontSize: 13, fontWeight: '700' }}>{'\u2713'}</Text>}
                     </View>
                   </Pressable>
                 </View>
@@ -399,13 +399,13 @@ export default function ShoppingListScreen() {
                       className="active:opacity-70"
                     >
                       <View style={{ width: 20, height: 20, borderRadius: 4, borderWidth: 2, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? '#386641' : 'transparent', borderColor: done ? '#386641' : '#D3C5AB' }}>
-                        {done && <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+                        {done && <Text style={{ color: 'white', fontSize: 13, fontWeight: '700' }}>✓</Text>}
                       </View>
                     </Pressable>
 
                     {/* Ingredient info — name + tappable qty */}
                     <View style={{ flex: 1, paddingVertical: 10 }}>
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: done ? '#B0A18C' : '#292522', textDecorationLine: done ? 'line-through' : 'none' }}>
+                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: done ? '#B0A18C' : '#000000', textDecorationLine: done ? 'line-through' : 'none' }}>
                         {ing.name}
                       </Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
@@ -416,7 +416,7 @@ export default function ShoppingListScreen() {
                               minWidth: 60, maxWidth: 130,
                               paddingHorizontal: 7, paddingVertical: 3,
                               borderRadius: 6, borderWidth: 1.5, borderColor: '#6F655A',
-                              fontSize: 12, fontFamily: 'NunitoSans_600SemiBold', color: '#292522',
+                              fontSize: 13, fontFamily: 'NunitoSans_600SemiBold', color: '#000000',
                               backgroundColor: '#EFF4EC',
                             }}
                             defaultValue={qtyStr}
@@ -434,7 +434,7 @@ export default function ShoppingListScreen() {
                             className="active:opacity-60"
                           >
                             <Text style={{
-                              fontFamily: 'NunitoSans_400Regular', fontSize: 12,
+                              fontFamily: 'NunitoSans_400Regular', fontSize: 13,
                               color: qtyChanged && !done ? '#6F655A' : '#B0A18C',
                               textDecorationLine: qtyChanged && !done ? 'underline' : 'none',
                             }}>
@@ -453,7 +453,7 @@ export default function ShoppingListScreen() {
                         style={{
                           width: 72, marginRight: 12, paddingHorizontal: 8, paddingVertical: 6,
                           borderRadius: 8, borderWidth: 1.5, borderColor: '#386641',
-                          fontSize: 13, fontFamily: 'NunitoSans_700Bold', color: '#386641',
+                          fontSize: 14, fontFamily: 'NunitoSans_700Bold', color: '#386641',
                           textAlign: 'right', backgroundColor: '#EFF4EC',
                         }}
                         keyboardType="decimal-pad"
@@ -472,11 +472,11 @@ export default function ShoppingListScreen() {
                         style={{ paddingHorizontal: 12, paddingVertical: 13, alignItems: 'flex-end' }}
                         className="active:opacity-60"
                       >
-                        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: done ? '#D3C5AB' : priceChanged ? '#C4881C' : '#386641' }}>
+                        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: done ? '#D3C5AB' : priceChanged ? '#C4881C' : '#386641' }}>
                           ₱{price.toFixed(0)}
                         </Text>
                         {priceChanged && !done && (
-                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#C4881C', marginTop: 1 }}>
+                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#C4881C', marginTop: 1 }}>
                             {lang === 'en' ? 'edited' : 'binago'}
                           </Text>
                         )}
@@ -494,7 +494,7 @@ export default function ShoppingListScreen() {
         <View style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Text style={{ fontSize: 14 }}>➕</Text>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#292522' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000' }}>
               {lang === 'en' ? 'Add item' : 'Dagdag na aytem'}
             </Text>
           </View>
@@ -513,13 +513,13 @@ export default function ShoppingListScreen() {
                   <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: idx < customItems.length - 1 ? 1 : 0, borderBottomColor: '#F9EDD3' }}>
                     <Pressable onPress={() => setChecked(p => ({ ...p, [key]: !done }))} style={{ marginRight: 12 }}>
                       <View style={{ width: 20, height: 20, borderRadius: 4, borderWidth: 2, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? '#386641' : 'transparent', borderColor: done ? '#386641' : '#D3C5AB' }}>
-                        {done && <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+                        {done && <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>✓</Text>}
                       </View>
                     </Pressable>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: done ? '#B0A18C' : '#292522', flex: 1, textDecorationLine: done ? 'line-through' : 'none' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: done ? '#B0A18C' : '#000000', flex: 1, textDecorationLine: done ? 'line-through' : 'none' }}>
                       {ci.name}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: done ? '#D3C5AB' : '#386641', marginRight: 10 }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: done ? '#D3C5AB' : '#386641', marginRight: 10 }}>
                       {ci.price ? `₱${parseFloat(ci.price).toFixed(0)}` : '—'}
                     </Text>
                     <Pressable onPress={() => removeCustomItem(ci.id)} hitSlop={8}>
@@ -534,7 +534,7 @@ export default function ShoppingListScreen() {
           {/* Input row */}
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TextInput
-              style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular' }}
+              style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular' }}
               placeholder={lang === 'en' ? 'Item name…' : 'Pangalan ng aytem…'}
               placeholderTextColor="#B0A18C"
               value={newItemName}
@@ -544,7 +544,7 @@ export default function ShoppingListScreen() {
             />
             <TextInput
               ref={priceInputRef}
-              style={{ width: 80, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', paddingHorizontal: 12, paddingVertical: 11, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular' }}
+              style={{ width: 80, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', paddingHorizontal: 12, paddingVertical: 11, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular' }}
               placeholder="₱0"
               placeholderTextColor="#B0A18C"
               value={newItemPrice}
@@ -576,12 +576,12 @@ export default function ShoppingListScreen() {
             }}>
               <Text style={{ fontSize: 18 }}>{over ? '⚠️' : '✅'}</Text>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: over ? '#E24B4A' : '#386641' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: over ? '#E24B4A' : '#386641' }}>
                   {over
                     ? (lang === 'en' ? `Over budget by ₱${Math.abs(diff).toFixed(0)}` : `Lumampas sa budget ng ₱${Math.abs(diff).toFixed(0)}`)
                     : (lang === 'en' ? `₱${diff.toFixed(0)} remaining in budget` : `₱${diff.toFixed(0)} pa ang natitira sa budget`)}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: over ? '#E24B4A' : '#6F655A', marginTop: 2 }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: over ? '#E24B4A' : '#6F655A', marginTop: 2 }}>
                   {lang === 'en'
                     ? `Daily budget: ₱${budget.budget.toFixed(0)} · Shopping total: ₱${total.toFixed(0)}`
                     : `Daily budget: ₱${budget.budget.toFixed(0)} · Kabuuan: ₱${total.toFixed(0)}`}
@@ -595,13 +595,13 @@ export default function ShoppingListScreen() {
         <View style={{ backgroundColor: '#3C3A2F', borderRadius: 16, padding: 16, marginBottom: 12 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,248,232,0.78)', marginBottom: 2 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,248,232,0.78)', marginBottom: 2 }}>
                 {lang === 'en' ? 'Shopping total' : 'Kabuuang gastos'}
               </Text>
               <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 26, color: 'white' }}>₱{total.toFixed(0)}</Text>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,248,232,0.78)', marginBottom: 2 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,248,232,0.78)', marginBottom: 2 }}>
                 {lang === 'en' ? 'Bought' : 'Nabilhin na'}
               </Text>
               <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: 'white' }}>

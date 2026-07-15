@@ -78,7 +78,7 @@ export default function ForgotPasswordScreen() {
 
       <ScrollView contentContainerClassName="flex-grow px-6 py-10" keyboardShouldPersistTaps="handled">
         <Pressable onPress={() => router.back()} hitSlop={10} className="w-9 h-9 rounded-full bg-cream-200 items-center justify-center active:opacity-70 mb-4">
-          <Ionicons name="arrow-back" size={18} color="#292522" />
+          <Ionicons name="arrow-back" size={18} color="#000000" />
         </Pressable>
 
         <View className="items-center mt-2 mb-8">
@@ -87,7 +87,7 @@ export default function ForgotPasswordScreen() {
 
         {step === 'email' && (
           <>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#292522', marginBottom: 4 }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#000000', marginBottom: 4 }}>
               {lang === 'en' ? 'Forgot your password?' : 'Nakalimutan ang password?'}
             </Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6E7B4A', marginBottom: 24 }}>
@@ -133,7 +133,7 @@ export default function ForgotPasswordScreen() {
 
         {step === 'reset' && (
           <>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#292522', marginBottom: 4 }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#000000', marginBottom: 4 }}>
               {lang === 'en' ? 'Check your email' : 'Tingnan ang iyong email'}
             </Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6E7B4A', marginBottom: 24 }}>
@@ -217,7 +217,7 @@ export default function ForgotPasswordScreen() {
             <View className="items-center mb-6">
               <Text style={{ fontSize: 56 }}>✅</Text>
             </View>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#292522', marginBottom: 4, textAlign: 'center' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#000000', marginBottom: 4, textAlign: 'center' }}>
               {lang === 'en' ? 'Password updated!' : 'Na-update ang password!'}
             </Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6E7B4A', marginBottom: 24, textAlign: 'center' }}>

@@ -143,10 +143,18 @@ export default function ProfileScreen() {
           <Pressable
             onPress={() => router.push('/settings' as any)}
             hitSlop={10}
-            className="w-9 h-9 rounded-full items-center justify-center active:opacity-70"
-            style={{ backgroundColor: 'rgba(255,248,232,0.18)' }}
+            className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
+            style={{
+              backgroundColor: 'rgba(255,248,232,0.18)',
+              shadowColor: '#000', shadowOpacity: 0.22, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 3,
+            }}
           >
-            <Ionicons name="settings-outline" size={20} color="#FFF8E8" />
+            <Ionicons
+              name="settings-outline"
+              size={23}
+              color="#FFF8E8"
+              style={{ textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
+            />
           </Pressable>
         </View>
 
@@ -155,21 +163,21 @@ export default function ProfileScreen() {
             {avatarUri ? (
               <Image
                 source={{ uri: avatarUri }}
-                className="w-24 h-24 rounded-full bg-cream-300"
+                className="w-28 h-28 rounded-full bg-cream-300"
               />
             ) : (
-              <View className="w-24 h-24 rounded-full bg-brand-400 items-center justify-center">
+              <View className="w-28 h-28 rounded-full bg-brand-400 items-center justify-center">
                 <Text className="text-4xl">👤</Text>
               </View>
             )}
           </View>
 
           {/* Edit badge */}
-          <View className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gold-400 items-center justify-center border-2 border-cream-50">
+          <View className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-gold-400 items-center justify-center border-2 border-cream-50">
             {uploading ? (
               <ActivityIndicator color="white" size="small" />
             ) : (
-              <Ionicons name="camera-outline" size={14} color="white" />
+              <Ionicons name="camera-outline" size={16} color="white" />
             )}
           </View>
         </Pressable>
@@ -206,8 +214,8 @@ export default function ProfileScreen() {
         ].map((s) => (
           <View key={s.label} className="flex-1 rounded-2xl border border-cream-200 bg-white p-4 items-center">
             <Text style={{ fontSize: 30, marginBottom: 4 }}>{s.emoji}</Text>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#292522' }}>{s.value}</Text>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A' }}>{s.label}</Text>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#000000' }}>{s.value}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#6F655A' }}>{s.label}</Text>
           </View>
         ))}
       </View>

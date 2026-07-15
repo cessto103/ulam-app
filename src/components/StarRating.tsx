@@ -39,7 +39,7 @@ export default function StarRating({ myRating, avgRating, count, onRate, noRatin
           </Pressable>
         ))}
       </View>
-      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
         {myRating ? `Your rating: ${myRating}/5 · ` : ''}
         {count > 0 ? `${avgRating.toFixed(1)} avg (${count} rating${count !== 1 ? 's' : ''})` : (noRatingsLabel ?? 'No ratings yet')}
       </Text>

@@ -39,7 +39,7 @@ function TimePickerModal({ visible, value, onSelect, onClose }: TimePickerModalP
           style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '65%' }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#292522' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#000000' }}>
               {lang === 'en' ? 'Select time' : 'Piliin ang Oras'}
             </Text>
             <Pressable onPress={onClose} hitSlop={8}>
@@ -59,7 +59,7 @@ function TimePickerModal({ visible, value, onSelect, onClose }: TimePickerModalP
                   }}
                   className="active:opacity-70"
                 >
-                  <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 14, color: active ? '#386641' : '#292522' }}>
+                  <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 14, color: active ? '#386641' : '#000000' }}>
                     {formatTime12h(t)}
                   </Text>
                 </Pressable>
@@ -98,12 +98,12 @@ export default function DayHoursPicker({ value, onChange }: DayHoursPickerProps)
               paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F9EDD3',
             }}
           >
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', width: 78 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', width: 78 }}>
               {lang === 'en' ? DAY_LABELS[day].en : DAY_LABELS[day].tl}
             </Text>
 
             {day_.closed ? (
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', flex: 1 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', flex: 1 }}>
                 {lang === 'en' ? 'Closed' : 'Sarado'}
               </Text>
             ) : (
@@ -113,17 +113,17 @@ export default function DayHoursPicker({ value, onChange }: DayHoursPickerProps)
                   style={{ backgroundColor: '#FFFCF5', borderRadius: 10, borderWidth: 1, borderColor: '#F0DEBB', paddingHorizontal: 10, paddingVertical: 7 }}
                   className="active:opacity-70"
                 >
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
                     {formatTime12h(day_.open)}
                   </Text>
                 </Pressable>
-                <Text style={{ fontSize: 12, color: '#6F655A' }}>–</Text>
+                <Text style={{ fontSize: 13, color: '#6F655A' }}>–</Text>
                 <Pressable
                   onPress={() => setPickerFor({ day, field: 'close' })}
                   style={{ backgroundColor: '#FFFCF5', borderRadius: 10, borderWidth: 1, borderColor: '#F0DEBB', paddingHorizontal: 10, paddingVertical: 7 }}
                   className="active:opacity-70"
                 >
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
                     {formatTime12h(day_.close)}
                   </Text>
                 </Pressable>

@@ -114,7 +114,7 @@ export default function RegisterScreen() {
           <LanguageSwitcher tone="warm" />
         </View>
 
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 27, color: '#292522', marginBottom: 2 }}>{t('create_account')}</Text>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 27, color: '#000000', marginBottom: 2 }}>{t('create_account')}</Text>
         <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6E7B4A', marginBottom: 28 }}>{t('signup_free')}</Text>
 
         {errors.general ? (

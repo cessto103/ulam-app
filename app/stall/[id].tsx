@@ -214,7 +214,7 @@ export default function StallDetailScreen() {
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#3C3A2F' }} numberOfLines={1}>
                   {stall?.name ?? '—'}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                   {[stall?.barangay, stall?.municipality].filter(Boolean).join(', ')}
                 </Text>
               </>
@@ -232,8 +232,8 @@ export default function StallDetailScreen() {
                 }}
                 className="active:opacity-70"
               >
-                <Text style={{ fontSize: 12 }}>✏️</Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6E7B4A' }}>
+                <Text style={{ fontSize: 13 }}>✏️</Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6E7B4A' }}>
                   {lang === 'en' ? 'Edit store' : 'I-edit'}
                 </Text>
               </Pressable>
@@ -247,8 +247,8 @@ export default function StallDetailScreen() {
                 }}
                 className="active:opacity-70"
               >
-                <Text style={{ fontSize: 12 }}>🚩</Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#E24B4A' }}>
+                <Text style={{ fontSize: 13 }}>🚩</Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#E24B4A' }}>
                   {lang === 'en' ? 'Report' : 'I-report'}
                 </Text>
               </Pressable>
@@ -329,7 +329,7 @@ export default function StallDetailScreen() {
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
                 <Ionicons name="location-outline" size={12} color="#B0A18C" />
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', flexShrink: 1 }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', flexShrink: 1 }} numberOfLines={1}>
                   {[stall.barangay, stall.municipality].filter(Boolean).join(', ')}
                 </Text>
               </View>
@@ -360,7 +360,7 @@ export default function StallDetailScreen() {
                 marginBottom: 12,
               }}
             >
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6E7B4A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6E7B4A' }}>
                 {MARKET_TYPE_EMOJI[stall.type] ?? '🏪'} {stall.type}
               </Text>
             </View>
@@ -368,7 +368,7 @@ export default function StallDetailScreen() {
 
           {/* Description */}
           {stall.description && (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#3C3A2F', lineHeight: 20, marginBottom: 16 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#3C3A2F', lineHeight: 20, marginBottom: 16 }}>
               {stall.description}
             </Text>
           )}
@@ -398,7 +398,7 @@ export default function StallDetailScreen() {
                         }}
                       >
                         <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: openNow ? '#4E7A47' : '#E24B4A' }} />
-                        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: openNow ? '#065F46' : '#E24B4A' }}>
+                        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: openNow ? '#065F46' : '#E24B4A' }}>
                           {openNow
                             ? (lang === 'en' ? 'Open now' : 'Bukas ngayon')
                             : (lang === 'en' ? 'Closed now' : 'Sarado ngayon')}
@@ -410,10 +410,10 @@ export default function StallDetailScreen() {
                       if (!hours) return null;
                       return (
                         <View key={day} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2 }}>
-                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                             {lang === 'en' ? DAY_LABELS[day].en : DAY_LABELS[day].tl}
                           </Text>
-                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#3C3A2F' }}>
+                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#3C3A2F' }}>
                             {hours.closed
                               ? (lang === 'en' ? 'Closed' : 'Sarado')
                               : `${formatTime12h(hours.open)} – ${formatTime12h(hours.close)}`}
@@ -430,7 +430,7 @@ export default function StallDetailScreen() {
                   className="flex-row items-center gap-2 active:opacity-70"
                 >
                   <Text style={{ fontSize: 14 }}>📞</Text>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6E7B4A' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6E7B4A' }}>
                     {stall.contact_number}
                   </Text>
                 </Pressable>
@@ -446,10 +446,10 @@ export default function StallDetailScreen() {
             >
               <Text style={{ fontSize: 20 }}>{MARKET_TYPE_EMOJI[stall.market.type] ?? '🏪'}</Text>
               <View className="flex-1">
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {lang === 'en' ? 'Located inside' : 'Nasa loob ng'}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6E7B4A' }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#6E7B4A' }} numberOfLines={1}>
                   {stall.market.name}
                 </Text>
               </View>
@@ -464,7 +464,7 @@ export default function StallDetailScreen() {
             style={{ alignSelf: 'flex-start', marginBottom: 20 }}
             className="active:opacity-60"
           >
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               {lang === 'en' ? 'Listed by ' : 'Inilista ni '}
               <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#6E7B4A' }}>{stall.user.name}</Text>
             </Text>
@@ -472,12 +472,12 @@ export default function StallDetailScreen() {
 
           {/* Prices */}
           <View className="flex-row justify-between items-center mb-2 px-1">
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6 }}>
               {lang === 'en' ? 'Prices at this store' : 'Presyo sa tindahang ito'}
             </Text>
             <View className="flex-row items-center gap-2">
               {prices.length > 0 && (
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {prices.length} {lang === 'en' ? 'items' : 'sangkap'}
                 </Text>
               )}
@@ -491,7 +491,7 @@ export default function StallDetailScreen() {
           {prices.length > 0 && (() => {
             const latest = prices.reduce((m, p) => (p.updated_at > m ? p.updated_at : m), prices[0].updated_at);
             return (
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 8, paddingHorizontal: 4 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 8, paddingHorizontal: 4 }}>
                 {lang === 'en'
                   ? `Prices updated ${updatedAgoLabel(latest, lang)}`
                   : `Na-update ang presyo ${updatedAgoLabel(latest, lang)}`}
@@ -524,10 +524,10 @@ export default function StallDetailScreen() {
                     <ItemThumb photo={item.photo} name={item.item_name} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#3C3A2F' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#3C3A2F' }}>
                       {item.item_name}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 1 }}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 1 }}>
                       {relativeTime(item.updated_at, lang)}
                     </Text>
                   </View>
@@ -535,7 +535,7 @@ export default function StallDetailScreen() {
                     <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#3C3A2F' }}>
                       ₱{Number(item.price_per_unit).toFixed(2)}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                       /{item.unit}
                     </Text>
                   </View>
@@ -566,7 +566,7 @@ export default function StallDetailScreen() {
           </View>
 
           {/* Comments */}
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, paddingHorizontal: 1 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, paddingHorizontal: 1 }}>
             {lang === 'en' ? 'Comments' : 'Mga Komento'} {comments.length > 0 ? `(${comments.length})` : ''}
           </Text>
 
@@ -606,15 +606,15 @@ export default function StallDetailScreen() {
                   }}
                 >
                   <View className="flex-row items-center justify-between mb-1">
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#3C3A2F' }}>{c.user.name}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#3C3A2F' }}>{c.user.name}</Text>
                     {user?.id === c.user_id && (
                       <Pressable onPress={() => deleteComment(c.id)} hitSlop={8}>
                         <Ionicons name="trash-outline" size={14} color="#B0A18C" />
                       </Pressable>
                     )}
                   </View>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#3C3A2F', lineHeight: 19 }}>{c.body}</Text>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 4 }}>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#3C3A2F', lineHeight: 19 }}>{c.body}</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 4 }}>
                     {relativeTime(c.created_at, lang)}
                   </Text>
                 </View>

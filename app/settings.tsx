@@ -270,9 +270,9 @@ export default function SettingsScreen() {
               onPress={() => router.back()}
               className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
             >
-              <Ionicons name="arrow-back" size={18} color="#292522" />
+              <Ionicons name="arrow-back" size={18} color="#000000" />
             </Pressable>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
               {lang === 'en' ? 'Settings' : 'Mga Setting'}
             </Text>
           </View>

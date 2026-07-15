@@ -82,7 +82,7 @@ export default function ReportModal({ visible, onClose, reportableType, reportab
             justifyContent: 'space-between',
           }}
         >
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
             🚩 {lang === 'en' ? 'Report this listing' : 'I-report ang listing na ito'}
           </Text>
           <Pressable
@@ -95,13 +95,13 @@ export default function ReportModal({ visible, onClose, reportableType, reportab
         </View>
 
         <View style={{ padding: 20 }}>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 14, lineHeight: 19 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', marginBottom: 14, lineHeight: 19 }}>
             {lang === 'en'
               ? 'Tell us what looks wrong — duplicate listing, incorrect info, closed store, etc.'
               : 'Sabihin sa amin kung ano ang mali — duplicate na listing, maling impormasyon, sarado nang tindahan, atbp.'}
           </Text>
 
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
             {lang === 'en' ? 'Reason' : 'Dahilan'}
           </Text>
           <TextInput
@@ -121,12 +121,12 @@ export default function ReportModal({ visible, onClose, reportableType, reportab
               paddingHorizontal: 14,
               paddingVertical: 12,
               fontFamily: 'NunitoSans_400Regular',
-              fontSize: 13,
-              color: '#292522',
+              fontSize: 14,
+              color: '#000000',
               textAlignVertical: 'top',
             }}
           />
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 4, textAlign: 'right' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 4, textAlign: 'right' }}>
             {reason.length}/500
           </Text>
         </View>

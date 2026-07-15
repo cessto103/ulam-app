@@ -75,7 +75,7 @@ function InsightGraph({ metric, title, color }: { metric: Metric; title: string;
   return (
     <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-4">
       <View className="flex-row items-center justify-between mb-1">
-        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#292522' }}>{title}</Text>
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>{title}</Text>
         <PeriodToggle value={period} onChange={setPeriod} />
       </View>
       <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color, marginBottom: 8 }}>{total}</Text>
@@ -105,8 +105,8 @@ function InsightGraph({ metric, title, color }: { metric: Metric; title: string;
           hideRules
           xAxisColor="#F0DEBB"
           yAxisColor="transparent"
-          yAxisTextStyle={{ color: '#6F655A', fontSize: 12 }}
-          xAxisLabelTextStyle={{ color: '#6F655A', fontSize: 12 }}
+          yAxisTextStyle={{ color: '#6F655A', fontSize: 13 }}
+          xAxisLabelTextStyle={{ color: '#6F655A', fontSize: 13 }}
           noOfSections={3}
           initialSpacing={8}
           endSpacing={8}
@@ -129,7 +129,7 @@ function BoostRow({ boost }: { boost: Boost }) {
   return (
     <View className="flex-row items-center justify-between py-3 border-b border-cream-100">
       <View className="flex-1 mr-2">
-        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522' }} numberOfLines={1}>
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }} numberOfLines={1}>
           {boost.target === 'recipe' ? '🍽️' : '🏪'} {boost.target_name ?? '—'}
         </Text>
         {boost.views_before !== null && (
@@ -140,7 +140,7 @@ function BoostRow({ boost }: { boost: Boost }) {
         )}
       </View>
       <View style={{ backgroundColor: c.bg, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
-        <Text style={{ fontSize: 12, fontWeight: '700', color: c.text, textTransform: 'capitalize' }}>{boost.status}</Text>
+        <Text style={{ fontSize: 13, fontWeight: '700', color: c.text, textTransform: 'capitalize' }}>{boost.status}</Text>
       </View>
     </View>
   );
@@ -173,9 +173,9 @@ export default function InsightsScreen() {
             onPress={() => router.back()}
             className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
           >
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
             {lang === 'en' ? 'My Insights' : 'Aking Insights'}
           </Text>
         </View>
@@ -192,7 +192,7 @@ export default function InsightsScreen() {
               className="rounded-2xl bg-brand-500 p-4 mb-4 flex-row items-center justify-between active:opacity-90"
             >
               <View>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: 'rgba(255,248,232,0.8)' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: 'rgba(255,248,232,0.8)' }}>
                   {lang === 'en' ? 'Current plan' : 'Kasalukuyang plano'}
                 </Text>
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#fff' }}>{summary.subscription.plan_name}</Text>

@@ -61,7 +61,7 @@ export default function LegalAcceptanceGate() {
             <View className="w-12 h-12 rounded-full bg-leaf-50 items-center justify-center mb-2">
               <Ionicons name="document-text-outline" size={24} color="#386641" />
             </View>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#292522', textAlign: 'center' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#000000', textAlign: 'center' }}>
               {lang === 'en' ? 'Updated terms' : 'Bagong kasunduan'}
             </Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', marginTop: 4 }}>
@@ -79,13 +79,13 @@ export default function LegalAcceptanceGate() {
             >
               <Ionicons name="document-text" size={20} color="#386641" />
               <View className="flex-1">
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }}>{doc.title}</Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>{doc.title}</Text>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {lang === 'en' ? 'Version' : 'Bersyon'} {doc.version}
                   {doc.published_at ? ` · ${new Date(doc.published_at).toLocaleDateString()}` : ''}
                 </Text>
               </View>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#C45E3A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C45E3A' }}>
                 {lang === 'en' ? 'Read' : 'Basahin'}
               </Text>
             </Pressable>

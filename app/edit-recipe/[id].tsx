@@ -68,7 +68,7 @@ function SelectRow<T extends string | number>({
 }: { label: string; options: T[]; value: T; onChange: (v: T) => void }) {
   return (
     <View style={{ marginBottom: 16 }}>
-      <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_600SemiBold', color: '#6F655A', marginBottom: 6 }}>{label}</Text>
+      <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_600SemiBold', color: '#6F655A', marginBottom: 6 }}>{label}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
         {options.map((o) => (
           <Pressable
@@ -79,7 +79,7 @@ function SelectRow<T extends string | number>({
               backgroundColor: value === o ? '#6E7B4A' : '#F9EDD3',
             }}
           >
-            <Text style={{ fontSize: 12, fontFamily: 'NunitoSans_600SemiBold', color: value === o ? '#fff' : '#6F655A' }}>
+            <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_600SemiBold', color: value === o ? '#fff' : '#6F655A' }}>
               {String(o)}
             </Text>
           </Pressable>
@@ -336,11 +336,11 @@ export default function EditRecipeScreen() {
                   style={{
                     position: 'absolute', top: -5, right: -5,
                     width: 18, height: 18, borderRadius: 9,
-                    backgroundColor: '#292522', alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center',
                   }}
                   hitSlop={6}
                 >
-                  <Text style={{ color: '#fff', fontSize: 12, lineHeight: 13 }}>×</Text>
+                  <Text style={{ color: '#fff', fontSize: 13, lineHeight: 13 }}>×</Text>
                 </Pressable>
               </View>
             ))}
@@ -358,11 +358,11 @@ export default function EditRecipeScreen() {
                   style={{
                     position: 'absolute', top: -5, right: -5,
                     width: 18, height: 18, borderRadius: 9,
-                    backgroundColor: '#292522', alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center',
                   }}
                   hitSlop={6}
                 >
-                  <Text style={{ color: '#fff', fontSize: 12, lineHeight: 13 }}>×</Text>
+                  <Text style={{ color: '#fff', fontSize: 13, lineHeight: 13 }}>×</Text>
                 </Pressable>
               </View>
             ))}
@@ -391,11 +391,11 @@ export default function EditRecipeScreen() {
             }}
           >
             <Ionicons name="color-palette-outline" size={16} color="#C45E3A" />
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#C45E3A' }}>Style</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>Style</Text>
           </Pressable>
         </View>
 
-        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', paddingHorizontal: 16, marginTop: 4, marginBottom: 16 }}>
+        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', paddingHorizontal: 16, marginTop: 4, marginBottom: 16 }}>
           {totalPhotoCount}/{MAX_PHOTOS} photos · tap Style to change cover layout
         </Text>
 
@@ -404,9 +404,9 @@ export default function EditRecipeScreen() {
 
           {/* Title */}
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>Recipe Title *</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>Recipe Title *</Text>
             <TextInput
-              style={{ borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular' }}
+              style={{ borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular' }}
               placeholder="e.g. Ginisang Patola"
               placeholderTextColor="#B0A18C"
               value={title}
@@ -416,9 +416,9 @@ export default function EditRecipeScreen() {
 
           {/* Description */}
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>Description</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>Description</Text>
             <TextInput
-              style={{ borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular', minHeight: 72, textAlignVertical: 'top' }}
+              style={{ borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 16, paddingVertical: 12, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular', minHeight: 72, textAlignVertical: 'top' }}
               placeholder="A short description of this recipe..."
               placeholderTextColor="#B0A18C"
               value={description}
@@ -430,13 +430,13 @@ export default function EditRecipeScreen() {
 
           {/* YouTube link */}
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>
               YouTube Video <Text style={{ fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>(optional)</Text>
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, gap: 8 }}>
               <Ionicons name="logo-youtube" size={18} color="#E24B4A" />
               <TextInput
-                style={{ flex: 1, paddingVertical: 12, fontSize: 13, color: '#292522', fontFamily: 'NunitoSans_400Regular' }}
+                style={{ flex: 1, paddingVertical: 12, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular' }}
                 placeholder="https://youtube.com/watch?v=..."
                 placeholderTextColor="#B0A18C"
                 value={youtubeUrl}
@@ -459,7 +459,7 @@ export default function EditRecipeScreen() {
 
           {/* Difficulty */}
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>Difficulty</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>Difficulty</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {DIFFICULTY_OPTIONS.map((d) => (
                 <Pressable
@@ -471,7 +471,7 @@ export default function EditRecipeScreen() {
                     borderColor:     difficulty === d.key ? '#6E7B4A' : '#F0DEBB',
                   }}
                 >
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: difficulty === d.key ? '#fff' : '#6F655A' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: difficulty === d.key ? '#fff' : '#6F655A' }}>
                     {d.label}
                   </Text>
                 </Pressable>
@@ -481,7 +481,7 @@ export default function EditRecipeScreen() {
 
           {/* Budget */}
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>Budget range</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>Budget range</Text>
             <View style={{ gap: 8 }}>
               {BUDGET_OPTIONS.map((b) => (
                 <Pressable
@@ -502,7 +502,7 @@ export default function EditRecipeScreen() {
                   }}>
                     {budgetTag === b.key && <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#fff' }} />}
                   </View>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: budgetTag === b.key ? '#5E693F' : '#292522' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: budgetTag === b.key ? '#5E693F' : '#000000' }}>
                     {b.label}
                   </Text>
                 </Pressable>
@@ -512,7 +512,7 @@ export default function EditRecipeScreen() {
 
           {/* Tags */}
           <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>
               Tags <Text style={{ fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>(tap to select)</Text>
             </Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -528,7 +528,7 @@ export default function EditRecipeScreen() {
                       borderWidth: active ? 0 : 1, borderColor: '#F0DEBB',
                     }}
                   >
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: active ? '#fff' : '#6F655A' }}>{tag}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#6F655A' }}>{tag}</Text>
                   </Pressable>
                 );
               })}
@@ -537,14 +537,14 @@ export default function EditRecipeScreen() {
 
           {/* Instructions */}
           <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>Instructions *</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>Instructions *</Text>
             {steps.map((step, i) => (
               <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
                 <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#6E7B4A', alignItems: 'center', justifyContent: 'center', marginTop: 10, flexShrink: 0 }}>
-                  <Text style={{ color: '#fff', fontSize: 12, fontFamily: 'NunitoSans_700Bold' }}>{i + 1}</Text>
+                  <Text style={{ color: '#fff', fontSize: 13, fontFamily: 'NunitoSans_700Bold' }}>{i + 1}</Text>
                 </View>
                 <TextInput
-                  style={{ flex: 1, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular', textAlignVertical: 'top' }}
+                  style={{ flex: 1, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular', textAlignVertical: 'top' }}
                   placeholder={`Step ${i + 1}...`}
                   placeholderTextColor="#B0A18C"
                   value={step}
@@ -562,37 +562,37 @@ export default function EditRecipeScreen() {
               onPress={addStep}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: '#B9D0AE', paddingVertical: 10, paddingHorizontal: 16, marginTop: 4 }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}><View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#C45E3A', alignItems: 'center', justifyContent: 'center' }}><Ionicons name="add" size={14} color="#fff" /></View><Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C45E3A' }}>Add step</Text></View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}><View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#C45E3A', alignItems: 'center', justifyContent: 'center' }}><Ionicons name="add" size={14} color="#fff" /></View><Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#C45E3A' }}>Add step</Text></View>
             </Pressable>
           </View>
 
           {/* Ingredients */}
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>Ingredients *</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>Ingredients *</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 4, paddingHorizontal: 4 }}>
-              <Text style={{ flex: 1, fontSize: 12, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>Ingredient</Text>
-              <Text style={{ width: 96, fontSize: 12, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>Qty / Unit</Text>
-              <Text style={{ width: 64, fontSize: 12, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>Price ₱</Text>
+              <Text style={{ flex: 1, fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>Ingredient</Text>
+              <Text style={{ width: 96, fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>Qty / Unit</Text>
+              <Text style={{ width: 64, fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>Price ₱</Text>
               <View style={{ width: 24 }} />
             </View>
             {ingredients.map((ing, i) => (
               <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: 8, alignItems: 'center' }}>
                 <TextInput
-                  style={{ flex: 1, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular' }}
+                  style={{ flex: 1, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular' }}
                   placeholder="e.g. Patola"
                   placeholderTextColor="#B0A18C"
                   value={ing.name}
                   onChangeText={(v) => updateIngredient(i, 'name', v)}
                 />
                 <TextInput
-                  style={{ width: 96, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular' }}
+                  style={{ width: 96, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular' }}
                   placeholder="2 pcs"
                   placeholderTextColor="#B0A18C"
                   value={ing.qty}
                   onChangeText={(v) => updateIngredient(i, 'qty', v)}
                 />
                 <TextInput
-                  style={{ width: 64, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular' }}
+                  style={{ width: 64, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular' }}
                   placeholder="0"
                   placeholderTextColor="#B0A18C"
                   value={ing.price}
@@ -610,22 +610,22 @@ export default function EditRecipeScreen() {
               onPress={addIngredient}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: '#B9D0AE', paddingVertical: 10, paddingHorizontal: 16, marginTop: 4 }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}><View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#C45E3A', alignItems: 'center', justifyContent: 'center' }}><Ionicons name="add" size={14} color="#fff" /></View><Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C45E3A' }}>Add ingredient</Text></View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}><View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#C45E3A', alignItems: 'center', justifyContent: 'center' }}><Ionicons name="add" size={14} color="#fff" /></View><Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#C45E3A' }}>Add ingredient</Text></View>
             </Pressable>
           </View>
 
           {/* Tips */}
           <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>
               Tips <Text style={{ fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>(optional)</Text>
             </Text>
             {tips.map((tip, i) => (
               <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
                 <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#F4B942', alignItems: 'center', justifyContent: 'center', marginTop: 10, flexShrink: 0 }}>
-                  <Text style={{ color: '#fff', fontSize: 12 }}>💡</Text>
+                  <Text style={{ color: '#fff', fontSize: 13 }}>💡</Text>
                 </View>
                 <TextInput
-                  style={{ flex: 1, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#292522', fontFamily: 'NunitoSans_400Regular', textAlignVertical: 'top' }}
+                  style={{ flex: 1, borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#FFFCF5', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#000000', fontFamily: 'NunitoSans_400Regular', textAlignVertical: 'top' }}
                   placeholder={`Tip ${i + 1}…`}
                   placeholderTextColor="#B0A18C"
                   value={tip}
@@ -641,7 +641,7 @@ export default function EditRecipeScreen() {
               onPress={addTip}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: '#F5C97A', paddingVertical: 10, paddingHorizontal: 16, marginTop: 4 }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}><View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#C4881C', alignItems: 'center', justifyContent: 'center' }}><Ionicons name="add" size={14} color="#fff" /></View><Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C' }}>Add tip</Text></View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}><View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#C4881C', alignItems: 'center', justifyContent: 'center' }}><Ionicons name="add" size={14} color="#fff" /></View><Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#C4881C' }}>Add tip</Text></View>
             </Pressable>
           </View>
 

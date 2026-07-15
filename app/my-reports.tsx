@@ -85,13 +85,13 @@ export default function MyReportsScreen() {
             onPress={() => router.back()}
             className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
           >
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
           <View className="flex-1">
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
               {lang === 'en' ? 'My Price Reports' : 'Aking mga Price Report'}
             </Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               {lang === 'en'
                 ? 'Store-targeted reports need the owner’s approval'
                 : 'Kailangan ng approval ng may-ari ang mga report sa tindahan'}
@@ -113,7 +113,7 @@ export default function MyReportsScreen() {
         ) : reports.length === 0 ? (
           <View className="bg-white rounded-2xl border border-cream-200 p-8 items-center">
             <Text className="text-3xl mb-2">🏷️</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center' }}>
               {lang === 'en'
                 ? "You haven't reported any prices yet."
                 : 'Wala ka pang nai-report na presyo.'}
@@ -128,18 +128,18 @@ export default function MyReportsScreen() {
                 <View className="flex-row items-start justify-between gap-2">
                   <ItemThumb photo={r.photo} name={r.item_name} size={40} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>
                       {r.item_name}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#C4881C', marginTop: 1 }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C', marginTop: 1 }}>
                       ₱{Number(r.reported_price).toFixed(2)} / {r.unit}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }}>
                       {place ? `${place} · ` : ''}{timeAgo(r.created_at, lang)}
                     </Text>
                   </View>
                   <View className="rounded-full px-2.5 py-1" style={{ backgroundColor: meta.bg }}>
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: meta.text }}>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: meta.text }}>
                       {lang === 'en' ? meta.en : meta.tl}
                     </Text>
                   </View>
@@ -147,7 +147,7 @@ export default function MyReportsScreen() {
 
                 {r.status === 'declined' && r.declined_reason ? (
                   <View className="mt-2 rounded-xl px-3 py-2" style={{ backgroundColor: '#FCEBEB' }}>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#E24B4A' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#E24B4A' }}>
                       {lang === 'en' ? 'Reason: ' : 'Dahilan: '}
                       {declineReasonLabel(r.declined_reason, lang)}
                     </Text>

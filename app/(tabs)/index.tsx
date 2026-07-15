@@ -275,14 +275,14 @@ function PickerRecipeCard({
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 }}>
             {recipe.budget_tag ? (
               <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#9A6A12' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12' }}>
                   {BUDGET_LABEL[recipe.budget_tag] ?? recipe.budget_tag}
                 </Text>
               </View>
             ) : null}
             {diff && recipe.difficulty ? (
               <View style={{ backgroundColor: diff.bg, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: diff.text, textTransform: 'capitalize' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: diff.text, textTransform: 'capitalize' }}>
                   {recipe.difficulty}
                 </Text>
               </View>
@@ -303,20 +303,20 @@ function PickerRecipeCard({
         </View>
 
         {/* Title */}
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
           {recipe.title}
         </Text>
 
         {/* Author (community recipes) */}
         {recipe.user?.name ? (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 4 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 4 }}>
             by {recipe.user.name}
           </Text>
         ) : null}
 
         {/* Description */}
         {recipe.description ? (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
             {recipe.description}
           </Text>
         ) : null}
@@ -324,17 +324,17 @@ function PickerRecipeCard({
         {/* Meta chips */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           {recipe.estimated_cost ? (
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#C45E3A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
               ₱{Number(recipe.estimated_cost).toFixed(0)}
             </Text>
           ) : null}
           {(recipe.servings ?? 0) > 0 ? (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               {recipe.servings} {lang === 'en' ? 'servings' : 'serving'}
             </Text>
           ) : null}
           {totalMin > 0 ? (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               {totalMin} min
             </Text>
           ) : null}
@@ -541,16 +541,16 @@ export default function HomeScreen() {
         </View>
 
         <View className="flex-row items-center gap-2 mb-0.5">
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
             {greeting}, {firstName}!
           </Text>
           {user?.plan === 'premium' && (
             <View className="rounded-full px-2 py-0.5" style={{ backgroundColor: '#FDEFC9' }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#C4881C' }}>Premium</Text>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C' }}>Premium</Text>
             </View>
           )}
         </View>
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#292522', marginBottom: 12 }}>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#000000', marginBottom: 12 }}>
           {lang === 'en' ? 'What will you cook today?' : 'Anong lulutuin mo ngayon?'}
         </Text>
 
@@ -559,7 +559,7 @@ export default function HomeScreen() {
           className="flex-row items-center gap-2 rounded-2xl border border-cream-300 bg-cream-50 px-4 py-3 active:opacity-70"
         >
           <Ionicons name="search" size={16} color="#B0A18C" />
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A' }}>
             {lang === 'en' ? 'Search recipes, ingredients, users…' : 'Maghanap ng recipes, sangkap, users…'}
           </Text>
         </Pressable>
@@ -587,7 +587,7 @@ export default function HomeScreen() {
             >
               <Text style={{
                 fontFamily: 'NunitoSans_700Bold',
-                fontSize: 12,
+                fontSize: 13,
                 color: selected ? 'rgba(255,255,255,0.85)' : '#B0A18C',
                 marginBottom: 2,
               }}>
@@ -596,7 +596,7 @@ export default function HomeScreen() {
               <Text style={{
                 fontFamily: 'Baloo2_700Bold',
                 fontSize: 16,
-                color: selected ? '#FFFFFF' : '#292522',
+                color: selected ? '#FFFFFF' : '#000000',
                 lineHeight: 18,
               }}>
                 {date.getDate()}
@@ -639,11 +639,11 @@ export default function HomeScreen() {
               <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}>
                 Budget Meal Plan
               </Text>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12.5, color: 'rgba(255,255,255,0.95)', marginBottom: 10, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13.5, color: 'rgba(255,255,255,0.95)', marginBottom: 10, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }}>
                 {lang === 'en' ? 'Good meals for less' : 'Masarap na pagkain, mas mura'}
               </Text>
               <View className="self-start rounded-full px-3.5 py-2" style={{ backgroundColor: '#40482B' }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#fff' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
                   {lang === 'en' ? 'View Meal Plans' : 'Tingnan ang Meal Plans'}
                 </Text>
               </View>
@@ -683,7 +683,7 @@ export default function HomeScreen() {
               </View>
             </ThemedSection>
             <Text
-              style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522', textAlign: 'center' }}
+              style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000', textAlign: 'center' }}
               numberOfLines={2}
             >
               {item.label}
@@ -695,11 +695,11 @@ export default function HomeScreen() {
       {false && <>
       <View className="flex-row justify-between items-center mb-4">
         <View>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{greeting}</Text>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{greeting}</Text>
           <View className="flex-row items-center gap-2">
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#292522' }}>{firstName}</Text>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>{firstName}</Text>
             {user?.plan === 'premium' && (
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>⭐ Premium</Text>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>⭐ Premium</Text>
             )}
           </View>
         </View>
@@ -762,7 +762,7 @@ export default function HomeScreen() {
             >
               <Text style={{
                 fontFamily: 'NunitoSans_400Regular',
-                fontSize: 12,
+                fontSize: 13,
                 color: today ? '#9A6A12' : selected ? 'rgba(255,255,255,0.7)' : '#B0A18C',
                 marginBottom: 2,
               }}>
@@ -771,7 +771,7 @@ export default function HomeScreen() {
               <Text style={{
                 fontFamily: 'Baloo2_700Bold',
                 fontSize: 15,
-                color: today ? '#9A6A12' : selected ? '#fff' : '#292522',
+                color: today ? '#9A6A12' : selected ? '#fff' : '#000000',
                 lineHeight: 18,
               }}>
                 {date.getDate()}
@@ -797,7 +797,7 @@ export default function HomeScreen() {
       {!isToday ? (
         <>
           <View className="flex-row items-center gap-2 mb-3">
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               📅 {selectedDayLabel}
             </Text>
           </View>
@@ -810,7 +810,7 @@ export default function HomeScreen() {
               className="rounded-2xl bg-white border border-cream-200 p-4 mb-3"
               style={{ borderLeftWidth: 3, borderLeftColor: '#4E7A47' }}
             >
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>
                 {t('history_budget')}
               </Text>
               <View className="flex-row justify-between items-end mb-3">
@@ -818,21 +818,21 @@ export default function HomeScreen() {
                   <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 26, color: '#386641', lineHeight: 30 }}>
                     ₱{Number(historyBudget.spent ?? 0).toLocaleString()}
                   </Text>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                     {t('history_spent')}
                   </Text>
                 </View>
                 <View className="items-end gap-1">
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000' }}>
                     Budget: ₱{Number(historyBudget.budget ?? 0).toLocaleString()}
                   </Text>
                   {historyBudget.has_logged ? (
                     <View className="rounded-full bg-leaf-50 px-2.5 py-0.5">
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>{t('logged')}</Text>
+                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>{t('logged')}</Text>
                     </View>
                   ) : (
                     <View className="rounded-full bg-cream-200 px-2.5 py-0.5">
-                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{t('not_logged')}</Text>
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{t('not_logged')}</Text>
                     </View>
                   )}
                 </View>
@@ -849,14 +849,14 @@ export default function HomeScreen() {
                 />
               </View>
 
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                 {Number(historyBudget.spent ?? 0) > Number(historyBudget.budget ?? 0)
                   ? `${t('overspent')} ₱${(Number(historyBudget.spent ?? 0) - Number(historyBudget.budget ?? 0)).toLocaleString()}`
                   : `${t('saved')} ₱${(Number(historyBudget.budget ?? 0) - Number(historyBudget.spent ?? 0)).toLocaleString()}`}
               </Text>
 
               {historyBudget.notes ? (
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 6, fontStyle: 'italic' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 6, fontStyle: 'italic' }}>
                   "{historyBudget.notes}"
                 </Text>
               ) : null}
@@ -864,7 +864,7 @@ export default function HomeScreen() {
           ) : (
             <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 items-center">
               <Text className="text-2xl mb-1">💸</Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                 {t('history_no_budget')}
               </Text>
             </View>
@@ -878,16 +878,16 @@ export default function HomeScreen() {
           ) : historyMealPlan ? (
             <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-3">
               <View className="flex-row justify-between items-center mb-3">
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#292522' }}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000' }}>
                   {t('tab_meal_plan')}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   ₱{Number(historyMealPlan.total_estimated_cost).toLocaleString()}
                 </Text>
               </View>
               {Object.entries(histMealGroups).map(([mealType, items]) => (
                 <View key={mealType} className="mb-3 last:mb-0">
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 4 }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 4 }}>
                     {mealTypeLabel(mealType, lang)}
                   </Text>
                   {items.map((item) => (
@@ -898,17 +898,17 @@ export default function HomeScreen() {
                           style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4 }}
                           className="active:opacity-60"
                         >
-                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641', flex: 1 }}>
+                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#386641', flex: 1 }}>
                             {item.dish_name}
                           </Text>
-                          <Text style={{ fontSize: 12, color: '#B9D0AE' }}>›</Text>
+                          <Text style={{ fontSize: 13, color: '#B9D0AE' }}>›</Text>
                         </Pressable>
                       ) : (
-                        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', flex: 1 }}>
+                        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', flex: 1 }}>
                           {item.dish_name}
                         </Text>
                       )}
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#4E7A47', marginLeft: 8 }}>
+                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#4E7A47', marginLeft: 8 }}>
                         ₱{Number(item.estimated_cost).toFixed(0)}
                       </Text>
                     </View>
@@ -919,7 +919,7 @@ export default function HomeScreen() {
                 onPress={() => { setPickerMealType('almusal'); setPickerRecipe(null); setPickerSearch(''); setPickerOpen(true); }}
                 className="mt-2 rounded-xl border border-cream-300 bg-brand-50 py-2.5 items-center active:opacity-75"
               >
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#C45E3A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
                   {t('set_recipe_as_meal')}
                 </Text>
               </Pressable>
@@ -927,14 +927,14 @@ export default function HomeScreen() {
           ) : (
             <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 items-center">
               <Text className="text-2xl mb-1">🍽️</Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                 {t('history_no_meal')}
               </Text>
               <Pressable
                 onPress={() => { setPickerMealType('almusal'); setPickerRecipe(null); setPickerSearch(''); setPickerOpen(true); }}
                 className="mt-3 rounded-xl border border-cream-300 bg-brand-50 py-2 px-5 active:opacity-75"
               >
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#C45E3A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
                   {t('set_recipe_as_meal')}
                 </Text>
               </Pressable>
@@ -962,11 +962,11 @@ export default function HomeScreen() {
               <>
                 <View className="flex-row justify-between items-start mb-2">
                   <View>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 2 }}>{t('food_budget_today')}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 2 }}>{t('food_budget_today')}</Text>
                     <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 28, color: '#386641', lineHeight: 34 }}>
                       ₱{Number(budget.remaining ?? 0).toLocaleString()}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{t('remaining')}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{t('remaining')}</Text>
                     {endDate ? (
                       <Text className="text-xs text-ink-soft mt-0.5">
                         {periodLabel(totalDays, endDate, lang)}
@@ -1113,7 +1113,7 @@ export default function HomeScreen() {
       {popularRecipes.length > 0 && (
         <>
           <View className="flex-row justify-between items-center mt-5 mb-2">
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
               {lang === 'en' ? 'Popular This Week' : 'Sikat Ngayong Linggo'}
             </Text>
             <Pressable onPress={() => router.push('/recipe-book' as any)} hitSlop={8}>
@@ -1145,12 +1145,12 @@ export default function HomeScreen() {
                   />
                 </View>
                 <Text
-                  style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522' }}
+                  style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}
                   numberOfLines={1}
                 >
                   {r.title}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#C4881C' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C' }}>
                   {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toLocaleString()}` : '—'}
                   {r.servings ? ` / ${r.servings} servings` : ''}
                 </Text>
@@ -1174,7 +1174,7 @@ export default function HomeScreen() {
             backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3',
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
           }}>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
               {t('set_recipe_as_meal')}
             </Text>
             <Pressable onPress={() => setPickerOpen(false)} className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70">
@@ -1185,7 +1185,7 @@ export default function HomeScreen() {
           <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
             {/* Meal type selector */}
             <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {t('pick_meal_type')}
               </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
@@ -1200,7 +1200,7 @@ export default function HomeScreen() {
                         backgroundColor: active ? '#6E7B4A' : '#F9EDD3',
                       }}
                     >
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: active ? '#fff' : '#292522' }}>
+                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#000000' }}>
                         {mt.emoji} {lang === 'en' ? mt.labelEn : mt.labelTl}
                       </Text>
                     </Pressable>
@@ -1211,11 +1211,11 @@ export default function HomeScreen() {
 
             {/* Recipe search */}
             <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {t('pick_recipe')}
               </Text>
               <View style={{ position: 'relative' }}>
-                <Text style={{ position: 'absolute', left: 12, top: 11, fontSize: 13, zIndex: 1 }}>🔍</Text>
+                <Text style={{ position: 'absolute', left: 12, top: 11, fontSize: 14, zIndex: 1 }}>🔍</Text>
                 <TextInput
                   value={pickerSearch}
                   onChangeText={setPickerSearch}
@@ -1223,7 +1223,7 @@ export default function HomeScreen() {
                   style={{
                     backgroundColor: '#fff', borderRadius: 12, borderWidth: 1,
                     borderColor: '#F0DEBB', paddingLeft: 36, paddingRight: 12,
-                    paddingVertical: 10, fontSize: 13, color: '#292522',
+                    paddingVertical: 10, fontSize: 14, color: '#000000',
                     fontFamily: 'NunitoSans_400Regular',
                   }}
                 />
@@ -1238,7 +1238,7 @@ export default function HomeScreen() {
             ) : recipeOptions.length === 0 ? (
               <View style={{ alignItems: 'center', paddingTop: 24 }}>
                 <Text style={{ fontSize: 28, marginBottom: 6 }}>🍽️</Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A' }}>
                   {lang === 'en' ? 'No recipes found' : 'Walang recipe na nahanap'}
                 </Text>
               </View>

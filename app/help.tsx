@@ -121,9 +121,9 @@ export default function HelpScreen() {
             onPress={() => router.back()}
             className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
           >
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
             {lang === 'en' ? 'Help & Support' : 'Tulong at Suporta'}
           </Text>
           <Pressable
@@ -247,7 +247,7 @@ export default function HelpScreen() {
         >
           <View className="bg-white rounded-t-3xl p-5" style={{ paddingBottom: insets.bottom + 20 }}>
             <View className="flex-row items-center justify-between mb-3">
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522' }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000' }}>
                 {lang === 'en' ? 'New support ticket' : 'Bagong support ticket'}
               </Text>
               <Pressable onPress={() => setComposing(false)} className="w-8 h-8 items-center justify-center">

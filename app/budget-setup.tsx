@@ -250,7 +250,7 @@ export default function BudgetSetupScreen() {
                   className={`font-semibold ${
                     active ? 'text-white' : 'text-ink-soft'
                   }`}
-                  style={{ fontSize: 12 }}
+                  style={{ fontSize: 13 }}
                 >
                   {lang === 'en' ? d.labelEn : d.labelTl}
                 </Text>
@@ -353,7 +353,7 @@ export default function BudgetSetupScreen() {
             }}
           >
             <View className="flex-row justify-between items-center mb-2">
-              <Text className="text-xs font-medium" style={{ color: dailyFoodBudget > 0 ? '#292522' : '#791F1F' }}>
+              <Text className="text-xs font-medium" style={{ color: dailyFoodBudget > 0 ? '#000000' : '#791F1F' }}>
                 Daily food budget
               </Text>
               <Text className="text-xl font-semibold" style={{ color: dailyFoodBudget > 0 ? '#386641' : '#E24B4A' }}>
@@ -362,7 +362,7 @@ export default function BudgetSetupScreen() {
             </View>
             {perPerson !== null && dailyFoodBudget > 0 && (
               <View className="flex-row justify-between items-center pt-2 border-t" style={{ borderTopColor: dailyFoodBudget > 0 ? '#B9D0AE' : '#F8BCBC' }}>
-                <Text className="text-xs" style={{ color: dailyFoodBudget > 0 ? '#292522' : '#791F1F' }}>
+                <Text className="text-xs" style={{ color: dailyFoodBudget > 0 ? '#000000' : '#791F1F' }}>
                   {lang === 'en' ? 'Per person / day' : 'Bawat tao / araw'}
                 </Text>
                 <Text className="text-sm font-medium" style={{ color: dailyFoodBudget > 0 ? '#386641' : '#E24B4A' }}>

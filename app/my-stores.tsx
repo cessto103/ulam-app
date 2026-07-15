@@ -124,9 +124,9 @@ export default function MyStoresScreen() {
             onPress={() => router.back()}
             className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
           >
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
             {lang === 'en' ? 'My Stores' : 'Aking mga Tindahan'}
           </Text>
           <AddButton label={lang === 'en' ? 'Add' : 'Idagdag'} onPress={() => router.push('/add-listing' as any)} />
@@ -146,12 +146,12 @@ export default function MyStoresScreen() {
               onPress={() => setTab(t.key)}
               className={`flex-1 flex-row items-center justify-center gap-1.5 py-2 rounded-lg ${active ? 'bg-olive-400' : ''}`}
             >
-              <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_600SemiBold', fontSize: 12, color: active ? '#fff' : '#6F655A' }}>
+              <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#6F655A' }}>
                 {t.label}
               </Text>
               {t.key === 'reports' && pendingReports.length > 0 && (
                 <View className="rounded-full px-1.5 py-0.5" style={{ backgroundColor: active ? 'rgba(255,248,232,0.3)' : '#FDEFC9', minWidth: 18, alignItems: 'center' }}>
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: active ? '#fff' : '#9A6A12' }}>{pendingReports.length}</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: active ? '#fff' : '#9A6A12' }}>{pendingReports.length}</Text>
                 </View>
               )}
             </Pressable>
@@ -169,7 +169,7 @@ export default function MyStoresScreen() {
             {pendingReports.length === 0 && (
               <View className="bg-white rounded-2xl border border-cream-200 p-8 items-center">
                 <Ionicons name="checkmark-circle" size={30} color="#4E7A47" style={{ marginBottom: 8 }} />
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center' }}>
                   {lang === 'en' ? 'No price reports to review.' : 'Walang price report na irereview.'}
                 </Text>
               </View>
@@ -179,13 +179,13 @@ export default function MyStoresScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <ItemThumb photo={r.photo} name={r.item_name} size={44} />
                   <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>
                   {r.item_name}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#C4881C', marginTop: 1 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C', marginTop: 1 }}>
                   {'\u20b1'}{Number(r.reported_price).toFixed(2)} / {r.unit}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }}>
                   {r.tindahan.name} {'\u00b7'} {lang === 'en' ? 'reported by' : 'ni-report ni'} {r.user.name}
                 </Text>
                   </View>
@@ -196,7 +196,7 @@ export default function MyStoresScreen() {
                     disabled={acceptMutation.isPending}
                     className="flex-1 rounded-xl bg-leaf-600 py-2.5 items-center active:opacity-80 disabled:opacity-60"
                   >
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>
                       {'\u2713'} {lang === 'en' ? 'Accept' : 'Tanggapin'}
                     </Text>
                   </Pressable>
@@ -205,7 +205,7 @@ export default function MyStoresScreen() {
                     className="flex-1 rounded-xl border py-2.5 items-center active:opacity-70"
                     style={{ borderColor: '#E24B4A', backgroundColor: '#fff' }}
                   >
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#E24B4A' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#E24B4A' }}>
                       {lang === 'en' ? 'Decline' : 'Tanggihan'}
                     </Text>
                   </Pressable>
@@ -223,7 +223,7 @@ export default function MyStoresScreen() {
         ) : stores.length === 0 ? (
           <View className="bg-white rounded-2xl border border-cream-200 p-8 items-center">
             <Text className="text-3xl mb-2">🏪</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', marginBottom: 14 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', marginBottom: 14 }}>
               {lang === 'en'
                 ? "You haven't added a store yet."
                 : 'Wala ka pang naidadagdag na tindahan.'}
@@ -232,7 +232,7 @@ export default function MyStoresScreen() {
               onPress={() => router.push('/add-listing' as any)}
               className="rounded-xl bg-brand-600 px-5 py-2.5 active:opacity-80"
             >
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>
                 {lang === 'en' ? 'Add my Store' : 'Idagdag ang Tindahan'}
               </Text>
             </Pressable>
@@ -256,10 +256,10 @@ export default function MyStoresScreen() {
                     <Text style={{ fontSize: 20 }}>{MARKET_TYPE_EMOJI[store.type ?? ''] ?? '🛒'}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#292522' }} numberOfLines={1}>
+                    <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000' }} numberOfLines={1}>
                       {store.name}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                       {store.market
                         ? `${lang === 'en' ? 'Inside' : 'Nasa loob ng'} ${store.market.name}`
                         : [store.barangay, store.municipality].filter(Boolean).join(', ')}
@@ -285,7 +285,7 @@ export default function MyStoresScreen() {
                       }}
                     >
                       <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: openNow ? '#4E7A47' : '#E24B4A' }} />
-                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: openNow ? '#2C5234' : '#E24B4A' }}>
+                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: openNow ? '#2C5234' : '#E24B4A' }}>
                         {openNow
                           ? (lang === 'en' ? 'Open now' : 'Bukas ngayon')
                           : (lang === 'en' ? 'Closed now' : 'Sarado ngayon')}
@@ -294,15 +294,15 @@ export default function MyStoresScreen() {
                   )}
                   {store.is_verified && (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#EFF4EC', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 }}>
-                      <Text style={{ fontSize: 12 }}>✅</Text>
-                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#386641' }}>
+                      <Text style={{ fontSize: 13 }}>✅</Text>
+                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#386641' }}>
                         {lang === 'en' ? 'Verified' : 'Beripikado'}
                       </Text>
                     </View>
                   )}
                   {!store.is_active && (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 }}>
-                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#6F655A' }}>
+                      <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A' }}>
                         {lang === 'en' ? 'Hidden' : 'Nakatago'}
                       </Text>
                     </View>
@@ -325,10 +325,10 @@ export default function MyStoresScreen() {
             style={{ backgroundColor: '#FFFCF5', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 34 }}
           >
             <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#F0DEBB', marginBottom: 14 }} />
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000' }}>
               {lang === 'en' ? 'Why are you declining?' : 'Bakit mo tinatanggihan?'}
             </Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 12 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 12 }}>
               {declining?.item_name} {'\u00b7'} {'\u20b1'}{Number(declining?.reported_price ?? 0).toFixed(2)} / {declining?.unit}
             </Text>
 
@@ -350,7 +350,7 @@ export default function MyStoresScreen() {
                   >
                     {selected && <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#FFF8E8' }} />}
                   </View>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#292522' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>
                     {opt[lang]}
                   </Text>
                 </Pressable>

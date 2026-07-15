@@ -166,7 +166,7 @@ export default function MarketDetailScreen() {
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#3C3A2F' }} numberOfLines={1}>
                   {data?.market.name ?? '—'}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {data?.market.barangay}, {data?.market.municipality}
                 </Text>
               </>
@@ -204,7 +204,7 @@ export default function MarketDetailScreen() {
           {(data.market.source === 'osm' || (data.market.latitude != null && data.market.longitude != null)) && (
             <View style={{ paddingHorizontal: 16, paddingTop: 10 }}>
               {data.market.source === 'osm' && (
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 8 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 8 }}>
                   🌐 {lang === 'en' ? 'Location data from OpenStreetMap' : 'Lokasyon mula sa OpenStreetMap'}
                 </Text>
               )}
@@ -274,7 +274,7 @@ export default function MarketDetailScreen() {
                     >
                       <Text style={{
                         fontFamily: 'NunitoSans_600SemiBold',
-                        fontSize: 12,
+                        fontSize: 13,
                         color: active ? '#fff' : '#3C3A2F',
                       }}>
                         {CAT_EMOJI[cat] ?? '📦'} {catLabel(cat)}
@@ -300,10 +300,10 @@ export default function MarketDetailScreen() {
             ) : activeCat ? (
               <>
                 <View className="flex-row justify-between items-center mb-2 px-1">
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6 }}>
                     {CAT_EMOJI[activeCat] ?? '📦'} {catLabel(activeCat)}
                   </Text>
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                     {data.by_category[activeCat]?.length ?? 0} {t('items')}
                   </Text>
                 </View>
@@ -325,10 +325,10 @@ export default function MarketDetailScreen() {
                         }}
                       >
                         <View style={{ flex: 1 }}>
-                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#3C3A2F' }}>
+                          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#3C3A2F' }}>
                             {item.item_name}
                           </Text>
-                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 1 }}>
+                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 1 }}>
                             {item.stall_name} · {relativeTime(item.updated_at, lang)}
                           </Text>
                         </View>
@@ -336,12 +336,12 @@ export default function MarketDetailScreen() {
                           <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: isCheap ? '#6E7B4A' : '#3C3A2F' }}>
                             ₱{Number(item.price).toFixed(2)}
                           </Text>
-                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                             /{item.unit}
                           </Text>
                           {isCheap && arr.length > 1 && (
                             <View style={{ backgroundColor: '#EFF4EC', borderRadius: 10, paddingHorizontal: 7, paddingVertical: 1, marginTop: 2 }}>
-                              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6E7B4A' }}>
+                              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6E7B4A' }}>
                                 {t('cheapest')}
                               </Text>
                             </View>
@@ -361,10 +361,10 @@ export default function MarketDetailScreen() {
             >
               <Text style={{ fontSize: 20 }}>📢</Text>
               <View className="flex-1">
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6E7B4A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#6E7B4A' }}>
                   {t('report_price')}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {lang === 'en' ? 'Help the community · +15 XP' : 'Tumulong sa komunidad · +15 XP'}
                 </Text>
               </View>

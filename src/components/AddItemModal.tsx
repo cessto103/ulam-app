@@ -154,7 +154,7 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
             justifyContent: 'space-between',
           }}
         >
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
             🏷️ {isEditing
               ? (lang === 'en' ? 'Edit item' : 'I-edit ang Item')
               : (lang === 'en' ? 'Add item' : 'Magdagdag ng Item')}
@@ -170,7 +170,7 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
 
         <ScrollView contentContainerStyle={{ padding: 20 }} keyboardShouldPersistTaps="handled">
           {/* Item name */}
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
             {lang === 'en' ? 'Item name' : 'Pangalan ng Item'}
           </Text>
           <TextInput
@@ -182,12 +182,12 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
             style={{
               borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#fff',
               paddingHorizontal: 14, paddingVertical: 12, fontFamily: 'NunitoSans_400Regular',
-              fontSize: 13, color: '#292522', marginBottom: 16,
+              fontSize: 14, color: '#000000', marginBottom: 16,
             }}
           />
 
           {/* Item photo */}
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 8 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 8 }}>
             {lang === 'en' ? 'Photo (optional)' : 'Litrato (opsyonal)'}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -206,7 +206,7 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
                 <Ionicons name="camera-outline" size={22} color="#B0A18C" />
               )}
             </Pressable>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', flex: 1 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', flex: 1 }}>
               {lang === 'en'
                 ? 'Snap the product so neighbors recognize it, lalo na ang uncommon items.'
                 : 'Kunan ng litrato para makilala ng kapitbahay, lalo na ang di-pangkaraniwang item.'}
@@ -214,7 +214,7 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
           </View>
 
           {/* Category chips */}
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 8 }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 8 }}>
             {lang === 'en' ? 'Category' : 'Kategorya'}
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
@@ -229,7 +229,7 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
                 }}
                 className="active:opacity-70"
               >
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: category === cat.key ? '#fff' : '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: category === cat.key ? '#fff' : '#000000' }}>
                   {lang === 'en' ? cat.labelEn : cat.labelTl}
                 </Text>
               </Pressable>
@@ -239,7 +239,7 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
           {/* Price + unit */}
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Price (₱)' : 'Presyo (₱)'}
               </Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB', backgroundColor: '#fff', paddingHorizontal: 12 }}>
@@ -250,12 +250,12 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
                   keyboardType="decimal-pad"
                   placeholder="0.00"
                   placeholderTextColor="#B0A18C"
-                  style={{ flex: 1, paddingVertical: 12, fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522' }}
+                  style={{ flex: 1, paddingVertical: 12, fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000' }}
                 />
               </View>
             </View>
             <View style={{ width: 110 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Unit' : 'Yunit'}
               </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }} style={{ height: 44 }}>
@@ -270,7 +270,7 @@ export default function AddItemModal({ visible, onClose, tindahanId, editItem }:
                     }}
                     className="active:opacity-70"
                   >
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: unit === u ? '#fff' : '#292522' }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: unit === u ? '#fff' : '#000000' }}>
                       {u}
                     </Text>
                   </Pressable>

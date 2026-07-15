@@ -38,14 +38,14 @@ export default function LegalDocumentScreen() {
       >
         <View className="flex-row items-center gap-3">
           <Pressable onPress={() => router.back()} className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70">
-            <Ionicons name="arrow-back" size={18} color="#292522" />
+            <Ionicons name="arrow-back" size={18} color="#000000" />
           </Pressable>
           <View className="flex-1">
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }} numberOfLines={1}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }} numberOfLines={1}>
               {data?.title ?? '…'}
             </Text>
             {data && (
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                 {lang === 'en' ? 'Version' : 'Bersyon'} {data.version}
                 {data.published_at ? ` · ${new Date(data.published_at).toLocaleDateString()}` : ''}
               </Text>

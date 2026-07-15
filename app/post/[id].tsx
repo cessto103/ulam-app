@@ -52,7 +52,7 @@ const TYPE_META: Record<string, { labelEn: string; labelTl: string; bg: string; 
   recipe_share: { labelEn: 'Recipe',     labelTl: 'Recipe',     bg: '#FDEFC9', text: '#9A6A12', emoji: '🍲' },
   price_tip:    { labelEn: 'Price Tip',  labelTl: 'Presyo',     bg: '#EFF4EC', text: '#386641', emoji: '💰' },
   budget_win:   { labelEn: 'Budget Win', labelTl: 'Budget Win', bg: '#EFF4EC', text: '#2C5234', emoji: '🏆' },
-  general:      { labelEn: 'General',    labelTl: 'General',    bg: '#F9EDD3', text: '#292522', emoji: '💬' },
+  general:      { labelEn: 'General',    labelTl: 'General',    bg: '#F9EDD3', text: '#000000', emoji: '💬' },
 };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -111,15 +111,15 @@ function CommentRow({
 
     return (
       <View key={c.id} className={`flex-row gap-2.5 ${isReply ? 'ml-10 mt-2' : ''}`}>
-        <Avatar user={c.user} size={isReply ? 7 : 8} />
+        <Avatar user={c.user} size={isReply ? 8 : 9} />
         <View className="flex-1">
           <View className="bg-cream-50 rounded-2xl rounded-tl-none px-3 py-2">
             <View className="flex-row items-center justify-between mb-0.5">
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#292522' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}>
                 {c.user.name}
               </Text>
               <View className="flex-row items-center gap-2">
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {timeAgo(c.created_at, lang)}
                 </Text>
                 {canEdit && (
@@ -134,12 +134,12 @@ function CommentRow({
                 )}
               </View>
             </View>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', lineHeight: 20 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', lineHeight: 20 }}>
               {c.body}
             </Text>
           </View>
           <Pressable onPress={() => onReply(c.user)} className="ml-2 mt-1 active:opacity-60">
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>{lang === 'en' ? 'Reply' : 'Tumugon'}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>{lang === 'en' ? 'Reply' : 'Tumugon'}</Text>
           </Pressable>
         </View>
       </View>
@@ -367,9 +367,9 @@ export default function PostDetailScreen() {
         style={{ paddingTop: insets.top + 8, paddingHorizontal: 16, paddingBottom: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', gap: 12 }}
       >
         <Pressable onPress={() => router.back()} hitSlop={12} style={{ padding: 4 }}>
-          <Ionicons name="arrow-back" size={20} color="#292522" />
+          <Ionicons name="arrow-back" size={20} color="#000000" />
         </Pressable>
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', flex: 1 }}>Post</Text>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>Post</Text>
         {!isMyPost && (
           <Pressable onPress={() => setReportSheetOpen(true)} hitSlop={8}>
             <Ionicons name="flag-outline" size={18} color="#B0A18C" />
@@ -393,14 +393,14 @@ export default function PostDetailScreen() {
       {editCommentId !== null && (
         <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F8D076', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TextInput
-            style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 80 }}
+            style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 80 }}
             value={editCommentBody}
             onChangeText={setEditCommentBody}
             multiline
             autoFocus
           />
           <Pressable onPress={saveEditComment} disabled={savingComment} style={{ backgroundColor: '#386641', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 }}>
-            {savingComment ? <ActivityIndicator color="white" size="small" /> : <Text style={{ color: 'white', fontFamily: 'NunitoSans_700Bold', fontSize: 12 }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
+            {savingComment ? <ActivityIndicator color="white" size="small" /> : <Text style={{ color: 'white', fontFamily: 'NunitoSans_700Bold', fontSize: 13 }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
           </Pressable>
           <Pressable onPress={() => setEditCommentId(null)}>
             <Text style={{ color: '#6F655A', fontSize: 14 }}>✕</Text>
@@ -437,14 +437,14 @@ export default function PostDetailScreen() {
                 {/* Author */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                   <Pressable onPress={() => router.push(`/user/${post.user_id}` as any)}>
-                    <Avatar user={post.user} size={9} />
+                    <Avatar user={post.user} size={10} />
                   </Pressable>
                   <Pressable style={{ flex: 1 }} onPress={() => router.push(`/user/${post.user_id}` as any)}>
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#292522' }}>{post.user.name}</Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{timeAgo(post.created_at, lang)}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>{post.user.name}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{timeAgo(post.created_at, lang)}</Text>
                   </Pressable>
                   <View style={{ borderRadius: 99, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: meta.bg }}>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: meta.text }}>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: meta.text }}>
                       {meta.emoji} {lang === 'en' ? meta.labelEn : meta.labelTl}
                     </Text>
                   </View>
@@ -454,7 +454,7 @@ export default function PostDetailScreen() {
                 {editingPost ? (
                   <View style={{ marginBottom: 12 }}>
                     <TextInput
-                      style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#292522', backgroundColor: '#FFFCF5', borderRadius: 12, padding: 12, minHeight: 80, borderWidth: 1, borderColor: '#D1FAE5' }}
+                      style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', backgroundColor: '#FFFCF5', borderRadius: 12, padding: 12, minHeight: 80, borderWidth: 1, borderColor: '#D1FAE5' }}
                       value={editPostBody}
                       onChangeText={setEditPostBody}
                       multiline
@@ -466,18 +466,18 @@ export default function PostDetailScreen() {
                         disabled={savingPost}
                         style={{ flex: 1, backgroundColor: '#386641', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}
                       >
-                        {savingPost ? <ActivityIndicator color="white" size="small" /> : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: 'white' }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
+                        {savingPost ? <ActivityIndicator color="white" size="small" /> : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: 'white' }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
                       </Pressable>
                       <Pressable
                         onPress={() => setEditingPost(false)}
                         style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}
                       >
-                        <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>{lang === 'en' ? 'Cancel' : 'Kanselahin'}</Text>
+                        <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#6F655A' }}>{lang === 'en' ? 'Cancel' : 'Kanselahin'}</Text>
                       </Pressable>
                     </View>
                   </View>
                 ) : (
-                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#292522', lineHeight: 22, marginBottom: 12 }}>{post.body}</Text>
+                  <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', lineHeight: 22, marginBottom: 12 }}>{post.body}</Text>
                 )}
 
                 {/* Images */}
@@ -499,21 +499,21 @@ export default function PostDetailScreen() {
                     <Animated.View style={{ transform: [{ scale: likeScale }] }}>
                       <Ionicons name={isReacted ? 'thumbs-up' : 'thumbs-up-outline'} size={18} color={isReacted ? '#386641' : '#B0A18C'} />
                     </Animated.View>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: isReacted ? '#386641' : '#B0A18C' }}>{thisPuso}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: isReacted ? '#386641' : '#B0A18C' }}>{thisPuso}</Text>
                   </Pressable>
                   <Pressable onPress={toggleDislike} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                     <Animated.View style={{ transform: [{ scale: dislikeScale }] }}>
                       <Ionicons name={isDisliked ? 'thumbs-down' : 'thumbs-down-outline'} size={18} color={isDisliked ? '#E24B4A' : '#B0A18C'} />
                     </Animated.View>
-                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: isDisliked ? '#E24B4A' : '#B0A18C' }}>{thisDislike}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: isDisliked ? '#E24B4A' : '#B0A18C' }}>{thisDislike}</Text>
                   </Pressable>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                     <Ionicons name="chatbubble-outline" size={16} color="#B0A18C" />
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{post.comments_count}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A' }}>{post.comments_count}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                     <Ionicons name="eye-outline" size={16} color="#B0A18C" />
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{formatCount(post.views_count)}</Text>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A' }}>{formatCount(post.views_count)}</Text>
                   </View>
                   <View style={{ flex: 1 }} />
                   <Pressable onPress={toggleSave} hitSlop={8}>
@@ -523,7 +523,7 @@ export default function PostDetailScreen() {
               </View>
 
               {/* Comments heading */}
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 1, paddingHorizontal: 16, paddingVertical: 8 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 1, paddingHorizontal: 16, paddingVertical: 8 }}>
                 {lang === 'en' ? 'Comments' : 'Mga Komento'} ({commentsData?.data.length ?? 0})
               </Text>
               {commentsLoading && <ActivityIndicator color="#386641" style={{ marginTop: 16 }} />}
@@ -534,7 +534,7 @@ export default function PostDetailScreen() {
           !commentsLoading ? (
             <View style={{ alignItems: 'center', paddingTop: 32, paddingHorizontal: 32 }}>
               <Text style={{ fontSize: 28, marginBottom: 8 }}>💬</Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center' }}>
                 {lang === 'en' ? 'No comments yet. Be the first!' : 'Wala pang komento. Maging una!'}
               </Text>
             </View>
@@ -546,7 +546,7 @@ export default function PostDetailScreen() {
       {/* Reply banner */}
       {replyTo && (
         <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#EFF4EC', paddingHorizontal: 16, paddingVertical: 6, borderTopWidth: 1, borderTopColor: '#DCE8D6' }}>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#386641', flex: 1 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#386641', flex: 1 }}>
             ↩ {lang === 'en' ? 'Replying to' : 'Tumutugon kay'} <Text style={{ fontFamily: 'NunitoSans_700Bold' }}>{replyTo.name.split(' ')[0]}</Text>
           </Text>
           <Pressable onPress={() => setReplyTo(null)} hitSlop={8}>
@@ -557,10 +557,10 @@ export default function PostDetailScreen() {
 
       {/* Input bar — padded for Android nav bar */}
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 16, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 12), backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#F9EDD3' }}>
-        {me && <Avatar user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }} size={8} />}
+        {me && <Avatar user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }} size={9} />}
         <TextInput
           ref={inputRef}
-          style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#292522', maxHeight: 100 }}
+          style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, fontFamily: 'NunitoSans_400Regular', color: '#000000', maxHeight: 100 }}
           placeholder={
             replyTo
               ? (lang === 'en' ? `Reply to ${replyTo.name.split(' ')[0]}...` : `Tumugon kay ${replyTo.name.split(' ')[0]}...`)

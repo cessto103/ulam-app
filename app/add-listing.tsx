@@ -257,9 +257,9 @@ export default function AddListingScreen() {
                   <Text
                     style={{
                       fontFamily: 'NunitoSans_600SemiBold',
-                      fontSize: 12,
+                      fontSize: 13,
                       textAlign: 'center',
-                      color: active ? '#fff' : '#292522',
+                      color: active ? '#fff' : '#000000',
                     }}
                   >
                     {lang === 'en' ? opt.en : opt.tl}
@@ -272,7 +272,7 @@ export default function AddListingScreen() {
           {/* ── Stall in a market: market picker ── */}
           {mode === 'stall' && (
             <View className="mb-4">
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Which market?' : 'Aling palengke?'}
               </Text>
 
@@ -286,15 +286,15 @@ export default function AddListingScreen() {
                 >
                   <Text style={{ fontSize: 18 }}>🏪</Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#5E693F' }} numberOfLines={1}>
+                    <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#5E693F' }} numberOfLines={1}>
                       {selectedMarket.name}
                     </Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                       {selectedMarket.barangay}, {selectedMarket.municipality}
                     </Text>
                   </View>
                   <Pressable onPress={() => setSelectedMarket(null)} className="active:opacity-60" hitSlop={8}>
-                    <Text style={{ fontSize: 12, color: '#5E693F', fontFamily: 'NunitoSans_600SemiBold' }}>
+                    <Text style={{ fontSize: 13, color: '#5E693F', fontFamily: 'NunitoSans_600SemiBold' }}>
                       {lang === 'en' ? 'Change' : 'Palitan'}
                     </Text>
                   </Pressable>
@@ -333,10 +333,10 @@ export default function AddListingScreen() {
                           >
                             <Text style={{ fontSize: 16 }}>🏪</Text>
                             <View style={{ flex: 1 }}>
-                              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522' }} numberOfLines={1}>
+                              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }} numberOfLines={1}>
                                 {m.name}
                               </Text>
-                              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+                              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                                 {m.barangay}, {m.municipality}
                               </Text>
                             </View>
@@ -353,7 +353,7 @@ export default function AddListingScreen() {
           {/* ── New market: type selector ── */}
           {mode === 'market' && (
             <View className="mb-4">
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                 {lang === 'en' ? 'Market type' : 'Uri ng Palengke'}
               </Text>
               <View className="flex-row flex-wrap gap-2">
@@ -368,8 +368,8 @@ export default function AddListingScreen() {
                       <Text
                         style={{
                           fontFamily: 'NunitoSans_600SemiBold',
-                          fontSize: 12,
-                          color: active ? '#fff' : '#292522',
+                          fontSize: 13,
+                          color: active ? '#fff' : '#000000',
                         }}
                       >
                         {t.emoji} {lang === 'en' ? t.en : t.tl}
@@ -394,7 +394,7 @@ export default function AddListingScreen() {
 
           {/* Name */}
           <View className="mb-4">
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
               {lang === 'en' ? 'Name' : 'Pangalan'}
             </Text>
             <TextInput
@@ -415,7 +415,7 @@ export default function AddListingScreen() {
           {mode !== 'market' && (
             <>
               <View className="mb-4">
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                   {lang === 'en' ? 'Description (optional)' : 'Deskripsyon (opsyonal)'}
                 </Text>
                 <TextInput
@@ -431,7 +431,7 @@ export default function AddListingScreen() {
               </View>
 
               <View className="mb-4">
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
                   {lang === 'en' ? 'Contact number (optional)' : 'Numero ng Kontak (opsyonal)'}
                 </Text>
                 <TextInput
@@ -446,7 +446,7 @@ export default function AddListingScreen() {
 
               <View className="mb-4">
                 <View className="flex-row items-center justify-between mb-2">
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522' }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000' }}>
                     {lang === 'en' ? 'Store hours (optional)' : 'Oras ng Bukas (opsyonal)'}
                   </Text>
                   <Pressable
@@ -472,13 +472,13 @@ export default function AddListingScreen() {
 
           {/* Location capture */}
           <View className="mb-6">
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#292522', marginBottom: 6 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>
               {lang === 'en' ? 'Location' : 'Lokasyon'}
             </Text>
             {mode !== 'market' && (
               <View style={{ flexDirection: 'row', gap: 8, backgroundColor: '#FEF6E3', borderRadius: 12, padding: 10, marginBottom: 10 }}>
                 <Text style={{ fontSize: 14 }}>📌</Text>
-                <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#92700A', lineHeight: 16 }}>
+                <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#92700A', lineHeight: 16 }}>
                   {lang === 'en'
                     ? 'You should be at your store to pin its exact location.'
                     : 'Dapat nasa iyong tindahan ka para tumpak ang pag-pin ng lokasyon.'}
@@ -495,7 +495,7 @@ export default function AddListingScreen() {
               ) : (
                 <Text style={{ fontSize: 14 }}>📍</Text>
               )}
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#C45E3A' }}>
                 {locating
                   ? (lang === 'en' ? 'Locating...' : 'Hinahanap...')
                   : coords
@@ -505,8 +505,8 @@ export default function AddListingScreen() {
             </Pressable>
             {coords && (
               <View className="flex-row items-center gap-1.5 mt-2">
-                <Text style={{ fontSize: 12 }}>✅</Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
+                <Text style={{ fontSize: 13 }}>✅</Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
                   {lang === 'en' ? 'Location captured' : 'Nakuha ang lokasyon'}
                 </Text>
               </View>

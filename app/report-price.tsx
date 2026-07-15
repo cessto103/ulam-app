@@ -380,7 +380,7 @@ export default function ReportPriceScreen() {
           >
             <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#292522' }}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#000000' }}>
                   {lang === 'en' ? 'Select market or store' : 'Pumili ng palengke o tindahan'}
                 </Text>
                 <Pressable onPress={() => setPickerOpen(false)} hitSlop={8}>
@@ -401,7 +401,7 @@ export default function ReportPriceScreen() {
                 className="flex-row items-center gap-2 px-4 py-3 border-b border-cream-200 active:opacity-70"
               >
                 <Text style={{ fontSize: 16 }}>🌏</Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>
                   {lang === 'en' ? 'General area (no specific store)' : 'Pangkalahatang lugar (walang tiyak na tindahan)'}
                 </Text>
               </Pressable>
@@ -420,10 +420,10 @@ export default function ReportPriceScreen() {
                   >
                     <Text style={{ fontSize: 16 }}>{TARGET_TYPE_EMOJI[m.type] ?? (m.kind === 'tindahan' ? '🛒' : '🏪')}</Text>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522' }} numberOfLines={1}>
+                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }} numberOfLines={1}>
                         {m.name}
                       </Text>
-                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }} numberOfLines={1}>
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                         {m.barangay}{m.kind === 'tindahan' ? ` · ${lang === 'en' ? 'Independent store' : 'Sariling tindahan'}` : ''}
                       </Text>
                     </View>

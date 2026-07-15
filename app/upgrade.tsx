@@ -143,11 +143,11 @@ export default function UpgradeScreen() {
             }}
           >
             <RadioDot selected={selectedPlan === 'monthly'} />
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>
               {lang === 'en' ? 'Monthly' : 'Buwanin'}
             </Text>
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: 'white' }}>₱59</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
               {lang === 'en' ? 'per month' : 'bawat buwan'}
             </Text>
           </Pressable>
@@ -163,13 +163,13 @@ export default function UpgradeScreen() {
           >
             <RadioDot selected={selectedPlan === 'yearly'} accentColor="#E5A26F" />
             <View className="flex-row items-center justify-between mb-1">
-              <Text style={{ fontSize: 12, color: '#E5A26F' }}>{lang === 'en' ? 'Yearly' : 'Taon-taon'}</Text>
+              <Text style={{ fontSize: 13, color: '#E5A26F' }}>{lang === 'en' ? 'Yearly' : 'Taon-taon'}</Text>
               <View className="rounded-full px-1.5 py-0.5" style={{ backgroundColor: '#E5A26F' }}>
-                <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#3C3A2F' }}>{lang === 'en' ? 'SAVE' : 'MATIPID'}</Text>
+                <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#3C3A2F' }}>{lang === 'en' ? 'SAVE' : 'MATIPID'}</Text>
               </View>
             </View>
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: 'white' }}>₱499</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#E5A26F' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#E5A26F' }}>
               {lang === 'en' ? '₱41.58/month' : '₱41.58/buwan'}
             </Text>
           </Pressable>

@@ -29,7 +29,7 @@ function GradientCover({ gradientKey, fontKey = 'baloo', title, height }: { grad
         style={[
           styles.gradientTitle,
           { fontFamily: family, fontStyle: fontKey === 'baloo' ? 'italic' : 'normal' },
-          compact ? { fontSize: 13, paddingHorizontal: 8 } : null,
+          compact ? { fontSize: 14, paddingHorizontal: 8 } : null,
         ]}
         numberOfLines={compact ? 2 : 3}
       >

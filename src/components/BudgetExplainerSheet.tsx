@@ -40,7 +40,7 @@ export default function BudgetExplainerSheet({
             <View className="w-14 h-14 rounded-full bg-gold-100 items-center justify-center mb-2">
               <Text style={{ fontSize: 28 }}>💰</Text>
             </View>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 21, color: '#292522', textAlign: 'center' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 21, color: '#000000', textAlign: 'center' }}>
               {lang === 'en' ? 'What is a food budget?' : 'Ano ang food budget?'}
             </Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', marginTop: 4, lineHeight: 21 }}>
@@ -56,7 +56,7 @@ export default function BudgetExplainerSheet({
                 <View className="w-9 h-9 rounded-full bg-leaf-50 items-center justify-center">
                   <Ionicons name={step.icon} size={18} color="#386641" />
                 </View>
-                <Text style={{ flex: 1, fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#292522', lineHeight: 19 }}>
+                <Text style={{ flex: 1, fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000', lineHeight: 19 }}>
                   {step.text}
                 </Text>
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#F0DEBB' }}>{i + 1}</Text>
@@ -73,7 +73,7 @@ export default function BudgetExplainerSheet({
             </Text>
           </Pressable>
           <Pressable onPress={onClose} className="items-center py-3.5 active:opacity-60">
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#6F655A' }}>
               {lang === 'en' ? 'Maybe later' : 'Mamaya na lang'}
             </Text>
           </Pressable>

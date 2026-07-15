@@ -151,7 +151,7 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
             elevation: 8,
           }}
         >
-          <Text style={{ fontFamily: 'Baloo2_800ExtraBold', fontSize: 20, color: '#292522' }}>
+          <Text style={{ fontFamily: 'Baloo2_800ExtraBold', fontSize: 20, color: '#000000' }}>
             +{displayXp} XP
           </Text>
         </Animated.View>
@@ -205,14 +205,14 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
           }}
         >
           <Text style={{ fontSize: 36, marginBottom: 6 }}>{currentAchievement.icon || '🏆'}</Text>
-          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#C4881C', letterSpacing: 1, marginBottom: 2 }}>
+          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C', letterSpacing: 1, marginBottom: 2 }}>
             {lang === 'en' ? 'ACHIEVEMENT UNLOCKED' : 'NA-UNLOCK NA ACHIEVEMENT'}
           </Text>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522', textAlign: 'center' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000', textAlign: 'center' }}>
             {currentAchievement.name}
           </Text>
           {currentAchievement.xp_reward > 0 && (
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#9A6A12', marginTop: 4 }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#9A6A12', marginTop: 4 }}>
               +{currentAchievement.xp_reward} XP
             </Text>
           )}

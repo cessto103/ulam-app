@@ -127,13 +127,13 @@ function RecipeCard({
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 }}>
             <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#9A6A12' }}>
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12' }}>
                 {BUDGET_LABEL[recipe.budget_tag] ?? recipe.budget_tag}
               </Text>
             </View>
             {diff && recipe.difficulty && (
               <View style={{ backgroundColor: diff.bg, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: diff.text, textTransform: 'capitalize' }}>
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: diff.text, textTransform: 'capitalize' }}>
                   {recipe.difficulty}
                 </Text>
               </View>
@@ -150,29 +150,29 @@ function RecipeCard({
         </View>
 
         {/* Title */}
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
           {recipe.title}
         </Text>
 
         {/* Description */}
         {!!recipe.description && (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
             {recipe.description}
           </Text>
         )}
 
         {/* Meta chips */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
-          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#5E693F' }}>
+          <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#5E693F' }}>
             ₱{Number(recipe.estimated_cost).toFixed(0)}
           </Text>
           {recipe.servings > 0 && (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               {recipe.servings} {lang === 'en' ? 'servings' : 'serving'}
             </Text>
           )}
           {totalMin > 0 && (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
               {totalMin} min
             </Text>
           )}
@@ -187,8 +187,8 @@ function RecipeCard({
           }}
           className="active:opacity-70"
         >
-          <Text style={{ fontSize: 13 }}>🍳</Text>
-          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C' }}>
+          <Text style={{ fontSize: 14 }}>🍳</Text>
+          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#C4881C' }}>
             {lang === 'en' ? 'Add to Meal Plan' : 'Idagdag sa Plano'}
           </Text>
         </Pressable>
@@ -288,13 +288,13 @@ export default function RecipeBookScreen() {
         backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3',
       }}>
         <Pressable onPress={() => router.back()} className="active:opacity-60">
-          <Ionicons name="arrow-back" size={20} color="#292522" />
+          <Ionicons name="arrow-back" size={20} color="#000000" />
         </Pressable>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#292522' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>
             {lang === 'en' ? 'My Recipe Book' : 'Aking Recipe Book'}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
             {filtered.length} {lang === 'en' ? `of ${recipes.length} saved` : `sa ${recipes.length} na naka-save`}
           </Text>
         </View>
@@ -310,7 +310,7 @@ export default function RecipeBookScreen() {
             onChangeText={setSearch}
             placeholder={lang === 'en' ? 'Search saved recipes...' : 'Hanapin ang recipe...'}
             placeholderTextColor="#B0A18C"
-            style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#292522', padding: 0 }}
+            style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', padding: 0 }}
           />
           {search.length > 0 && (
             <Pressable onPress={() => setSearch('')} hitSlop={8}>
@@ -333,7 +333,7 @@ export default function RecipeBookScreen() {
             onPress={() => { setBudgetFilter(null); setDiffFilter(null); }}
             style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, backgroundColor: '#FCEBEB' }}
           >
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#E24B4A' }}>✕ Clear</Text>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#E24B4A' }}>✕ Clear</Text>
           </Pressable>
         )}
 
@@ -347,7 +347,7 @@ export default function RecipeBookScreen() {
               onPress={() => setDiffFilter(active ? null : d)}
               style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, backgroundColor: active ? c.bg : '#F9EDD3', borderWidth: active ? 1.5 : 0, borderColor: c.text }}
             >
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: active ? c.text : '#292522', textTransform: 'capitalize' }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: active ? c.text : '#000000', textTransform: 'capitalize' }}>
                 {d}
               </Text>
             </Pressable>
@@ -363,7 +363,7 @@ export default function RecipeBookScreen() {
               onPress={() => setBudgetFilter(active ? null : b)}
               style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, backgroundColor: active ? '#6E7B4A' : '#F9EDD3' }}
             >
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: active ? '#fff' : '#292522' }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#000000' }}>
                 {BUDGET_LABEL[b]}
               </Text>
             </Pressable>
@@ -386,12 +386,12 @@ export default function RecipeBookScreen() {
           ListEmptyComponent={
             <View style={{ alignItems: 'center', paddingTop: 80, paddingHorizontal: 32 }}>
               <Ionicons name="bookmark-outline" size={52} color="#D3C5AB" style={{ marginBottom: 14 }} />
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522', marginBottom: 6, textAlign: 'center' }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 6, textAlign: 'center' }}>
                 {search || hasFilters
                   ? (lang === 'en' ? 'No matches found' : 'Walang nahanap')
                   : (lang === 'en' ? 'No saved recipes yet' : 'Wala pang naka-save')}
               </Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', textAlign: 'center', lineHeight: 20 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', lineHeight: 20 }}>
                 {search || hasFilters
                   ? (lang === 'en' ? 'Try adjusting your filters.' : 'Subukan ng ibang filter.')
                   : (lang === 'en' ? 'Tap the bookmark icon on any recipe to save it here.' : 'I-tap ang bookmark sa anumang recipe para i-save dito.')}
@@ -425,11 +425,11 @@ export default function RecipeBookScreen() {
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
           }}>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#292522' }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
                 {lang === 'en' ? 'Add to Today\'s Meal Plan' : 'Idagdag sa Meal Plan Ngayon'}
               </Text>
               {mealRecipe && (
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
                   {mealRecipe.title}
                 </Text>
               )}
@@ -458,7 +458,7 @@ export default function RecipeBookScreen() {
 
           <ScrollView contentContainerStyle={{ padding: 20, gap: 20 }}>
             <View>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>
                 {lang === 'en' ? 'Pick meal type' : 'Pumili ng meal type'}
               </Text>
               <View style={{ gap: 8 }}>
@@ -476,7 +476,7 @@ export default function RecipeBookScreen() {
                       }}
                     >
                       <Text style={{ fontSize: 20 }}>{mt.emoji}</Text>
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#292522', flex: 1 }}>
+                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#000000', flex: 1 }}>
                         {lang === 'en' ? mt.labelEn : mt.labelTl}
                       </Text>
                       {active && <Ionicons name="checkmark-circle" size={20} color="#6E7B4A" />}

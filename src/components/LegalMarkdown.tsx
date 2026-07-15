@@ -23,7 +23,7 @@ export default function LegalMarkdown({ md }: { md: string }) {
         }
         if (trimmed.startsWith('# ')) {
           return (
-            <Text key={i} style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#292522', marginBottom: 8 }}>
+            <Text key={i} style={{ fontFamily: 'Baloo2_700Bold', fontSize: 24, color: '#000000', marginBottom: 8 }}>
               {inline(trimmed.slice(2))}
             </Text>
           );
@@ -35,7 +35,7 @@ export default function LegalMarkdown({ md }: { md: string }) {
               {items.map((line, j) => (
                 <View key={j} style={{ flexDirection: 'row', gap: 8 }}>
                   <Text style={{ color: '#386641', fontSize: 14, lineHeight: 21 }}>•</Text>
-                  <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 14, lineHeight: 21, color: '#292522' }}>
+                  <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 14, lineHeight: 21, color: '#000000' }}>
                     {inline(line.replace(/^[-•] /, ''))}
                   </Text>
                 </View>
@@ -44,7 +44,7 @@ export default function LegalMarkdown({ md }: { md: string }) {
           );
         }
         return (
-          <Text key={i} style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, lineHeight: 22, color: '#292522', marginBottom: 10 }}>
+          <Text key={i} style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, lineHeight: 22, color: '#000000', marginBottom: 10 }}>
             {inline(trimmed.replace(/\n/g, ' '))}
           </Text>
         );

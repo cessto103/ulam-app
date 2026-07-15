@@ -66,12 +66,12 @@ function RecipePreviewCard({ title, budgetTag, imageUrl }: {
         </View>
       )}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, backgroundColor: '#fff' }}>
-        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#292522', flex: 1 }} numberOfLines={1}>
+        <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000', flex: 1 }} numberOfLines={1}>
           {title}
         </Text>
         {budgetTag && (
           <View style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 3, marginLeft: 8 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#386641' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
               {BUDGET_LABEL[budgetTag] ?? budgetTag}
             </Text>
           </View>
@@ -189,7 +189,7 @@ export default function CreatePostScreen() {
         {/* ── Recipe share mode ── */}
         {isRecipeShare ? (
           <>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A', marginBottom: 10 }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#6F655A', marginBottom: 10 }}>
               Sharing Recipe
             </Text>
             <RecipePreviewCard
@@ -199,18 +199,18 @@ export default function CreatePostScreen() {
             />
             <View style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
                   Caption <Text style={{ fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
                     {lang === 'en' ? '(optional)' : '(opsyonal)'}
                   </Text>
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: charColor }}>{charCount}/2000</Text>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: charColor }}>{charCount}/2000</Text>
               </View>
               <TextInput
                 style={{
                   width: '100%', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB',
                   backgroundColor: '#FFFCF5', paddingHorizontal: 14, paddingVertical: 12,
-                  fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#292522',
+                  fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000',
                   minHeight: 100, textAlignVertical: 'top',
                 }}
                 placeholder="Say something about this recipe..."
@@ -226,7 +226,7 @@ export default function CreatePostScreen() {
           <>
             {/* ── Post type selector ── */}
             <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 8 }}>Post type</Text>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 8 }}>Post type</Text>
               <View style={{ gap: 8 }}>
                 {POST_TYPES.map((t) => (
                   <Pressable
@@ -249,12 +249,12 @@ export default function CreatePostScreen() {
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{
-                        fontFamily: 'NunitoSans_600SemiBold', fontSize: 13,
-                        color: postType === t.key ? '#5E693F' : '#292522',
+                        fontFamily: 'NunitoSans_600SemiBold', fontSize: 14,
+                        color: postType === t.key ? '#5E693F' : '#000000',
                       }}>
                         {t.label}
                       </Text>
-                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }}>
+                      <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }}>
                         {t.hint}
                       </Text>
                     </View>
@@ -266,16 +266,16 @@ export default function CreatePostScreen() {
             {/* Body text */}
             <View style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
                   {lang === 'en' ? 'Your message' : 'Iyong mensahe'}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: charColor }}>{charCount}/2000</Text>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: charColor }}>{charCount}/2000</Text>
               </View>
               <TextInput
                 style={{
                   width: '100%', borderRadius: 12, borderWidth: 1, borderColor: '#F0DEBB',
                   backgroundColor: '#FFFCF5', paddingHorizontal: 14, paddingVertical: 12,
-                  fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#292522',
+                  fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000',
                   minHeight: 120, textAlignVertical: 'top',
                 }}
                 placeholder="Minimum 10 characters."
@@ -290,7 +290,7 @@ export default function CreatePostScreen() {
             {/* Budget amount (budget_win only) */}
             {postType === 'budget_win' && (
               <View style={{ marginBottom: 16 }}>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A', marginBottom: 6 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 6 }}>
                   {lang === 'en' ? 'How much did you save?' : 'Magkano ang natipid?'}{' '}
                   <Text style={{ fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
                     {lang === 'en' ? '(optional)' : '(opsyonal)'}
@@ -303,7 +303,7 @@ export default function CreatePostScreen() {
                 }}>
                   <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', marginRight: 4 }}>₱</Text>
                   <TextInput
-                    style={{ flex: 1, paddingVertical: 12, fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#292522' }}
+                    style={{ flex: 1, paddingVertical: 12, fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000' }}
                     value={budgetAmount}
                     onChangeText={(v) => setBudgetAmount(v.replace(/[^0-9.]/g, ''))}
                     keyboardType="decimal-pad"
@@ -317,13 +317,13 @@ export default function CreatePostScreen() {
             {/* Photo picker */}
             <View style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 12, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
                   {lang === 'en' ? 'Photos' : 'Mga Larawan'}{' '}
                   <Text style={{ fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
                     {lang === 'en' ? `(optional, max ${MAX_PHOTOS})` : `(opsyonal, max ${MAX_PHOTOS})`}
                   </Text>
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A' }}>{photos.length}/{MAX_PHOTOS}</Text>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{photos.length}/{MAX_PHOTOS}</Text>
               </View>
               <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 {photos.map((asset, i) => (
@@ -335,10 +335,10 @@ export default function CreatePostScreen() {
                       style={{
                         position: 'absolute', top: -6, right: -6,
                         width: 20, height: 20, borderRadius: 10,
-                        backgroundColor: '#292522', alignItems: 'center', justifyContent: 'center',
+                        backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center',
                       }}
                     >
-                      <Text style={{ color: '#fff', fontSize: 12, lineHeight: 16 }}>×</Text>
+                      <Text style={{ color: '#fff', fontSize: 13, lineHeight: 16 }}>×</Text>
                     </Pressable>
                   </View>
                 ))}
@@ -352,7 +352,7 @@ export default function CreatePostScreen() {
                     }}
                   >
                     <Text style={{ fontSize: 22, color: '#6F655A' }}>+</Text>
-                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 2 }}>
+                    <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }}>
                       {lang === 'en' ? 'Photo' : 'Larawan'}
                     </Text>
                   </Pressable>
@@ -365,7 +365,7 @@ export default function CreatePostScreen() {
         {/* Community reminder */}
         <View style={{ backgroundColor: '#FEF6E3', borderRadius: 12, padding: 12, marginBottom: 20, flexDirection: 'row', gap: 8 }}>
           <Text style={{ fontSize: 14 }}>💡</Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#9A6A12', lineHeight: 18, flex: 1 }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#9A6A12', lineHeight: 18, flex: 1 }}>
             {isRecipeShare
               ? (lang === 'en'
                   ? 'Share the recipe with the community to help other families plan their budget.'

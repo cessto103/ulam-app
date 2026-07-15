@@ -242,13 +242,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0DEBB', alignSelf: 'center', marginBottom: 16,
   },
   sheetTitle: {
-    fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#292522', marginBottom: 2,
+    fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000', marginBottom: 2,
   },
   sheetSub: {
-    fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginBottom: 16,
+    fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 16,
   },
   secLabel: {
-    fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#6F655A',
+    fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A',
     letterSpacing: 0.7, marginBottom: 10,
   },
   // Layout grid: 3 columns
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   checkText: {
-    color: '#fff', fontSize: 12, fontWeight: '900', lineHeight: 14,
+    color: '#fff', fontSize: 13, fontWeight: '900', lineHeight: 14,
   },
   optLabelWrap: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden', position: 'relative',
   },
   gradOptActive: {
-    borderColor: '#292522',
+    borderColor: '#000000',
     transform: [{ scale: 1.06 }],
   },
   gradCheck: {
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     borderColor: '#6E7B4A', backgroundColor: '#EFF4EC',
   },
   fontPreview: {
-    fontSize: 20, color: '#292522',
+    fontSize: 20, color: '#000000',
   },
   fontPreviewActive: {
     color: '#5E693F',
