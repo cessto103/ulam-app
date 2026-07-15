@@ -5,6 +5,18 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.26.0] — 2026-07-15
+
+Admin-editable Premium pricing with an optional promo discount, plus two bug fixes.
+
+### Added
+- **uLam Premium pricing is now admin-editable** (Content > Monetization), instead of being fixed at ₱59/month and ₱499/year.
+- **Promo discount system**: the admin can turn on a discount for either plan, set a promo name (e.g. "Mother's Day special discount!"), and the Upgrade screen shows a strikethrough original price, the discounted price, a "Saved ₱X" callout, and a promo banner. Checkout charges the discounted amount whenever a promo is active.
+
+### Fixed
+- **The "set up your budget first" error was always shown in Tagalog**, even with the app set to English. Now respects the app's language setting.
+- **The Yearly pricing card's radio button was covered by the "SAVE" badge** on the Upgrade screen; they no longer overlap.
+
 ## [1.25.1] — 2026-07-15
 
 Follow-up fixes for the v1.25.0 recipe-authorship and About the App features.

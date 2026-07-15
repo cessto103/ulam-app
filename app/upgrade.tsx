@@ -11,6 +11,14 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'rea
 
 type Feature = { emoji: string; titleEn: string; titleTl: string; descEn: string; descTl: string; free: boolean };
 type RemoteFeature = { emoji: string; title_en: string; title_tl: string; desc_en: string; desc_tl: string; free: boolean };
+type RemotePricing = {
+  premium_price_monthly: string;
+  premium_price_yearly: string;
+  premium_promo_enabled: string;
+  premium_promo_label: string;
+  premium_promo_price_monthly: string;
+  premium_promo_price_yearly: string;
+};
 
 // Compiled-in fallback — shown until the admin sets a custom list (Content → Monetization).
 const DEFAULT_FEATURES: Feature[] = [
@@ -60,6 +68,28 @@ export default function UpgradeScreen() {
         emoji: f.emoji, titleEn: f.title_en, titleTl: f.title_tl, descEn: f.desc_en, descTl: f.desc_tl, free: f.free,
       }))
     : DEFAULT_FEATURES;
+
+  const { data: pricing } = useQuery({
+    queryKey: ['premium-pricing'],
+    queryFn: async () => (await client.get<RemotePricing>('/premium-pricing')).data,
+    staleTime: 30 * 60_000,
+    retry: 1,
+  });
+
+  const monthlyBase = Number(pricing?.premium_price_monthly ?? 59);
+  const yearlyBase = Number(pricing?.premium_price_yearly ?? 499);
+  const promoOn = pricing?.premium_promo_enabled === '1';
+  const monthlyPromo = promoOn && pricing?.premium_promo_price_monthly
+    ? Number(pricing.premium_promo_price_monthly)
+    : null;
+  const yearlyPromo = promoOn && pricing?.premium_promo_price_yearly
+    ? Number(pricing.premium_promo_price_yearly)
+    : null;
+  const monthlyHasDiscount = monthlyPromo !== null && monthlyPromo < monthlyBase;
+  const yearlyHasDiscount = yearlyPromo !== null && yearlyPromo < yearlyBase;
+  const monthlyEffective = monthlyHasDiscount ? monthlyPromo! : monthlyBase;
+  const yearlyEffective = yearlyHasDiscount ? yearlyPromo! : yearlyBase;
+  const showPromoBanner = (monthlyHasDiscount || yearlyHasDiscount) && !!pricing?.premium_promo_label;
 
   const handleCheckout = async (plan: 'monthly' | 'yearly') => {
     setLoading(plan);
@@ -130,8 +160,17 @@ export default function UpgradeScreen() {
             : 'I-unlock ang lahat: meal plans, premium recipes, at higit pa.'}
         </Text>
 
+        {/* Promo banner — only shown while an admin-configured discount is active */}
+        {showPromoBanner && (
+          <View className="rounded-full px-3 py-1.5 mt-6 self-center" style={{ backgroundColor: '#F4B942' }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#3C3A2F' }}>
+              🎉 {pricing?.premium_promo_label}
+            </Text>
+          </View>
+        )}
+
         {/* Pricing cards — tap to select, radio-style */}
-        <View className="flex-row gap-3 mt-8 w-full">
+        <View className={`flex-row gap-3 w-full ${showPromoBanner ? 'mt-3' : 'mt-8'}`}>
           {/* Monthly */}
           <Pressable
             onPress={() => setSelectedPlan('monthly')}
@@ -146,10 +185,20 @@ export default function UpgradeScreen() {
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>
               {lang === 'en' ? 'Monthly' : 'Buwanin'}
             </Text>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: 'white' }}>₱59</Text>
+            {monthlyHasDiscount && (
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: 'rgba(255,255,255,0.6)', textDecorationLine: 'line-through' }}>
+                ₱{monthlyBase}
+              </Text>
+            )}
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: 'white' }}>₱{monthlyEffective}</Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
               {lang === 'en' ? 'per month' : 'bawat buwan'}
             </Text>
+            {monthlyHasDiscount && (
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#F4B942', marginTop: 2 }}>
+                {lang === 'en' ? `Saved ₱${monthlyBase - monthlyEffective}` : `Nakatipid ng ₱${monthlyBase - monthlyEffective}`}
+              </Text>
+            )}
           </Pressable>
           {/* Yearly — highlighted */}
           <Pressable
@@ -162,16 +211,26 @@ export default function UpgradeScreen() {
             }}
           >
             <RadioDot selected={selectedPlan === 'yearly'} accentColor="#E5A26F" />
-            <View className="flex-row items-center justify-between mb-1">
-              <Text style={{ fontSize: 13, color: '#E5A26F' }}>{lang === 'en' ? 'Yearly' : 'Taon-taon'}</Text>
-              <View className="rounded-full px-1.5 py-0.5" style={{ backgroundColor: '#E5A26F' }}>
+            <View style={{ paddingRight: 26 }}>
+              <Text style={{ fontSize: 13, color: '#E5A26F', marginBottom: 4 }}>{lang === 'en' ? 'Yearly' : 'Taon-taon'}</Text>
+              <View className="rounded-full px-1.5 py-0.5 self-start" style={{ backgroundColor: '#E5A26F' }}>
                 <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#3C3A2F' }}>{lang === 'en' ? 'SAVE' : 'MATIPID'}</Text>
               </View>
             </View>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: 'white' }}>₱499</Text>
+            {yearlyHasDiscount && (
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: 'rgba(255,255,255,0.6)', textDecorationLine: 'line-through' }}>
+                ₱{yearlyBase}
+              </Text>
+            )}
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: 'white' }}>₱{yearlyEffective}</Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#E5A26F' }}>
-              {lang === 'en' ? '₱41.58/month' : '₱41.58/buwan'}
+              {lang === 'en' ? `₱${(yearlyEffective / 12).toFixed(2)}/month` : `₱${(yearlyEffective / 12).toFixed(2)}/buwan`}
             </Text>
+            {yearlyHasDiscount && (
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#F4B942', marginTop: 2 }}>
+                {lang === 'en' ? `Saved ₱${yearlyBase - yearlyEffective}` : `Nakatipid ng ₱${yearlyBase - yearlyEffective}`}
+              </Text>
+            )}
           </Pressable>
         </View>
       </ThemedSection>

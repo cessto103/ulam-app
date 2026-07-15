@@ -337,6 +337,19 @@ function PlanView({ user }: { user: any }) {
         );
         return;
       }
+      if (e?.response?.data?.no_budget) {
+        Alert.alert(
+          lang === 'en' ? 'Set up your budget first' : 'I-setup muna ang budget mo',
+          lang === 'en'
+            ? 'Please set up your daily food budget before generating a meal plan.'
+            : 'I-setup muna ang iyong araw-araw na food budget bago mag-generate ng meal plan.',
+          [
+            { text: lang === 'en' ? 'Not now' : 'Huwag muna', style: 'cancel' },
+            { text: lang === 'en' ? 'Set up budget →' : 'I-setup ang budget →', onPress: () => router.push('/budget-setup' as any) },
+          ],
+        );
+        return;
+      }
       Alert.alert(
         lang === 'en' ? 'Error' : 'Error',
         e?.response?.data?.message ?? (lang === 'en' ? 'Could not generate a meal plan. Try again.' : 'Hindi nagawa ang meal plan. Subukan ulit.'),
