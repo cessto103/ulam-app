@@ -130,7 +130,7 @@ function BoostRow({ boost }: { boost: Boost }) {
     <View className="flex-row items-center justify-between py-3 border-b border-cream-100">
       <View className="flex-1 mr-2">
         <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }} numberOfLines={1}>
-          {boost.target === 'recipe' ? '🍽️' : '🏪'} {boost.target_name ?? '—'}
+          {boost.target === 'recipe' ? '🍽️' : '🏪'} {boost.target_name ?? '-'}
         </Text>
         {boost.views_before !== null && (
           <Text className="text-[12px] text-ink-soft mt-0.5">

@@ -212,7 +212,7 @@ export default function StallDetailScreen() {
             ) : (
               <>
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#3C3A2F' }} numberOfLines={1}>
-                  {stall?.name ?? '—'}
+                  {stall?.name ?? '-'}
                 </Text>
                 <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
                   {[stall?.barangay, stall?.municipality].filter(Boolean).join(', ')}

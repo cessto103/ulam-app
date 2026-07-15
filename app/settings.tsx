@@ -448,7 +448,7 @@ export default function SettingsScreen() {
                   <Ionicons name="navigate-outline" size={16} color="#386641" />
                   <Text className="text-sm font-semibold text-leaf-700">
                     {coords
-                      ? (lang === 'en' ? 'Location pinned — tap to update' : 'Na-pin ang lokasyon — i-tap para i-update')
+                      ? (lang === 'en' ? 'Location pinned (tap to update)' : 'Na-pin ang lokasyon (i-tap para i-update)')
                       : (lang === 'en' ? 'Use my current location' : 'Gamitin ang kasalukuyang lokasyon')}
                   </Text>
                 </>

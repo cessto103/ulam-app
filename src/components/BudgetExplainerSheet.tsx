@@ -20,12 +20,12 @@ export default function BudgetExplainerSheet({
 
   const steps = lang === 'en'
     ? [
-        { icon: 'wallet-outline' as const,      text: 'Tell uLam your food budget — for example ₱2,000 for one week.' },
+        { icon: 'wallet-outline' as const,      text: 'Tell uLam your food budget (for example ₱2,000 for one week).' },
         { icon: 'restaurant-outline' as const,  text: 'uLam divides it into a daily food budget and suggests meals that fit it.' },
         { icon: 'trending-down-outline' as const, text: 'Log what you spend each day and watch your savings grow.' },
       ]
     : [
-        { icon: 'wallet-outline' as const,      text: 'Sabihin sa uLam ang iyong budget sa pagkain — halimbawa ₱2,000 para sa isang linggo.' },
+        { icon: 'wallet-outline' as const,      text: 'Sabihin sa uLam ang iyong budget sa pagkain (halimbawa ₱2,000 para sa isang linggo).' },
         { icon: 'restaurant-outline' as const,  text: 'Hahatiin ito ng uLam sa pang-araw-araw na budget at magmumungkahi ng ulam na kasya rito.' },
         { icon: 'trending-down-outline' as const, text: 'I-log ang gastos araw-araw at panoorin lumaki ang iyong naiipon.' },
       ];
@@ -45,7 +45,7 @@ export default function BudgetExplainerSheet({
             </Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', marginTop: 4, lineHeight: 21 }}>
               {lang === 'en'
-                ? 'It’s the heart of uLam: set how much your family can spend on food, and everything else — meal plans, savings, streaks — works around it.'
+                ? 'It’s the heart of uLam: set how much your family can spend on food, and everything else (meal plans, savings, streaks) works around it.'
                 : 'Ito ang puso ng uLam: itakda kung magkano ang kaya ng pamilya para sa pagkain, at aayon dito ang meal plans, ipon, at streaks.'}
             </Text>
           </View>

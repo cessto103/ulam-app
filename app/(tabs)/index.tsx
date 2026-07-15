@@ -1042,7 +1042,7 @@ export default function HomeScreen() {
               <View className="flex-1 bg-white rounded-xl p-3 border border-cream-200">
                 <Text className="text-xs text-ink-soft mb-1">{savingsLabel(totalDays, lang)}</Text>
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#386641' }}>
-                  ₱{budget?.monthly_savings?.toLocaleString() ?? '—'}
+                  ₱{budget?.monthly_savings?.toLocaleString() ?? '-'}
                 </Text>
               </View>
               <Pressable
@@ -1151,7 +1151,7 @@ export default function HomeScreen() {
                   {r.title}
                 </Text>
                 <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C' }}>
-                  {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toLocaleString()}` : '—'}
+                  {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toLocaleString()}` : '-'}
                   {r.servings ? ` / ${r.servings} servings` : ''}
                 </Text>
               </Pressable>

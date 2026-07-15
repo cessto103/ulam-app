@@ -400,8 +400,8 @@ function PlanView({ user }: { user: any }) {
               </Text>
               <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#9A6A12', marginTop: 2 }}>
                 {lang === 'en'
-                  ? 'Use the monggo soup broth to stretch it further — two meals from one cook!'
-                  : 'Gamitin ang sabaw ng monggo para mag-extend — dalawang kain, isang luto!'}
+                  ? 'Use the monggo soup broth to stretch it further: two meals from one cook!'
+                  : 'Gamitin ang sabaw ng monggo para mag-extend: dalawang kain, isang luto!'}
               </Text>
             </View>
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#9A6A12' }}>
@@ -560,8 +560,8 @@ function PlanView({ user }: { user: any }) {
         user?.plan === 'premium' ? (
           <Text className="mt-3 text-xs text-ink-soft">
             {user?.premium_source === 'trial'
-              ? (lang === 'en' ? '🎁 Free trial — unlimited AI plans' : '🎁 Libreng trial — unlimited AI plans')
-              : (lang === 'en' ? '⭐ Premium — unlimited AI plans' : '⭐ Premium — unlimited AI plans')}
+              ? (lang === 'en' ? '🎁 Free trial (unlimited AI plans)' : '🎁 Libreng trial (unlimited AI plans)')
+              : (lang === 'en' ? '⭐ Premium (unlimited AI plans)' : '⭐ Premium (unlimited AI plans)')}
           </Text>
         ) : (
           <Pressable onPress={() => router.push('/upgrade' as any)} className="mt-3 flex-row items-center gap-1 active:opacity-70">

@@ -216,8 +216,8 @@ export default function ReportPriceScreen() {
               </Pressable>
               <Text className="text-xs text-ink-soft flex-1">
                 {lang === 'en'
-                  ? 'Add a photo of the item (optional) — helps with uncommon products.'
-                  : 'Maglagay ng litrato ng item (opsyonal) — nakakatulong sa di-kilalang produkto.'}
+                  ? 'Add a photo of the item (optional) to help with uncommon products.'
+                  : 'Maglagay ng litrato ng item (opsyonal) para makatulong sa di-kilalang produkto.'}
               </Text>
             </View>
           );

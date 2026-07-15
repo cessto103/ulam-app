@@ -144,10 +144,7 @@ export default function ProfileScreen() {
             onPress={() => router.push('/settings' as any)}
             hitSlop={10}
             className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
-            style={{
-              backgroundColor: 'rgba(255,248,232,0.88)',
-              shadowColor: '#000', shadowOpacity: 0.22, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 3,
-            }}
+            style={{ backgroundColor: 'rgba(255,248,232,0.78)' }}
           >
             <Ionicons name="settings-outline" size={23} color="#000000" />
           </Pressable>
@@ -291,7 +288,7 @@ export default function ProfileScreen() {
               ? (user?.premium_source === 'trial'
                   ? (lang === 'en' ? '🎁 Free trial active' : '🎁 Aktibo ang libreng trial')
                   : (lang === 'en' ? '✓ Premium' : '✓ Premium'))
-              : (lang === 'en' ? 'Free — tap to upgrade' : 'Free — i-tap para mag-upgrade')}
+              : (lang === 'en' ? 'Free (tap to upgrade)' : 'Free (i-tap para mag-upgrade)')}
           </Text>
         </View>
         <Text className="text-ink-soft text-base">›</Text>
@@ -311,7 +308,7 @@ export default function ProfileScreen() {
           </Text>
           {sellerPlanName && (
             <Text className={`text-xs mt-0.5 ${sellerPlanActive ? 'text-leaf-600 font-medium' : 'text-ink-soft'}`}>
-              {sellerPlanActive ? `✓ ${sellerPlanName}` : (lang === 'en' ? 'Free — tap to upgrade' : 'Free — i-tap para mag-upgrade')}
+              {sellerPlanActive ? `✓ ${sellerPlanName}` : (lang === 'en' ? 'Free (tap to upgrade)' : 'Free (i-tap para mag-upgrade)')}
             </Text>
           )}
         </View>

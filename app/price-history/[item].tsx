@@ -175,7 +175,7 @@ export default function PriceHistoryScreen() {
         </Pressable>
         <View className="flex-1">
           <Text className="text-base font-medium text-ink">{data?.item ?? item}</Text>
-          <Text className="text-xs text-ink-soft">{lang === 'en' ? 'Price history — 30 days' : 'Kasaysayan ng presyo — 30 araw'}</Text>
+          <Text className="text-xs text-ink-soft">{lang === 'en' ? 'Price history (30 days)' : 'Kasaysayan ng presyo (30 araw)'}</Text>
         </View>
         {trend !== 0 && latestAvg !== null && (
           <View className={`rounded-full px-2.5 py-1 ${trend > 0 ? 'bg-red-50' : 'bg-leaf-50'}`}>

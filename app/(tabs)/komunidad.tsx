@@ -401,7 +401,7 @@ export default function KomunidadScreen() {
             <View style={{ alignItems: 'center', paddingTop: 64, paddingHorizontal: 32 }}>
               <Text style={{ fontSize: 36, marginBottom: 12 }}>💬</Text>
               <Text className="text-sm text-ink-soft text-center">
-                No posts yet. Be the first — share a price tip!
+                No posts yet. Be the first to share a price tip!
               </Text>
               <Pressable
                 onPress={() => router.push('/create-post' as any)}

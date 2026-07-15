@@ -177,7 +177,7 @@ export default function SearchScreen() {
             {lang === 'en' ? 'No results found' : 'Walang nahanap'}
           </Text>
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center' }}>
-            {lang === 'en' ? 'Try a different word — a dish, an ingredient, or a name.' : 'Subukan ang ibang salita — ulam, sangkap, o pangalan.'}
+            {lang === 'en' ? 'Try a different word: a dish, an ingredient, or a name.' : 'Subukan ang ibang salita: ulam, sangkap, o pangalan.'}
           </Text>
         </View>
       )}
@@ -213,7 +213,7 @@ export default function SearchScreen() {
                       {r.title}
                     </Text>
                     <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-                      {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toFixed(0)}` : '—'}
+                      {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toFixed(0)}` : '-'}
                       {r.servings ? ` · ${r.servings} ${lang === 'en' ? 'servings' : 'tao'}` : ''}
                       {r.source === 'official' ? ' · uLam' : ''}
                     </Text>

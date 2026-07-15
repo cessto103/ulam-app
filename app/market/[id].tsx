@@ -164,7 +164,7 @@ export default function MarketDetailScreen() {
             ) : (
               <>
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#3C3A2F' }} numberOfLines={1}>
-                  {data?.market.name ?? '—'}
+                  {data?.market.name ?? '-'}
                 </Text>
                 <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {data?.market.barangay}, {data?.market.municipality}

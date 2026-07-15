@@ -97,8 +97,8 @@ export default function ReportModal({ visible, onClose, reportableType, reportab
         <View style={{ padding: 20 }}>
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', marginBottom: 14, lineHeight: 19 }}>
             {lang === 'en'
-              ? 'Tell us what looks wrong — duplicate listing, incorrect info, closed store, etc.'
-              : 'Sabihin sa amin kung ano ang mali — duplicate na listing, maling impormasyon, sarado nang tindahan, atbp.'}
+              ? 'Tell us what looks wrong: duplicate listing, incorrect info, closed store, etc.'
+              : 'Sabihin sa amin kung ano ang mali: duplicate na listing, maling impormasyon, sarado nang tindahan, atbp.'}
           </Text>
 
           <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#000000', marginBottom: 6 }}>

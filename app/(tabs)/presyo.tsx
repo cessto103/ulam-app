@@ -495,7 +495,7 @@ export default function PresyoScreen() {
             {lang === 'en' ? `No price found for "${query}"` : `Walang presyo na nahanap para sa "${query}"`}
           </Text>
           <Pressable onPress={() => goReport(query)} className="rounded-xl bg-brand-600 px-4 py-2.5">
-            <Text className="text-xs font-semibold text-white">{lang === 'en' ? 'Be the first — report it +15 XP' : 'Ikaw ang una — mag-report +15 XP'}</Text>
+            <Text className="text-xs font-semibold text-white">{lang === 'en' ? 'Be the first, report it (+15 XP)' : 'Ikaw ang una, mag-report (+15 XP)'}</Text>
           </Pressable>
         </View>
       ) : !query ? (
@@ -538,8 +538,8 @@ export default function PresyoScreen() {
         </View>
         <Text className="text-xs text-ink-soft mb-3 ml-7">
           {lang === 'en'
-            ? 'Help the community — everyone sees the right price. +15 XP per report.'
-            : 'Tumulong sa komunidad — nakakakita ng tamang presyo ang lahat. +15 XP per report.'}
+            ? 'Help the community: everyone sees the right price. +15 XP per report.'
+            : 'Tumulong sa komunidad: nakakakita ng tamang presyo ang lahat. +15 XP per report.'}
         </Text>
         <Pressable
           onPress={() => goReport(query || undefined)}

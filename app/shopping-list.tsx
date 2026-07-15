@@ -520,7 +520,7 @@ export default function ShoppingListScreen() {
                       {ci.name}
                     </Text>
                     <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: done ? '#D3C5AB' : '#386641', marginRight: 10 }}>
-                      {ci.price ? `₱${parseFloat(ci.price).toFixed(0)}` : '—'}
+                      {ci.price ? `₱${parseFloat(ci.price).toFixed(0)}` : '-'}
                     </Text>
                     <Pressable onPress={() => removeCustomItem(ci.id)} hitSlop={8}>
                       <Text style={{ color: '#E24B4A', fontSize: 16, lineHeight: 18 }}>×</Text>

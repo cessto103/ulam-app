@@ -18,7 +18,7 @@ const DEFAULT_FEATURES: Feature[] = [
   { emoji: '📊', titleEn: 'Budget Tracking',    titleTl: 'Budget Tracking',  descEn: 'Log expenses, track your savings',              descTl: 'Mag-log ng gastos, tingnan ang savings',    free: true  },
   { emoji: '📢', titleEn: 'Price Reporting',    titleTl: 'Price Reporting',  descEn: 'Report and check prices',                       descTl: 'Mag-report at makita ang presyo',           free: true  },
   { emoji: '👥', titleEn: 'Community',          titleTl: 'Komunidad',        descEn: 'Posts, likes, and tips from neighbors',         descTl: 'Mga post, puso, at diskarte ng kapitbahay', free: true  },
-  { emoji: '🔓', titleEn: 'Unlimited AI Plans', titleTl: 'Unlimited AI Plans', descEn: 'No limits — as many times as you want',       descTl: 'Walang limitasyon — kahit ilang beses',    free: false },
+  { emoji: '🔓', titleEn: 'Unlimited AI Plans', titleTl: 'Unlimited AI Plans', descEn: 'No limits, as many times as you want',       descTl: 'Walang limitasyon, kahit ilang beses',    free: false },
   { emoji: '⭐', titleEn: 'Premium Recipes',    titleTl: 'Premium Recipes',  descEn: 'Special recipes for the budget-savvy',          descTl: 'Espesyal na mga recipe para sa matipid',    free: false },
   { emoji: '🔔', titleEn: 'Smart Reminders',    titleTl: 'Smart Reminders',  descEn: 'Personalized reminders',                        descTl: 'Personalized na mga paalala',               free: false },
   { emoji: '🚫', titleEn: 'No Ads',             titleTl: 'Walang Ads',       descEn: 'A clean experience, no interruptions',          descTl: 'Malinis na karanasan, walang abala',        free: false },
@@ -126,8 +126,8 @@ export default function UpgradeScreen() {
         <Text style={{ fontFamily: 'Baloo2_800ExtraBold', fontSize: 28, color: 'white', marginBottom: 8, textAlign: 'center' }}>uLam Premium</Text>
         <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: 'rgba(255,255,255,0.75)', textAlign: 'center', lineHeight: 20 }}>
           {lang === 'en'
-            ? 'Unlock everything — meal plans, premium recipes, and more.'
-            : 'I-unlock ang lahat — meal plans, premium recipes, at higit pa.'}
+            ? 'Unlock everything: meal plans, premium recipes, and more.'
+            : 'I-unlock ang lahat: meal plans, premium recipes, at higit pa.'}
         </Text>
 
         {/* Pricing cards — tap to select, radio-style */}

@@ -5,6 +5,15 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.24.2] — 2026-07-15
+
+Header icon circle polish, plus an app-wide sweep to remove em dashes from user-facing copy.
+
+### Changed
+- **Header icon circles (search, price reports, notifications, settings, avatar) are less opaque** (down from ~88% to ~78%) and their drop shadow was removed; the Level/XP progress bar track is unchanged.
+- **Header icon circles on the Home tab now have a border** (a darker shade of each circle's own fill color, e.g. a darker orange border on the orange avatar-initials circle) so they read clearly against the cream page background.
+- **Em dashes removed from all user-facing copy** in the mobile app and admin panel, replaced with a colon, comma, parenthesis, or a new sentence depending on context.
+
 ## [1.24.1] — 2026-07-15
 
 Follow-up polish on the v1.24.0 readability pass, plus a fix for a regression it introduced.
