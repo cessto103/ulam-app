@@ -39,6 +39,9 @@ type Recipe = {
   font_key: FontKey;
   image_urls: string[] | null;
   save_count: number;
+  source: string;
+  is_mine: boolean;
+  user?: { id: number; name: string; username: string | null } | null;
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -94,6 +97,7 @@ function RecipeCard({
   onAddMeal: () => void;
   lang: 'en' | 'tl';
 }) {
+  const router   = useRouter();
   const photos   = recipe.image_urls ?? [];
   const totalMin = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
   const diff     = recipe.difficulty ? DIFF_COLOR[recipe.difficulty] : null;
@@ -148,6 +152,18 @@ function RecipeCard({
             <Ionicons name="bookmark" size={20} color="#F4B942" />
           </Pressable>
         </View>
+
+        {/* Author row (community only) */}
+        {!recipe.is_mine && recipe.source === 'community' && recipe.user && (
+          <Pressable
+            onPress={(e) => { e.stopPropagation(); router.push(`/user/${recipe.user!.id}` as any); }}
+            style={{ marginBottom: 5 }}
+          >
+            <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
+              by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{recipe.user.name}</Text>
+            </Text>
+          </Pressable>
+        )}
 
         {/* Title */}
         <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>

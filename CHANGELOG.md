@@ -5,6 +5,17 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.26.1] — 2026-07-15
+
+Recipe author display fixed on My Recipe Book, plus recipe page layout polish.
+
+### Added
+- **My Recipe Book now shows the community author's name** ("by {name}", clickable to their profile) on saved recipes from other users — this screen never had author info before.
+
+### Changed
+- **Recipe page**: Views moved below the thumbs-up vote button, and the "Edited ... ago" line moved below the Save/bookmark button. The author's avatar there is about 40% bigger for better visibility.
+- **Author avatars removed from the Menu Plan > Recipes list and My Recipe Book list** (both now show "by {name}" as text only, no avatar) to keep those cards less cluttered; the Recipe detail page keeps its avatar.
+
 ## [1.26.0] — 2026-07-15
 
 Admin-editable Premium pricing with an optional promo discount, plus two bug fixes.

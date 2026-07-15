@@ -740,13 +740,8 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
           {!isMine && r.source === 'community' && r.user && (
             <Pressable
               onPress={(e) => { e.stopPropagation(); router.push(`/user/${r.user!.id}` as any); }}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 5 }}
+              style={{ marginBottom: 5 }}
             >
-              <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 10, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
-                  {r.user.name.substring(0, 2).toUpperCase()}
-                </Text>
-              </View>
               <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
                 by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{r.user.name}</Text>
               </Text>

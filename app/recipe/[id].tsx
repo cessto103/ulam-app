@@ -822,8 +822,8 @@ export default function RecipeDetailScreen() {
             onPress={() => router.push(`/user/${recipe.user!.id}` as any)}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}
           >
-            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
+            <View style={{ width: 31, height: 31, borderRadius: 15.5, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 14, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
                 {recipe.user.name.substring(0, 2).toUpperCase()}
               </Text>
             </View>
@@ -832,27 +832,25 @@ export default function RecipeDetailScreen() {
             </Text>
           </Pressable>
         )}
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Ionicons name="eye-outline" size={13} color="#B0A18C" />
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-            {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
-          </Text>
-        </View>
-        {wasEdited && (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 4 }}>{editedLabel()}</Text>
-        )}
       </View>
 
       {/* ── Vote + Save row ── */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F9EDD3', marginTop: 12, gap: 16 }}>
-        <VoteButton
-          emoji="👍"
-          active={myReaction === 'up'}
-          activeColor="#5E693F"
-          count={voteUp ?? recipe.vote_up_count ?? 0}
-          onPress={() => voteRecipe('up')}
-        />
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F9EDD3', marginTop: 12, gap: 16 }}>
+        <View>
+          <VoteButton
+            emoji="👍"
+            active={myReaction === 'up'}
+            activeColor="#5E693F"
+            count={voteUp ?? recipe.vote_up_count ?? 0}
+            onPress={() => voteRecipe('up')}
+          />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
+            <Ionicons name="eye-outline" size={13} color="#B0A18C" />
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+              {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
+            </Text>
+          </View>
+        </View>
         <VoteButton
           emoji="👎"
           active={myReaction === 'down'}
@@ -880,16 +878,21 @@ export default function RecipeDetailScreen() {
           </Text>
         </Pressable>
         {/* Save */}
-        <Pressable onPress={toggleSave} disabled={savePending} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          {savePending ? <ActivityIndicator color="#6E7B4A" size="small" /> : (
-            <>
-              <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={22} color={isSaved ? '#F4B942' : '#D3C5AB'} />
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-                {recipe.save_count ?? 0} saved
-              </Text>
-            </>
+        <View>
+          <Pressable onPress={toggleSave} disabled={savePending} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            {savePending ? <ActivityIndicator color="#6E7B4A" size="small" /> : (
+              <>
+                <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={22} color={isSaved ? '#F4B942' : '#D3C5AB'} />
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+                  {recipe.save_count ?? 0} saved
+                </Text>
+              </>
+            )}
+          </Pressable>
+          {wasEdited && (
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 6 }}>{editedLabel()}</Text>
           )}
-        </Pressable>
+        </View>
       </View>
 
       {/* ── Star rating ── */}
