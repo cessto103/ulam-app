@@ -236,9 +236,9 @@ function AwardsTab({
             <Text className="text-sm font-semibold text-ink-soft w-5 text-center">
               {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : entry.rank}
             </Text>
-            <View className="w-9 h-9 rounded-full bg-leaf-50 items-center justify-center">
+            <View className="w-[43px] h-[43px] rounded-full bg-leaf-50 items-center justify-center">
               {entry.user.avatar ? (
-                <Image source={{ uri: `${API_URL}${entry.user.avatar}` }} className="w-9 h-9 rounded-full" />
+                <Image source={{ uri: `${API_URL}${entry.user.avatar}` }} className="w-[43px] h-[43px] rounded-full" />
               ) : (
                 <Text className="text-xs font-semibold text-ink">{initials(entry.user.name)}</Text>
               )}
@@ -579,9 +579,9 @@ export default function AwardsScreen() {
           <Pressable onPress={showPhotoOptions} className="relative mb-3">
             <View style={{ padding: 3, borderRadius: 999, backgroundColor: '#FFFCF5' }}>
               {avatarUri ? (
-                <Image source={{ uri: avatarUri }} style={{ width: 84, height: 84, borderRadius: 9999, backgroundColor: '#F0DEBB' }} />
+                <Image source={{ uri: avatarUri }} style={{ width: 101, height: 101, borderRadius: 9999, backgroundColor: '#F0DEBB' }} />
               ) : (
-                <View style={{ width: 84, height: 84, borderRadius: 9999, backgroundColor: '#EC8156', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 101, height: 101, borderRadius: 9999, backgroundColor: '#EC8156', alignItems: 'center', justifyContent: 'center' }}>
                   <Text className="text-2xl font-semibold text-white">{initials(user?.name ?? 'U')}</Text>
                 </View>
               )}

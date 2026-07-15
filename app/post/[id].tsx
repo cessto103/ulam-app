@@ -77,16 +77,15 @@ function isEditable(iso: string) {
 
 // ─── Avatar ────────────────────────────────────────────────────────────────────
 
-function Avatar({ user, size = 9 }: { user: PostUser; size?: number }) {
-  const px  = size * 4;
+function Avatar({ user, size = 43 }: { user: PostUser; size?: number }) {
   const uri = user.avatar ? `${API_URL}${user.avatar}` : null;
   return uri ? (
-    <Image source={{ uri }} style={{ width: px, height: px, borderRadius: px / 2 }} />
+    <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size / 2 }} />
   ) : (
     <View
-      style={{ width: px, height: px, borderRadius: px / 2, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}
+      style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}
     >
-      <Text style={{ fontSize: px * 0.35, fontFamily: 'NunitoSans_700Bold', color: '#386641' }}>
+      <Text style={{ fontSize: size * 0.35, fontFamily: 'NunitoSans_700Bold', color: '#386641' }}>
         {initials(user.name)}
       </Text>
     </View>
@@ -105,19 +104,25 @@ function CommentRow({
   onReply: (user: PostUser) => void;
 }) {
   const { lang } = useLanguage();
+  const router = useRouter();
   const renderComment = (c: Comment, isReply = false) => {
     const isMine  = c.user_id === myId;
     const canEdit = isMine && isEditable(c.created_at);
+    const goToAuthor = () => router.push(`/user/${c.user.id}` as any);
 
     return (
       <View key={c.id} className={`flex-row gap-2.5 ${isReply ? 'ml-10 mt-2' : ''}`}>
-        <Avatar user={c.user} size={isReply ? 8 : 9} />
+        <Pressable onPress={goToAuthor}>
+          <Avatar user={c.user} size={isReply ? 38 : 43} />
+        </Pressable>
         <View className="flex-1">
           <View className="bg-cream-50 rounded-2xl rounded-tl-none px-3 py-2">
             <View className="flex-row items-center justify-between mb-0.5">
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}>
-                {c.user.name}
-              </Text>
+              <Pressable onPress={goToAuthor} className="active:opacity-60">
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}>
+                  {c.user.name}
+                </Text>
+              </Pressable>
               <View className="flex-row items-center gap-2">
                 <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {timeAgo(c.created_at, lang)}
@@ -437,7 +442,7 @@ export default function PostDetailScreen() {
                 {/* Author */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                   <Pressable onPress={() => router.push(`/user/${post.user_id}` as any)}>
-                    <Avatar user={post.user} size={10} />
+                    <Avatar user={post.user} size={48} />
                   </Pressable>
                   <Pressable style={{ flex: 1 }} onPress={() => router.push(`/user/${post.user_id}` as any)}>
                     <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>{post.user.name}</Text>
@@ -557,7 +562,7 @@ export default function PostDetailScreen() {
 
       {/* Input bar — padded for Android nav bar */}
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 16, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 12), backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#F9EDD3' }}>
-        {me && <Avatar user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }} size={9} />}
+        {me && <Avatar user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }} size={43} />}
         <TextInput
           ref={inputRef}
           style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, fontFamily: 'NunitoSans_400Regular', color: '#000000', maxHeight: 100 }}

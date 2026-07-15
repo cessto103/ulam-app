@@ -2,6 +2,7 @@ import ReportContentSheet from '@/src/components/ReportContentSheet';
 import client, { API_URL } from '@/src/api/client';
 import { BoostBadge, BoostButton } from '@/src/components/BoostButton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
+import { useSectionColors } from '@/src/components/ThemedSection';
 import StarRating from '@/src/components/StarRating';
 import { formatCount } from '@/src/utils/formatCount';
 import { Skeleton } from '@/src/components/Skeleton';
@@ -350,17 +351,23 @@ function RecipeCommentRow({
   onEdit: (id: number, currentBody: string) => void;
   onReply: (user: RecipeCommentUser) => void;
 }) {
+  const router = useRouter();
   const renderComment = (c: RecipeCommentItem, isReply = false) => {
     const isMine  = c.user_id === myId;
     const canEdit = isMine && commentIsEditable(c.created_at);
+    const goToAuthor = () => router.push(`/user/${c.user.id}` as any);
 
     return (
       <View key={c.id} style={{ flexDirection: 'row', gap: 10, marginLeft: isReply ? 40 : 0, marginTop: isReply ? 8 : 0 }}>
-        <CommentAvatar user={c.user} size={isReply ? 32 : 36} />
+        <Pressable onPress={goToAuthor}>
+          <CommentAvatar user={c.user} size={isReply ? 38 : 43} />
+        </Pressable>
         <View style={{ flex: 1 }}>
           <View style={{ backgroundColor: '#FFFCF5', borderRadius: 16, borderTopLeftRadius: 2, paddingHorizontal: 12, paddingVertical: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}>{c.user.name}</Text>
+              <Pressable onPress={goToAuthor} className="active:opacity-60">
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}>{c.user.name}</Text>
+              </Pressable>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                   {commentTimeAgo(c.created_at, lang)}
@@ -445,6 +452,11 @@ export default function RecipeDetailScreen() {
   const qc      = useQueryClient();
   const insets  = useSafeAreaInsets();
   const { lang } = useLanguage();
+
+  const budgetColors   = useSectionColors('awards_stat_saved',       ['#F4B942', '#58200F']);
+  const costColors     = useSectionColors('awards_stat_meal_plans',  ['#386641', '#FFFFFF']);
+  const servingsColors = useSectionColors('awards_stat_posts',       ['#E7653B', '#FFFFFF']);
+  const timeColors     = useSectionColors('awards_stat_achievements', ['#5E693F', '#FFFFFF']);
 
   const [savePending,  setSavePending]  = useState(false);
   const [myReaction,   setMyReaction]   = useState<'up' | 'down' | null>(null);
@@ -785,30 +797,13 @@ export default function RecipeDetailScreen() {
         <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: '#000000', lineHeight: 28, marginBottom: 2 }}>
           {recipe.title}
         </Text>
-        {wasEdited && (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 4 }}>{editedLabel()}</Text>
-        )}
         {recipe.description ? (
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', lineHeight: 20, marginBottom: 8 }}>
             {recipe.description}
           </Text>
         ) : null}
 
-        {/* Author */}
-        {!isMine && recipe.user && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
-                {recipe.user.name.substring(0, 2).toUpperCase()}
-              </Text>
-            </View>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-              by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{recipe.user.name}</Text>
-            </Text>
-          </View>
-        )}
-
-        {/* Tags */}
+        {/* Tags (category) */}
         {recipe.tags?.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
             {recipe.tags.map((tag) => (
@@ -821,12 +816,32 @@ export default function RecipeDetailScreen() {
           </View>
         )}
 
+        {/* Author */}
+        {!isMine && recipe.user && (
+          <Pressable
+            onPress={() => router.push(`/user/${recipe.user!.id}` as any)}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}
+          >
+            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_700Bold', color: '#5E693F' }}>
+                {recipe.user.name.substring(0, 2).toUpperCase()}
+              </Text>
+            </View>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+              by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{recipe.user.name}</Text>
+            </Text>
+          </Pressable>
+        )}
+
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Ionicons name="eye-outline" size={13} color="#B0A18C" />
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
             {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
           </Text>
         </View>
+        {wasEdited && (
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 4 }}>{editedLabel()}</Text>
+        )}
       </View>
 
       {/* ── Vote + Save row ── */}
@@ -961,16 +976,16 @@ export default function RecipeDetailScreen() {
       )}
 
       {/* ── Info strip ── */}
-      <View style={{ flexDirection: 'row', borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F9EDD3' }}>
+      <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingVertical: 16 }}>
         {[
-          { label: 'Budget',   val: BUDGET_LABEL[recipe.budget_tag] ?? recipe.budget_tag },
-          { label: 'Cost',     val: `₱${Number(recipe.estimated_cost).toFixed(0)}` },
-          { label: 'Servings', val: `${recipe.servings} pax` },
-          { label: 'Time',     val: `${totalTime} min` },
-        ].map((s, i) => (
-          <View key={s.label} style={{ flex: 1, alignItems: 'center', paddingVertical: 16, borderRightWidth: i < 3 ? 1 : 0, borderRightColor: '#F9EDD3' }}>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#5E693F' }}>{s.val}</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }}>{s.label}</Text>
+          { label: 'Budget',   val: BUDGET_LABEL[recipe.budget_tag] ?? recipe.budget_tag, colors: budgetColors },
+          { label: 'Cost',     val: `₱${Number(recipe.estimated_cost).toFixed(0)}`,        colors: costColors },
+          { label: 'Servings', val: `${recipe.servings} pax`,                              colors: servingsColors },
+          { label: 'Time',     val: `${totalTime} min`,                                    colors: timeColors },
+        ].map((s) => (
+          <View key={s.label} style={{ flex: 1, alignItems: 'center', paddingVertical: 12, borderRadius: 14, backgroundColor: s.colors[0] }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: s.colors[1] }}>{s.val}</Text>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: s.colors[1], opacity: 0.85, marginTop: 2 }}>{s.label}</Text>
           </View>
         ))}
       </View>
@@ -1145,7 +1160,7 @@ export default function RecipeDetailScreen() {
                     key={post.id}
                     onPress={() => router.push(`/user/${post.user?.id}`)}
                     style={{
-                      width: 42, height: 42, borderRadius: 21,
+                      width: 50, height: 50, borderRadius: 25,
                       backgroundColor: '#EFF4EC',
                       alignItems: 'center', justifyContent: 'center',
                       overflow: 'hidden',
@@ -1154,7 +1169,7 @@ export default function RecipeDetailScreen() {
                     }}
                   >
                     {post.user?.avatar ? (
-                      <Image source={{ uri: post.user.avatar }} style={{ width: 42, height: 42 }} />
+                      <Image source={{ uri: post.user.avatar }} style={{ width: 50, height: 50 }} />
                     ) : (
                       <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#5E693F' }}>
                         {(post.user?.name ?? '??').substring(0, 2).toUpperCase()}
@@ -1238,11 +1253,11 @@ export default function RecipeDetailScreen() {
                         style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 }}
                       >
                         <View style={{
-                          width: 48, height: 48, borderRadius: 24,
+                          width: 58, height: 58, borderRadius: 29,
                           backgroundColor: '#EFF4EC', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                         }}>
                           {post.user?.avatar ? (
-                            <Image source={{ uri: post.user.avatar }} style={{ width: 48, height: 48 }} />
+                            <Image source={{ uri: post.user.avatar }} style={{ width: 58, height: 58 }} />
                           ) : (
                             <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#5E693F' }}>
                               {(post.user?.name ?? '??').substring(0, 2).toUpperCase()}
@@ -1335,7 +1350,7 @@ export default function RecipeDetailScreen() {
             {me && (
               <CommentAvatar
                 user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }}
-                size={36}
+                size={43}
               />
             )}
             <TextInput

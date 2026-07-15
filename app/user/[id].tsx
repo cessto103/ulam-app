@@ -118,7 +118,7 @@ export default function UserProfileScreen() {
     return (
       <View className="flex-1 bg-cream-50">
         <View style={{ padding: 16, alignItems: 'center', paddingTop: 72 }}>
-          <Skeleton style={{ width: 84, height: 84, marginBottom: 12 }} radius={42} />
+          <Skeleton style={{ width: 86, height: 86, marginBottom: 12 }} radius={43} />
           <Skeleton style={{ height: 16, width: 150, marginBottom: 8 }} />
           <Skeleton style={{ height: 11, width: 90, marginBottom: 18 }} />
           <Skeleton style={{ height: 58, width: '100%', marginBottom: 12 }} radius={14} />
@@ -222,9 +222,9 @@ export default function UserProfileScreen() {
             <View className="bg-white p-5 mb-3 border-b border-cream-200">
               <View className="flex-row gap-4 items-center mb-4">
                 {avatarUri ? (
-                  <Image source={{ uri: avatarUri }} className="w-[72px] h-[72px] rounded-full bg-cream-300" />
+                  <Image source={{ uri: avatarUri }} className="w-[86px] h-[86px] rounded-full bg-cream-300" />
                 ) : (
-                  <View className="w-[72px] h-[72px] rounded-full bg-leaf-50 items-center justify-center">
+                  <View className="w-[86px] h-[86px] rounded-full bg-leaf-50 items-center justify-center">
                     <Text className="text-xl font-semibold text-ink">{initials(user.name)}</Text>
                   </View>
                 )}

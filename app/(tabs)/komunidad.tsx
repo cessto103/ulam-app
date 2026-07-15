@@ -208,7 +208,7 @@ export default function KomunidadScreen() {
         <View className="flex-row items-center gap-3 mb-3">
           <Pressable
             onPress={() => router.push(`/user/${post.user.id}` as any)}
-            className="w-10 h-10 rounded-full bg-cream-200 items-center justify-center overflow-hidden active:opacity-70"
+            className="w-12 h-12 rounded-full bg-cream-200 items-center justify-center overflow-hidden active:opacity-70"
           >
             {post.user.avatar ? (
               <Image source={{ uri: `${API_URL}${post.user.avatar}` }} style={{ width: '100%', height: '100%' }} />

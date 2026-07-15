@@ -230,7 +230,7 @@ export default function SearchScreen() {
                 onPress={() => router.push(`/user/${user.id}` as any)}
                 className="flex-row items-center px-4 py-3 border-b border-cream-200 active:bg-cream-50"
               >
-                <Avatar name={user.name} size={44} />
+                <Avatar name={user.name} size={53} />
                 <View className="flex-1 ml-3">
                   <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000' }}>
                     {user.name}

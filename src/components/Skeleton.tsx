@@ -153,7 +153,7 @@ export function SkeletonPostCard() {
   return (
     <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 0.5, borderColor: '#F0DEBB', padding: 16, marginBottom: 12 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <Skeleton style={{ width: 40, height: 40 }} radius={20} />
+        <Skeleton style={{ width: 48, height: 48 }} radius={24} />
         <View style={{ flex: 1 }}>
           <Skeleton style={{ height: 12, width: '50%', marginBottom: 6 }} />
           <Skeleton style={{ height: 10, width: '30%' }} />

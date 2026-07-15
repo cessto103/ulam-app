@@ -5,6 +5,24 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.25.0] — 2026-07-15
+
+Bigger avatars, fixed profile navigation, recipe authorship, and a redesigned Settings page with a new About the App screen.
+
+### Added
+- **Settings redesigned as a clean flat list** (My Account, Location, Languages, Help & Support, Rate Us, Share, Privacy Policy, Terms of Service, About the App, Log Out, app version), replacing the old page of stacked edit forms. The existing Profile/Secondary Email/Delete Account, Location, and Language settings still work exactly the same, just moved onto their own screens (My Account, Location, Languages).
+- **Rate Us and Share rows** on Settings, linking to the Play Store listing and sharing the app respectively.
+- **About the App** page, with content (title, body, company name, company link) editable from the admin panel with no app update needed.
+
+### Changed
+- **Avatars are about 20% bigger everywhere** (comment threads, feed cards, profile pages, Awards, search, connections), except the small header icon-row avatar, which is unchanged.
+- **Recipe detail page**: Tags, Author, and Views now appear before the "Edited ... ago" line (previously Edited was at the top); the community author name is clickable and opens their profile.
+- **Menu Plan > Recipes list**: the community author's name is now clickable and opens their profile.
+- **Recipe detail page's Budget/Cost/Servings/Time strip** now uses the same 4 admin-editable colors as the Awards "Your stats" tiles, so changing those colors in the admin panel updates both places.
+
+### Fixed
+- **Tapping a commenter's name or avatar** on a community post or a recipe now opens their profile (it previously did nothing).
+
 ## [1.24.2] — 2026-07-15
 
 Header icon circle polish, plus an app-wide sweep to remove em dashes from user-facing copy.

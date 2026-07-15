@@ -150,10 +150,10 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
 
-        <Pressable onPress={showPhotoOptions} style={{ position: 'relative', width: 122, height: 122 }}>
+        <Pressable onPress={showPhotoOptions} style={{ position: 'relative', width: 144, height: 144 }}>
           <View
             style={{
-              width: 122, height: 122, borderRadius: 61,
+              width: 144, height: 144, borderRadius: 72,
               borderWidth: 3, borderColor: '#FFFCF5',
               padding: 2,
               backgroundColor: '#E7653B',
@@ -164,10 +164,10 @@ export default function ProfileScreen() {
             {avatarUri ? (
               <Image
                 source={{ uri: avatarUri }}
-                style={{ width: 112, height: 112, borderRadius: 56, backgroundColor: '#F0DEBB' }}
+                style={{ width: 134, height: 134, borderRadius: 67, backgroundColor: '#F0DEBB' }}
               />
             ) : (
-              <View style={{ width: 112, height: 112, borderRadius: 56, backgroundColor: '#EC8156', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 134, height: 134, borderRadius: 67, backgroundColor: '#EC8156', alignItems: 'center', justifyContent: 'center' }}>
                 <Text className="text-4xl">👤</Text>
               </View>
             )}
