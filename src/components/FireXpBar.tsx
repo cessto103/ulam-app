@@ -34,7 +34,7 @@ export default function FireXpBar({ progress }: { progress: number }) {
         height: 18,
         borderRadius: 999,
         overflow: 'hidden',
-        backgroundColor: 'rgba(255,255,255,0.28)',
+        backgroundColor: 'rgba(255,255,255,0.88)',
         borderWidth: 2,
         borderColor: '#FFFCF5',
       }}

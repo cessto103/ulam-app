@@ -50,14 +50,9 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
 
   const initials = (user?.name ?? 'U').split(' ').map((w) => w[0]).slice(0, 2).join('');
   const avatarUri = user?.avatar ? `${API_URL}${user.avatar}` : null;
-  const circleBg = dark ? 'rgba(255,255,255,0.12)' : '#F9EDD3';
-  const iconColor = dark ? '#fff' : '#000000';
-
-  const iconShadow = {
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  } as const;
+  const circleBg = dark ? 'rgba(255,255,255,0.88)' : '#F9EDD3';
+  const iconColor = '#000000';
+  const initialsColor = dark ? '#000000' : '#fff';
 
   const circleShadow = {
     shadowColor: '#000',
@@ -74,14 +69,14 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
         className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
         style={{ backgroundColor: circleBg, ...circleShadow }}
       >
-        <Ionicons name="search" size={22} color={iconColor} style={iconShadow} />
+        <Ionicons name="search" size={22} color={iconColor} />
       </Pressable>
       <Pressable
         onPress={() => router.push('/my-reports' as any)}
         className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
         style={{ backgroundColor: circleBg, ...circleShadow }}
       >
-        <Ionicons name="receipt-outline" size={21} color={iconColor} style={iconShadow} />
+        <Ionicons name="receipt-outline" size={21} color={iconColor} />
       </Pressable>
       {hasStore && (
         <Pressable
@@ -89,7 +84,7 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
           className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
           style={{ backgroundColor: circleBg, ...circleShadow }}
         >
-          <Ionicons name="storefront-outline" size={21} color={iconColor} style={iconShadow} />
+          <Ionicons name="storefront-outline" size={21} color={iconColor} />
         </Pressable>
       )}
       <Pressable
@@ -97,7 +92,7 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
         className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
         style={{ backgroundColor: circleBg, ...circleShadow }}
       >
-        <Ionicons name="notifications-outline" size={23} color={iconColor} style={iconShadow} />
+        <Ionicons name="notifications-outline" size={23} color={iconColor} />
         {unreadCount > 0 && (
           <View className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-red-500 items-center justify-center px-1">
             <Text className="text-white text-[11px] font-bold">
@@ -110,7 +105,7 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
         onPress={() => router.push('/(tabs)/profile' as any)}
         className="w-11 h-11 rounded-full items-center justify-center overflow-hidden active:opacity-70"
         style={{
-          backgroundColor: avatarUri ? '#F9EDD3' : dark ? 'rgba(255,255,255,0.22)' : '#E7653B',
+          backgroundColor: avatarUri ? '#F9EDD3' : dark ? 'rgba(255,255,255,0.88)' : '#E7653B',
           borderWidth: 2,
           borderColor: dark ? 'rgba(255,255,255,0.55)' : '#E7653B',
           ...circleShadow,
@@ -119,7 +114,7 @@ export default function HeaderIconRow({ tone = 'dark' }: Props) {
         {avatarUri ? (
           <Image source={{ uri: avatarUri }} style={{ width: '100%', height: '100%' }} />
         ) : (
-          <Text className="text-sm font-bold text-white">{initials}</Text>
+          <Text className="text-sm font-bold" style={{ color: initialsColor }}>{initials}</Text>
         )}
       </Pressable>
     </View>

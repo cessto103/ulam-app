@@ -145,35 +145,47 @@ export default function ProfileScreen() {
             hitSlop={10}
             className="w-11 h-11 rounded-full items-center justify-center active:opacity-70"
             style={{
-              backgroundColor: 'rgba(255,248,232,0.18)',
+              backgroundColor: 'rgba(255,248,232,0.88)',
               shadowColor: '#000', shadowOpacity: 0.22, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 3,
             }}
           >
-            <Ionicons
-              name="settings-outline"
-              size={23}
-              color="#FFF8E8"
-              style={{ textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
-            />
+            <Ionicons name="settings-outline" size={23} color="#000000" />
           </Pressable>
         </View>
 
-        <Pressable onPress={showPhotoOptions} className="relative">
-          <View className="rounded-full border-[3px] border-cream-50 p-0.5 bg-brand-500">
+        <Pressable onPress={showPhotoOptions} style={{ position: 'relative', width: 122, height: 122 }}>
+          <View
+            style={{
+              width: 122, height: 122, borderRadius: 61,
+              borderWidth: 3, borderColor: '#FFFCF5',
+              padding: 2,
+              backgroundColor: '#E7653B',
+              overflow: 'hidden',
+              alignItems: 'center', justifyContent: 'center',
+            }}
+          >
             {avatarUri ? (
               <Image
                 source={{ uri: avatarUri }}
-                className="w-28 h-28 rounded-full bg-cream-300"
+                style={{ width: 112, height: 112, borderRadius: 56, backgroundColor: '#F0DEBB' }}
               />
             ) : (
-              <View className="w-28 h-28 rounded-full bg-brand-400 items-center justify-center">
+              <View style={{ width: 112, height: 112, borderRadius: 56, backgroundColor: '#EC8156', alignItems: 'center', justifyContent: 'center' }}>
                 <Text className="text-4xl">👤</Text>
               </View>
             )}
           </View>
 
           {/* Edit badge */}
-          <View className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-gold-400 items-center justify-center border-2 border-cream-50">
+          <View
+            style={{
+              position: 'absolute', bottom: 0, right: 0,
+              width: 36, height: 36, borderRadius: 18,
+              backgroundColor: '#F4B942',
+              alignItems: 'center', justifyContent: 'center',
+              borderWidth: 2, borderColor: '#FFFCF5',
+            }}
+          >
             {uploading ? (
               <ActivityIndicator color="white" size="small" />
             ) : (

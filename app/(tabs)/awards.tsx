@@ -581,7 +581,7 @@ export default function AwardsScreen() {
               {avatarUri ? (
                 <Image source={{ uri: avatarUri }} style={{ width: 84, height: 84, borderRadius: 9999, backgroundColor: '#F0DEBB' }} />
               ) : (
-                <View style={{ width: 84, height: 84, borderRadius: 9999, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 84, height: 84, borderRadius: 9999, backgroundColor: '#EC8156', alignItems: 'center', justifyContent: 'center' }}>
                   <Text className="text-2xl font-semibold text-white">{initials(user?.name ?? 'U')}</Text>
                 </View>
               )}

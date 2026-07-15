@@ -5,6 +5,18 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.24.1] — 2026-07-15
+
+Follow-up polish on the v1.24.0 readability pass, plus a fix for a regression it introduced.
+
+### Changed
+- **Header icon circles (search, price reports, notifications, settings, avatar) are more opaque** (~88%, up from ~12-22%) so they read as solid buttons instead of a faint tint over the photo header; their icons switched to black to stay visible against the now much lighter circles (the drop shadow from v1.24.0 was removed from these specific icons since it no longer serves a purpose on an opaque light circle).
+- **The Level/XP progress bar track is more opaque** (~88%, up from ~28%) so it reads as a clear bar against the header photo.
+
+### Fixed
+- **Profile page avatar was rendering as a pill/oval instead of a circle** — rewritten with explicit pixel dimensions instead of relying on Tailwind utility classes for the circular clipping.
+- **Awards & Achievements avatar fallback (initials) was showing black instead of orange** — a side effect of the v1.24.0 charcoal→black text sweep incorrectly catching a background color. Restored to the same orange used on the Profile page's avatar fallback.
+
 ## [1.24.0] — 2026-07-15
 
 Readability pass: bigger everything, real black body text, header elements that pop.
