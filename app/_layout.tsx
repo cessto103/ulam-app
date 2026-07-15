@@ -221,6 +221,22 @@ function RouteGuard() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="account"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="location"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="language"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="about"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="insights"
         options={{ headerShown: false }}
       />

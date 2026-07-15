@@ -5,6 +5,15 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.25.1] — 2026-07-15
+
+Follow-up fixes for the v1.25.0 recipe-authorship and About the App features.
+
+### Fixed
+- **Recipe author still wasn't showing on the recipe list or detail page**: every seeded recipe had been mislabeled "Community" with no author (a seeder default bug), so the community-author condition never matched. Corrected the labeling and seeded real community-authored recipes to confirm the fix.
+- **About the App page showed a duplicate header** ("About" from the screen's default header, plus "About the App" from the page itself). The default header is now hidden, leaving a single "About the App" header, consistent with every other settings sub-page.
+- **About the App body text wasn't showing**: the public endpoint had an empty fallback instead of the real default text, so it displayed blank until the admin manually saved something. Now shares the same default text as the admin editor.
+
 ## [1.25.0] — 2026-07-15
 
 Bigger avatars, fixed profile navigation, recipe authorship, and a redesigned Settings page with a new About the App screen.
