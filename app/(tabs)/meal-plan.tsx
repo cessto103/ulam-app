@@ -662,6 +662,7 @@ const SOURCE_FILTERS: { label: string; value: SourceFilter }[] = [
 function RecipeListView({ initialFilter }: { initialFilter?: string }) {
   const router = useRouter();
   const qc = useQueryClient();
+  const { lang } = useLanguage();
   const [budgetFilter,  setBudgetFilter]  = useState<string | null>(null);
   const [sourceFilter,  setSourceFilter]  = useState<SourceFilter>(
     (['all', 'mine', 'official', 'community'].includes(initialFilter ?? '') ? initialFilter : 'all') as SourceFilter,
@@ -721,6 +722,44 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
     } catch {}
   };
 
+  const { mutate: deleteRecipe } = useMutation({
+    mutationFn: (id: number) => client.delete(`/recipes/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['recipes'] }),
+    onError: () => Alert.alert('Error', lang === 'en' ? 'Could not delete recipe.' : 'Hindi mabura ang recipe.'),
+  });
+
+  const confirmDeleteRecipe = (r: Recipe) => {
+    Alert.alert(
+      lang === 'en' ? 'Delete this recipe?' : 'Burahin ang recipe na ito?',
+      lang === 'en'
+        ? `"${r.title}" will be permanently deleted. This cannot be undone.`
+        : `Permanenteng mabubura ang "${r.title}". Hindi na ito maibabalik.`,
+      [
+        { text: lang === 'en' ? 'Cancel' : 'Kanselahin', style: 'cancel' },
+        { text: lang === 'en' ? 'Delete' : 'Burahin', style: 'destructive', onPress: () => deleteRecipe(r.id) },
+      ],
+    );
+  };
+
+  const { mutate: deleteAllRecipes, isPending: isDeletingAll } = useMutation({
+    mutationFn: () => client.delete('/recipes'),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['recipes'] }),
+    onError: () => Alert.alert('Error', lang === 'en' ? 'Could not delete recipes.' : 'Hindi mabura ang mga recipe.'),
+  });
+
+  const confirmDeleteAllRecipes = () => {
+    Alert.alert(
+      lang === 'en' ? 'Delete all your recipes?' : 'Burahin lahat ng recipe mo?',
+      lang === 'en'
+        ? `All ${mine.length} of your recipes will be permanently deleted. This cannot be undone.`
+        : `Permanenteng mabubura ang lahat ng ${mine.length} recipe mo. Hindi na ito maibabalik.`,
+      [
+        { text: lang === 'en' ? 'Cancel' : 'Kanselahin', style: 'cancel' },
+        { text: lang === 'en' ? 'Delete All' : 'Burahin Lahat', style: 'destructive', onPress: () => deleteAllRecipes() },
+      ],
+    );
+  };
+
   const allRecipes = data?.data ?? [];
   const official  = allRecipes.filter(r => !r.is_mine && r.source === 'official');
   const community = allRecipes.filter(r => !r.is_mine && r.source === 'community');
@@ -773,12 +812,20 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
             <SourceBadge source={r.source} isMine={isMine} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               {isMine && (
-                <Pressable
-                  onPress={(e) => { e.stopPropagation(); router.push(`/edit-recipe/${r.id}` as any); }}
-                  hitSlop={8}
-                >
-                  <Ionicons name="create-outline" size={18} color="#E3A32A" />
-                </Pressable>
+                <>
+                  <Pressable
+                    onPress={(e) => { e.stopPropagation(); router.push(`/edit-recipe/${r.id}` as any); }}
+                    hitSlop={8}
+                  >
+                    <Ionicons name="create-outline" size={18} color="#E3A32A" />
+                  </Pressable>
+                  <Pressable
+                    onPress={(e) => { e.stopPropagation(); confirmDeleteRecipe(r); }}
+                    hitSlop={8}
+                  >
+                    <Ionicons name="trash-outline" size={18} color="#E24B4A" />
+                  </Pressable>
+                </>
               )}
               <Pressable
                 onPress={(e) => { e.stopPropagation(); toggleSave(r); }}
@@ -969,10 +1016,19 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
       renderItem={renderRecipe}
       stickySectionHeadersEnabled={false}
       renderSectionHeader={({ section }) => (
-        <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4 }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={{ fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: '#6F655A' }}>
             {section.title}
           </Text>
+          {section.key === 'mine' && mine.length > 0 && (
+            <Pressable onPress={confirmDeleteAllRecipes} disabled={isDeletingAll} hitSlop={8}>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: '#E24B4A' }}>
+                {isDeletingAll
+                  ? (lang === 'en' ? 'Deleting...' : 'Binubura...')
+                  : (lang === 'en' ? 'Delete All' : 'Burahin Lahat')}
+              </Text>
+            </Pressable>
+          )}
         </View>
       )}
       ListHeaderComponent={ListHeader}

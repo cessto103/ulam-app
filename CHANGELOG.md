@@ -5,6 +5,17 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.28.0] — 2026-07-16
+
+AI-generated meal plan dishes are now full, deletable recipes.
+
+### Added
+- **Generated meal plan dishes are now real recipe pages** — tapping a dish on Menu Plan > Plan opens a full recipe page with ingredients, step-by-step instructions, and tips, exactly like any other recipe.
+- **Generated recipes are yours** — they're posted under your account (categorized "Mine" on Menu Plan > Recipes), support ratings and thumbs up/down like any normal recipe, and can be deleted individually from the recipe list, the recipe detail page, or all at once with a new "Delete All" action on the "Mine" section.
+
+### Changed
+- **Backend**: the AI prompt used for meal plan generation now also asks for cooking steps, tips, difficulty, prep/cook time, and tags, since these are needed to render a full recipe page (previously the AI was only asked for ingredients and cost).
+
 ## [1.27.1] — 2026-07-15
 
 Regenerate is back on Menu Plan > Plan, Premium-only like Generate.

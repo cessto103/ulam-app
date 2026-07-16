@@ -594,6 +594,28 @@ export default function RecipeDetailScreen() {
     ]);
   };
 
+  const { mutate: deleteRecipe, isPending: isDeletingRecipe } = useMutation({
+    mutationFn: () => client.delete(`/recipes/${recipe!.id}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['recipes'] });
+      qc.invalidateQueries({ queryKey: ['meal-plan'] });
+      router.back();
+    },
+    onError: () => Alert.alert('Error', lang === 'en' ? 'Could not delete recipe. Please try again.' : 'Hindi na-delete ang recipe. Subukang muli.'),
+  });
+
+  const confirmDeleteRecipe = () => {
+    if (!recipe) return;
+    Alert.alert(
+      lang === 'en' ? 'Delete this recipe?' : 'I-delete ang recipe na ito?',
+      recipe.title,
+      [
+        { text: lang === 'en' ? 'Cancel' : 'Huwag', style: 'cancel' },
+        { text: lang === 'en' ? 'Delete' : 'I-delete', style: 'destructive', onPress: () => deleteRecipe() },
+      ]
+    );
+  };
+
   const toggleSave = async () => {
     if (savePending || !recipe) return;
     setSavePending(true);
@@ -762,12 +784,21 @@ export default function RecipeDetailScreen() {
               <Ionicons name="share-social-outline" size={17} color="#fff" />
             </Pressable>
             {isMine ? (
-              <Pressable
-                onPress={() => router.push(`/edit-recipe/${recipe.id}` as any)}
-                style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <Ionicons name="create-outline" size={18} color="#fff" />
-              </Pressable>
+              <>
+                <Pressable
+                  onPress={() => router.push(`/edit-recipe/${recipe.id}` as any)}
+                  style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Ionicons name="create-outline" size={18} color="#fff" />
+                </Pressable>
+                <Pressable
+                  onPress={confirmDeleteRecipe}
+                  disabled={isDeletingRecipe}
+                  style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center', opacity: isDeletingRecipe ? 0.5 : 1 }}
+                >
+                  <Ionicons name="trash-outline" size={17} color="#fff" />
+                </Pressable>
+              </>
             ) : (
               <Pressable
                 onPress={() => setReportSheetOpen(true)}
