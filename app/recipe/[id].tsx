@@ -14,6 +14,7 @@ import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/r
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -757,6 +758,9 @@ export default function RecipeDetailScreen() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ paddingBottom: 48 }}>
+      {/* Cover photo is full-bleed behind the status bar — light icons stay
+          visible against it; unmounting this screen reverts to the app-wide dark style. */}
+      <StatusBar style="light" />
 
       {/* ── Cover photo with floating nav ── */}
       <View style={{ position: 'relative' }}>

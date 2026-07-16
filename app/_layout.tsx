@@ -20,10 +20,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Constants from 'expo-constants';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import * as NavigationBar from 'expo-navigation-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
@@ -291,6 +293,15 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
+  // The app is a single, always-light cream theme — don't let the phone's
+  // system dark mode flip these to a light/white style that disappears
+  // against it (they don't follow app screens' own dark photo heroes either).
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    NavigationBar.setButtonStyleAsync('dark').catch(() => {});
+    NavigationBar.setBackgroundColorAsync('#FFFCF5').catch(() => {});
+  }, []);
+
   if (!fontsLoaded) return null;
 
   return (
@@ -299,7 +310,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <LanguageProvider>
             <AuthProvider>
-              <StatusBar style="auto" />
+              <StatusBar style="dark" />
               <RouteGuard />
             </AuthProvider>
           </LanguageProvider>

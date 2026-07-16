@@ -5,6 +5,13 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.28.1] — 2026-07-17
+
+Fixes status/navigation bar contrast when the phone is in system dark mode.
+
+### Fixed
+- **Status bar and Android navigation bar icons could turn white/invisible** when the phone's own dark mode was on, since they were following the system theme instead of the app's own always-light cream theme. They're now pinned to dark icons (light icons only on the recipe page's full-bleed photo header, where they need the contrast) and the Android navigation bar background is pinned to match the app.
+
 ## [1.28.0] — 2026-07-16
 
 AI-generated meal plan dishes are now full, deletable recipes.
