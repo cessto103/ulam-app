@@ -122,6 +122,57 @@ async function generatePlan(): Promise<MealPlan> {
   return data.meal_plan;
 }
 
+async function regeneratePlan(): Promise<MealPlan> {
+  const { data } = await client.post('/meal-plan/regenerate');
+  return data.meal_plan;
+}
+
+function showMealPlanError(
+  e: any,
+  lang: 'en' | 'tl',
+  router: ReturnType<typeof useRouter>,
+  setAiDisabled: (v: boolean) => void,
+) {
+  if (e?.response?.data?.ai_disabled) {
+    setAiDisabled(true);
+    Alert.alert(
+      lang === 'en' ? 'Temporarily unavailable' : 'Pansamantalang hindi available',
+      lang === 'en'
+        ? 'AI meal plan generation is paused for now. Please check back soon!'
+        : 'Naka-pause muna ang AI meal plan generation. Balik lang po kayo!',
+    );
+    return;
+  }
+  if (e?.response?.data?.quota_exceeded) {
+    Alert.alert(
+      lang === 'en' ? 'Premium feature' : 'Premium feature',
+      lang === 'en' ? 'AI meal plans are only available on uLam Premium.' : 'AI meal plans ay para lamang sa uLam Premium.',
+      [
+        { text: lang === 'en' ? 'Not now' : 'Huwag muna', style: 'cancel' },
+        { text: lang === 'en' ? 'Upgrade →' : 'I-upgrade →', onPress: () => router.push('/upgrade' as any) },
+      ],
+    );
+    return;
+  }
+  if (e?.response?.data?.no_budget) {
+    Alert.alert(
+      lang === 'en' ? 'Set up your budget first' : 'I-setup muna ang budget mo',
+      lang === 'en'
+        ? 'Please set up your daily food budget before generating a meal plan.'
+        : 'I-setup muna ang iyong araw-araw na food budget bago mag-generate ng meal plan.',
+      [
+        { text: lang === 'en' ? 'Not now' : 'Huwag muna', style: 'cancel' },
+        { text: lang === 'en' ? 'Set up budget →' : 'I-setup ang budget →', onPress: () => router.push('/budget-setup' as any) },
+      ],
+    );
+    return;
+  }
+  Alert.alert(
+    lang === 'en' ? 'Error' : 'Error',
+    e?.response?.data?.message ?? (lang === 'en' ? 'Could not generate a meal plan. Try again.' : 'Hindi nagawa ang meal plan. Subukan ulit.'),
+  );
+}
+
 async function fetchRecipes(budgetTag: string | null, search: string): Promise<RecipePage> {
   const params = new URLSearchParams({ per_page: '50' });
   if (budgetTag) params.set('budget_tag', budgetTag);
@@ -312,57 +363,41 @@ function PlanView({ user }: { user: any }) {
 
   const [aiDisabled, setAiDisabled] = useState(false);
 
+  const isPremiumUser = user?.plan === 'premium';
+
   const { mutate: generate, isPending } = useMutation({
     mutationFn: generatePlan,
     onSuccess: () => qc.invalidateQueries({ queryKey: ['meal-plan-today'] }),
-    onError: (e: any) => {
-      if (e?.response?.data?.ai_disabled) {
-        setAiDisabled(true);
-        Alert.alert(
-          lang === 'en' ? 'Temporarily unavailable' : 'Pansamantalang hindi available',
-          lang === 'en'
-            ? 'AI meal plan generation is paused for now. Please check back soon!'
-            : 'Naka-pause muna ang AI meal plan generation. Balik lang po kayo!',
-        );
-        return;
-      }
-      if (e?.response?.data?.quota_exceeded) {
-        Alert.alert(
-          lang === 'en' ? 'Premium feature' : 'Premium feature',
-          lang === 'en' ? 'AI meal plans are only available on uLam Premium.' : 'AI meal plans ay para lamang sa uLam Premium.',
-          [
-            { text: lang === 'en' ? 'Not now' : 'Huwag muna', style: 'cancel' },
-            { text: lang === 'en' ? 'Upgrade →' : 'I-upgrade →', onPress: () => router.push('/upgrade' as any) },
-          ],
-        );
-        return;
-      }
-      if (e?.response?.data?.no_budget) {
-        Alert.alert(
-          lang === 'en' ? 'Set up your budget first' : 'I-setup muna ang budget mo',
-          lang === 'en'
-            ? 'Please set up your daily food budget before generating a meal plan.'
-            : 'I-setup muna ang iyong araw-araw na food budget bago mag-generate ng meal plan.',
-          [
-            { text: lang === 'en' ? 'Not now' : 'Huwag muna', style: 'cancel' },
-            { text: lang === 'en' ? 'Set up budget →' : 'I-setup ang budget →', onPress: () => router.push('/budget-setup' as any) },
-          ],
-        );
-        return;
-      }
-      Alert.alert(
-        lang === 'en' ? 'Error' : 'Error',
-        e?.response?.data?.message ?? (lang === 'en' ? 'Could not generate a meal plan. Try again.' : 'Hindi nagawa ang meal plan. Subukan ulit.'),
-      );
-    },
+    onError: (e: any) => showMealPlanError(e, lang, router, setAiDisabled),
   });
+
+  const { mutate: regenerate, isPending: isRegenerating } = useMutation({
+    mutationFn: regeneratePlan,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['meal-plan-today'] }),
+    onError: (e: any) => showMealPlanError(e, lang, router, setAiDisabled),
+  });
+
+  const handleRegenerate = () => {
+    if (!isPremiumUser) {
+      router.push('/upgrade' as any);
+      return;
+    }
+    Alert.alert(
+      lang === 'en' ? 'Regenerate meal plan?' : 'Gumawa ulit ng meal plan?',
+      lang === 'en'
+        ? "This replaces today's plan with a new AI-generated one."
+        : 'Papalitan nito ang plano ngayon ng bagong AI-generated na plano.',
+      [
+        { text: lang === 'en' ? 'Cancel' : 'Kanselahin', style: 'cancel' },
+        { text: lang === 'en' ? 'Regenerate' : 'Gumawa Ulit', onPress: () => regenerate() },
+      ],
+    );
+  };
 
   const { mutate: removeItem } = useMutation({
     mutationFn: (itemId: number) => client.delete(`/meal-plan/items/${itemId}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['meal-plan-today'] }),
   });
-
-  const isPremiumUser = user?.plan === 'premium';
 
   const grouped = plan
     ? MEAL_ORDER.reduce((acc, type) => {
@@ -531,6 +566,31 @@ function PlanView({ user }: { user: any }) {
             </LinearGradient>
           </Pressable>
         </Link>
+
+        <Pressable
+          onPress={handleRegenerate}
+          disabled={isRegenerating || aiDisabled}
+          className="mt-3 rounded-2xl border border-cream-300 items-center active:opacity-70 disabled:opacity-60"
+          style={{ paddingVertical: 13, flexDirection: 'row', justifyContent: 'center', gap: 8 }}
+        >
+          {isRegenerating ? (
+            <>
+              <ActivityIndicator color="#6F655A" size="small" />
+              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#6F655A' }}>
+                {lang === 'en' ? 'Regenerating...' : 'Ginagawa ulit...'}
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={{ fontSize: 14 }}>{isPremiumUser ? '🔄' : '⭐'}</Text>
+              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#6F655A' }}>
+                {isPremiumUser
+                  ? (lang === 'en' ? 'Regenerate Plan' : 'Gumawa Ulit ng Plano')
+                  : (lang === 'en' ? 'Upgrade to Regenerate' : 'Mag-Premium para Gumawa Ulit')}
+              </Text>
+            </>
+          )}
+        </Pressable>
 
       </ScrollView>
 

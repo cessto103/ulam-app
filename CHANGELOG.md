@@ -5,6 +5,16 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.27.1] — 2026-07-15
+
+Regenerate is back on Menu Plan > Plan, Premium-only like Generate.
+
+### Added
+- **"Regenerate Plan" button** on an existing meal plan — replaces today's plan with a fresh AI-generated one. Premium-only, matching Generate; shows "Upgrade to Regenerate" and routes to the Upgrade screen for non-Premium accounts instead of attempting it.
+
+### Fixed
+- **Backend**: regenerating could delete a user's existing plan even when they weren't allowed to generate a replacement, leaving them with nothing. The Premium check now happens before the existing plan is touched.
+
 ## [1.27.0] — 2026-07-15
 
 AI meal plan generation is now a Premium-only feature.
