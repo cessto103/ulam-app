@@ -11,6 +11,7 @@
     "preview": {
       "distribution": "internal",
       "env": {
+        // "EXPO_PUBLIC_API_URL": "https://ulam.cesstowebsolutions.com"
         "EXPO_PUBLIC_API_URL": "https://ulam.cesstowebsolutions.com"
       },
       "android": {

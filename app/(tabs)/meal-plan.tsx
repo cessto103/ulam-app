@@ -328,8 +328,8 @@ function PlanView({ user }: { user: any }) {
       }
       if (e?.response?.data?.quota_exceeded) {
         Alert.alert(
-          lang === 'en' ? "You're out of free AI plans" : 'Naubos na ang libreng AI plans mo',
-          e?.response?.data?.message ?? (lang === 'en' ? "You've used your 3 free AI meal plans this month." : 'Naubos na ang 3 libreng AI meal plans mo ngayong buwan.'),
+          lang === 'en' ? 'Premium feature' : 'Premium feature',
+          lang === 'en' ? 'AI meal plans are only available on uLam Premium.' : 'AI meal plans ay para lamang sa uLam Premium.',
           [
             { text: lang === 'en' ? 'Not now' : 'Huwag muna', style: 'cancel' },
             { text: lang === 'en' ? 'Upgrade →' : 'I-upgrade →', onPress: () => router.push('/upgrade' as any) },
@@ -362,9 +362,7 @@ function PlanView({ user }: { user: any }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['meal-plan-today'] }),
   });
 
-  const remaining = user?.plan === 'premium'
-    ? '∞'
-    : `${Math.max(0, 3 - (user?.ai_meal_plans_used_this_month ?? 0))} left`;
+  const isPremiumUser = user?.plan === 'premium';
 
   const grouped = plan
     ? MEAL_ORDER.reduce((acc, type) => {
@@ -420,9 +418,11 @@ function PlanView({ user }: { user: any }) {
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#9A6A12' }}>
               ₱{planCost.toFixed(0)}
             </Text>
-            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12', marginLeft: 4, marginTop: 5 }}>
-              · {remaining}
-            </Text>
+            {isPremiumUser && (
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12', marginLeft: 4, marginTop: 5 }}>
+                · ∞
+              </Text>
+            )}
           </View>
         </View>
 
@@ -550,7 +550,7 @@ function PlanView({ user }: { user: any }) {
           : 'Gumawa ng AI-powered meal plan na akmang-akma sa iyong budget ngayon.'}
       </Text>
       <Pressable
-        onPress={() => generate()}
+        onPress={() => (isPremiumUser ? generate() : router.push('/upgrade' as any))}
         disabled={isPending || aiDisabled}
         className={`rounded-xl px-8 py-3.5 items-center active:opacity-80 disabled:opacity-60 ${aiDisabled ? 'bg-cream-300' : 'bg-brand-600'}`}
       >
@@ -565,26 +565,23 @@ function PlanView({ user }: { user: any }) {
           <Text className={`text-sm font-semibold ${aiDisabled ? 'text-ink-soft' : 'text-white'}`}>
             {aiDisabled
               ? (lang === 'en' ? 'Temporarily Unavailable' : 'Hindi Muna Available')
-              : (lang === 'en' ? 'Generate Meal Plan' : 'Gumawa ng Meal Plan')}
+              : isPremiumUser
+                ? (lang === 'en' ? 'Generate Meal Plan' : 'Gumawa ng Meal Plan')
+                : (lang === 'en' ? '⭐ Upgrade to Generate' : '⭐ Mag-Premium para Gumawa')}
           </Text>
         )}
       </Pressable>
       {!aiDisabled && (
-        user?.plan === 'premium' ? (
+        isPremiumUser ? (
           <Text className="mt-3 text-xs text-ink-soft">
             {user?.premium_source === 'trial'
               ? (lang === 'en' ? '🎁 Free trial (unlimited AI plans)' : '🎁 Libreng trial (unlimited AI plans)')
               : (lang === 'en' ? '⭐ Premium (unlimited AI plans)' : '⭐ Premium (unlimited AI plans)')}
           </Text>
         ) : (
-          <Pressable onPress={() => router.push('/upgrade' as any)} className="mt-3 flex-row items-center gap-1 active:opacity-70">
-            <Text className="text-xs text-ink-soft">
-              {remaining} {lang === 'en' ? 'generations left' : 'generations ang natitira'}
-            </Text>
-            <Text className="text-xs font-semibold text-brand-600">
-              {lang === 'en' ? '· Go Premium →' : '· Mag-Premium →'}
-            </Text>
-          </Pressable>
+          <Text className="mt-3 text-xs text-ink-soft text-center">
+            {lang === 'en' ? 'AI meal plans are a Premium feature' : 'Premium feature ang AI meal plans'}
+          </Text>
         )
       )}
     </View>

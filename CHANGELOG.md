@@ -5,6 +5,13 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.27.0] — 2026-07-15
+
+AI meal plan generation is now a Premium-only feature.
+
+### Changed
+- **AI meal plan generation now requires uLam Premium** — the previous "3 free per month" tier has been removed, since each generation is a real, billed API call. The Generate button now reads "Upgrade to Generate" for non-Premium accounts and goes straight to the Upgrade screen instead of attempting (and failing) generation.
+
 ## [1.26.1] — 2026-07-15
 
 Recipe author display fixed on My Recipe Book, plus recipe page layout polish.
