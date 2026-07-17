@@ -114,6 +114,24 @@ Last updated: 2026-07-17 · **v1.30.1**
 
 ## Version History
 
+### 2026-07-17 · v1.28.1–v1.30.1 — Gamification, celebrations, and a large UX/perf pass
+
+**v1.30.x — Daily/weekly tasks + UI batch**
+- Daily & Weekly Tasks checklist on the Awards screen — auto-completes (and awards bonus XP) when the matching real action happens (meal plan / price report / post / spending log); backed by the previously dormant `daily_tasks`/`user_daily_tasks` tables, now fully wired via `XpService::checkDailyTasks()`
+- New admin "Gamification" section: Daily & Weekly Tasks manager (emoji picker, action-type dropdown limited to real XP-earning actions) and Reward Tiers manager (XP milestones — scaffolding only, no redemption yet); admin v1.20.0
+- "Saved" tab removed from Awards (duplicated My Recipe Book) — now Profile > Saved Recipes
+- My Insights / Seller Subscription / My Store headers themed to the terracotta gradient; community post images tappable to full-screen; community filter chips now horizontally scrollable
+
+**v1.29.x — Level-up celebration**
+- New full-screen SVG confetti burst on level-up (`ConfettiBurst`, native-thread transform/opacity animation only); RewardCelebration now renders above all sibling content
+- Recipes tab + Community feed perf: extracted memoized `RecipeCard`/`PostCard` (inline render closures were rebuilding every visible card on any interaction); bookmark save is now optimistic; fixed 3 recipes carrying the stale `budget_400plus` tag (admin editor/API/seeder all still offered the old 4-tier scheme — now the full 7-tier one; admin v1.19.1)
+
+**v1.28.x — Status bar + collapsing headers + regional fix**
+- Status bar/Android nav icons pinned dark app-wide (was following system dark mode); light override only on the recipe photo hero — needs a fresh native build to take effect
+- Community/Prices collapsing headers: pinned logo row, threshold-snap collapse (fixes jitter/lag/disappearing-header regressions found along the way)
+- Report a Price: municipality picker now region-aware from `/markets` (was a hardcoded Metro Manila list); safe-area fixes across Log Spending, onboarding, meal-plan sheet, Report a Price
+- Onboarding budget field no longer closes the keyboard per keystroke (steps were being remounted every render)
+
 ### 2026-06-24 · v1.3.0 — Community, Ratings, Voting, Profile, UI fixes
 
 **Backend**
