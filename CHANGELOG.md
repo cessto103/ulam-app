@@ -5,6 +5,11 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.30.0] — 2026-07-17
+
+### Added
+- **Daily & weekly tasks checklist** on the Awards screen — shows today's/this week's tasks (admin-managed, see the new admin Gamification section) with a checkmark once completed. Completion is automatic: it happens the moment you perform the real underlying action elsewhere in the app (generate a meal plan, report a price, share a community post, log your spending) — there's no separate "mark done" button — and awards the task's own bonus XP on top of what that action already earns.
+
 ## [1.29.2] — 2026-07-17
 
 ### Fixed

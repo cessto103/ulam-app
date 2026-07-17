@@ -54,6 +54,12 @@ type UserStats = {
   posts_count: number; achievements_count: number;
 };
 
+type DailyTaskItem = {
+  id: number; title: string; description: string | null;
+  icon: string | null; xp_reward: number;
+  frequency: 'daily' | 'weekly'; is_completed: boolean;
+};
+
 type SavedEntry = {
   id: number; recipe_id: number;
   recipe: {
@@ -118,6 +124,11 @@ async function fetchStats(): Promise<UserStats> {
   return data.stats;
 }
 
+async function fetchDailyTasks(): Promise<DailyTaskItem[]> {
+  const { data } = await client.get('/user/daily-tasks');
+  return data.tasks;
+}
+
 async function fetchRecipeBook(page: number): Promise<SavedPage> {
   const { data } = await client.get(`/recipe-book?page=${page}`);
   return data;
@@ -126,13 +137,15 @@ async function fetchRecipeBook(page: number): Promise<SavedPage> {
 // ─── Sub-tabs ──────────────────────────────────────────────────────────────────
 
 function AwardsTab({
-  achievements, loadingAch, leaderData, loadingLb, stats,
+  achievements, loadingAch, leaderData, loadingLb, stats, dailyTasks, loadingTasks,
 }: {
   achievements: AchievementItem[] | undefined;
   loadingAch: boolean;
   leaderData: LeaderboardResponse | undefined;
   loadingLb: boolean;
   stats: UserStats | undefined;
+  dailyTasks: DailyTaskItem[] | undefined;
+  loadingTasks: boolean;
 }) {
   const { lang } = useLanguage();
   const earnedCount = achievements?.filter((a) => a.is_earned).length ?? 0;
@@ -172,6 +185,54 @@ function AwardsTab({
             ))}
           </View>
         </View>
+      )}
+
+      {/* Daily & weekly tasks — completion happens automatically when the
+          matching action is performed elsewhere in the app; this is a
+          read-only checklist, not a tap-to-complete list. */}
+      {(loadingTasks || (dailyTasks && dailyTasks.length > 0)) && (
+        <>
+          <Text className="text-xs font-medium text-ink-soft uppercase tracking-wider mb-2">
+            {lang === 'en' ? "Today's Tasks" : 'Mga Gawain Ngayon'}
+          </Text>
+          <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-4">
+            {loadingTasks ? (
+              <ActivityIndicator color="#386641" />
+            ) : (dailyTasks ?? []).map((task, i) => (
+              <View
+                key={task.id}
+                className={`flex-row items-center gap-3 py-2.5 ${
+                  i < (dailyTasks?.length ?? 0) - 1 ? 'border-b border-cream-200' : ''
+                }`}
+                style={{ opacity: task.is_completed ? 1 : 0.7 }}
+              >
+                <View
+                  className="w-10 h-10 rounded-xl items-center justify-center"
+                  style={{ backgroundColor: task.is_completed ? '#EFF4EC' : '#F9EDD3' }}
+                >
+                  <Text style={{ fontSize: 18 }}>{task.icon || '🎯'}</Text>
+                </View>
+                <View className="flex-1">
+                  <Text className={`text-sm font-medium ${task.is_completed ? 'text-ink' : 'text-ink-soft'}`}>
+                    {task.title}
+                  </Text>
+                  <Text className="text-xs text-ink-soft">
+                    {task.frequency === 'weekly'
+                      ? (lang === 'en' ? 'This week' : 'Ngayong linggo')
+                      : (lang === 'en' ? 'Today' : 'Ngayong araw')}
+                  </Text>
+                </View>
+                {task.is_completed ? (
+                  <View className="rounded-full bg-leaf-50 px-2 py-0.5">
+                    <Text className="text-xs font-semibold text-leaf-700">✓</Text>
+                  </View>
+                ) : (
+                  <Text className="text-xs text-gold-500 font-medium">+{task.xp_reward} XP</Text>
+                )}
+              </View>
+            ))}
+          </View>
+        </>
       )}
 
       {/* Achievements */}
@@ -483,6 +544,12 @@ export default function AwardsScreen() {
     staleTime: 120_000,
   });
 
+  const { data: dailyTasks, isLoading: loadingTasks } = useQuery({
+    queryKey: ['daily-tasks'],
+    queryFn:  fetchDailyTasks,
+    staleTime: 60_000,
+  });
+
   // Seller plan takes priority in the header badge over the consumer
   // Free/Premium plan — it's the bigger paid commitment for a store owner,
   // and showing "Free" right under the name reads as broken once someone
@@ -540,6 +607,7 @@ export default function AwardsScreen() {
       qc.invalidateQueries({ queryKey: ['achievements'] }),
       qc.invalidateQueries({ queryKey: ['leaderboard'] }),
       qc.invalidateQueries({ queryKey: ['user-stats'] }),
+      qc.invalidateQueries({ queryKey: ['daily-tasks'] }),
       refreshUser(),
     ]);
     setRefreshing(false);
@@ -730,6 +798,8 @@ export default function AwardsScreen() {
           leaderData={leaderData}
           loadingLb={loadingLb}
           stats={stats}
+          dailyTasks={dailyTasks}
+          loadingTasks={loadingTasks}
         />
       ) : (
         <RecipeBookTab />
