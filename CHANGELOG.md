@@ -5,6 +5,11 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.29.1] — 2026-07-17
+
+### Fixed
+- **Level-up celebration (XP pill, "LEVEL UP!" card, confetti) was getting covered by the success screen's own text and button.** It was mounted as the *first* child in Log Spending and Report a Price's success views, and React Native paints later siblings on top — so the plain success text/button underneath it were actually rendering in front. Moved it to render last (paint order in RN follows JSX order for siblings) and added a defensive `zIndex` so it always wins regardless of what a screen renders around it.
+
 ## [1.29.0] — 2026-07-17
 
 ### Added

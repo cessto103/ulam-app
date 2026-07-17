@@ -138,7 +138,6 @@ export default function ReportPriceScreen() {
   if (success) {
     return (
       <View className="flex-1 bg-white items-center justify-center px-8">
-        <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
         <Text style={{ fontSize: 56 }} className="mb-4">🎉</Text>
         <Text className="text-lg font-semibold text-ink text-center mb-2">
           {lang === 'en' ? 'Thanks for the report!' : 'Salamat sa report!'}
@@ -185,6 +184,8 @@ export default function ReportPriceScreen() {
             {lang === 'en' ? 'Report another one' : 'Mag-report pa ng isa'}
           </Text>
         </Pressable>
+
+        <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
       </View>
     );
   }

@@ -158,7 +158,6 @@ export default function LogSpendingScreen() {
   if (success) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', paddingHorizontal: 32, paddingBottom: insets.bottom + 16 }}>
-        <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
         <Text style={{ fontSize: 48, marginBottom: 16 }}>✅</Text>
         <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 20, color: '#000000', marginBottom: 8, textAlign: 'center' }}>
           {lang === 'en' ? 'Logged!' : 'Nai-log na!'}
@@ -186,6 +185,8 @@ export default function LogSpendingScreen() {
             {lang === 'en' ? 'Done' : 'Tapos na'}
           </Text>
         </Pressable>
+
+        <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
       </View>
     );
   }

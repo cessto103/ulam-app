@@ -137,6 +137,10 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
         alignItems: 'center',
         justifyContent: 'center',
         opacity: overlayOpacity,
+        // Belt-and-suspenders on top of mounting this last in the caller's
+        // tree (which is what actually controls paint order) — makes sure
+        // it still wins even if a future sibling sets its own zIndex.
+        zIndex: 9999,
       }}
     >
       {/* XP pill */}
