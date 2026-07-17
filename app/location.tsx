@@ -4,6 +4,7 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 import * as Location from 'expo-location';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -24,6 +25,8 @@ function errorMessage(e: any, fallback: string): string {
   if (errors) return Object.values(errors).flat().join('\n');
   return e?.response?.data?.message ?? fallback;
 }
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 export default function LocationScreen() {
   const { user, refreshUser } = useAuth();
@@ -112,28 +115,29 @@ export default function LocationScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
         {/* Header */}
-        <View
+        <LinearGradient
+          colors={HEADER_GRADIENT}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={{
             paddingTop: insets.top + 8,
-            paddingBottom: 12,
+            paddingBottom: 14,
             paddingHorizontal: 16,
-            backgroundColor: '#fff',
-            borderBottomWidth: 1,
-            borderBottomColor: '#F9EDD3',
           }}
         >
           <View className="flex-row items-center gap-3">
             <Pressable
               onPress={() => router.back()}
-              className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
+              className="w-8 h-8 rounded-full items-center justify-center active:opacity-70"
+              style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}
             >
-              <Ionicons name="arrow-back" size={18} color="#000000" />
+              <Ionicons name="arrow-back" size={18} color="#fff" />
             </Pressable>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#fff', flex: 1 }}>
               {lang === 'en' ? 'Location' : 'Lokasyon'}
             </Text>
           </View>
-        </View>
+        </LinearGradient>
 
         <ScrollView contentContainerClassName="px-4 pt-4 pb-12" keyboardShouldPersistTaps="handled">
           <View className="rounded-2xl border border-cream-200 bg-white p-4">

@@ -6,6 +6,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
@@ -42,7 +44,9 @@ const TARGET_TYPE_EMOJI: Record<string, string> = {
 
 const CATEGORIES = ITEM_CATEGORIES;
 
-const UNITS = ['kg', 'bundle', 'pcs', '100g', 'pack', 'bottle', 'tray', 'lata', 'sachet'];
+const UNITS = ['kg', 'bundle', 'pcs', '100g', 'liter(s)', 'pack', 'bottle', 'tray', 'lata', 'sachet'];
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 export default function ReportPriceScreen() {
   const router = useRouter();
@@ -193,9 +197,23 @@ export default function ReportPriceScreen() {
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
-      behavior="padding"
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'android' ? 30 : 0}
     >
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: insets.top + 8, paddingBottom: 14 }}
+      >
+        <Pressable onPress={() => router.back()} className="w-8 h-8 rounded-full items-center justify-center active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}>
+          <Ionicons name="arrow-back" size={18} color="#fff" />
+        </Pressable>
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#fff' }}>
+          {lang === 'en' ? 'Report a Price' : 'Mag-report ng Presyo'}
+        </Text>
+      </LinearGradient>
+
       <ScrollView
         contentContainerClassName="px-5 py-6"
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}

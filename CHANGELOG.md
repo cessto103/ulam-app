@@ -3,6 +3,17 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.2] — 2026-07-18
+
+### Fixed
+- **Your Store page**: header re-themed to the terracotta gradient, edit-store icon switched from an emoji to the app's standard Ionicons pencil, and the "Boost this" sheet no longer gets cut off by the Android navigation bar (a shared component used on both stores and recipes, so this fixes it everywhere it appears).
+- **Create Recipe**: the "Cover & Photo Style" picker sheet's bottom no longer sits behind the Android navigation bar.
+- **Recipe page comments**: the keyboard no longer covers the comment field while typing (the whole page was missing keyboard-avoidance). Editing a comment now reuses the same bottom compose field instead of a separate inline box — matches the existing "replying to" pattern, with an "Editing your comment" banner in its place.
+- **Report a Price**: header re-themed to the terracotta gradient; fixed the keyboard covering the bottom field on Android (was using `padding` behavior on both platforms — Android needs `height`); added "liter(s)" to the unit list.
+- **Location page**: header re-themed to the terracotta gradient.
+- **Market/store price lists**: added a note that prices come from a mix of sources (community reports, store owners, government DTI/DA references) and may not always match exactly.
+- **Home screen "Popular This Week" → See all**: was linking to My Recipe Book (your own saved recipes) instead of the actual popular/all recipes list — now correctly opens Menu Plan > Recipes.
+
 ---
 
 ## [1.30.1] — 2026-07-17

@@ -19,6 +19,7 @@ import {
 import StarRating from '@/src/components/StarRating';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Image, Linking, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
@@ -95,6 +96,8 @@ const MARKET_TYPE_EMOJI: Record<string, string> = {
   grocery: '🏬',
   tindahan: '🛒',
 };
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 function relativeTime(dateStr: string, lang: 'en' | 'tl'): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -189,32 +192,33 @@ export default function StallDetailScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
       {/* Header */}
-      <View
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={{
           paddingTop: insets.top + 8,
-          paddingBottom: 12,
+          paddingBottom: 14,
           paddingHorizontal: 16,
-          backgroundColor: '#fff',
-          borderBottomWidth: 1,
-          borderBottomColor: '#F9EDD3',
         }}
       >
         <View className="flex-row items-center gap-3">
           <Pressable
             onPress={() => router.back()}
-            className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
+            className="w-8 h-8 rounded-full items-center justify-center active:opacity-70"
+            style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}
           >
-            <Ionicons name="arrow-back" size={18} color="#3C3A2F" />
+            <Ionicons name="arrow-back" size={18} color="#fff" />
           </Pressable>
           <View className="flex-1">
             {isLoading ? (
-              <View className="h-5 w-40 bg-cream-200 rounded" />
+              <View className="h-5 w-40 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.25)' }} />
             ) : (
               <>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#3C3A2F' }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#fff' }} numberOfLines={1}>
                   {stall?.name ?? '-'}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.85)' }} numberOfLines={1}>
                   {[stall?.barangay, stall?.municipality].filter(Boolean).join(', ')}
                 </Text>
               </>
@@ -227,13 +231,13 @@ export default function StallDetailScreen() {
                 onPress={() => router.push(`/edit-store/${stall.id}` as any)}
                 style={{
                   flexDirection: 'row', alignItems: 'center', gap: 4,
-                  backgroundColor: '#EFF4EC',
+                  backgroundColor: 'rgba(255,255,255,0.22)',
                   borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
                 }}
                 className="active:opacity-70"
               >
-                <Text style={{ fontSize: 13 }}>✏️</Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6E7B4A' }}>
+                <Ionicons name="create-outline" size={15} color="#fff" />
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#fff' }}>
                   {lang === 'en' ? 'Edit store' : 'I-edit'}
                 </Text>
               </Pressable>
@@ -242,20 +246,20 @@ export default function StallDetailScreen() {
                 onPress={() => setReportOpen(true)}
                 style={{
                   flexDirection: 'row', alignItems: 'center', gap: 4,
-                  backgroundColor: '#FCEBEB',
+                  backgroundColor: 'rgba(255,255,255,0.22)',
                   borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
                 }}
                 className="active:opacity-70"
               >
-                <Text style={{ fontSize: 13 }}>🚩</Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#E24B4A' }}>
+                <Ionicons name="flag-outline" size={14} color="#fff" />
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#fff' }}>
                   {lang === 'en' ? 'Report' : 'I-report'}
                 </Text>
               </Pressable>
             )
           )}
         </View>
-      </View>
+      </LinearGradient>
 
       {isLoading ? (
         <ScrollView contentContainerStyle={{ padding: 16 }}>

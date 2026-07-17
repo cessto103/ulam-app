@@ -459,7 +459,8 @@ export default function HomeScreen() {
   const todayDow  = new Date().getDay();
   const todayIdx  = todayDow === 0 ? 6 : todayDow - 1;
 
-  // Popular This Week — /recipes is ordered by save_count desc on the backend
+  // Popular This Week — /recipes orders by is_boosted, then views in the
+  // last 7 days, then all-time saves as a tiebreaker (RecipeController::index).
   const { data: popularRecipes = [] } = useQuery({
     queryKey: ['popular-recipes'],
     queryFn: () => fetchRecipes(''),
@@ -1116,7 +1117,7 @@ export default function HomeScreen() {
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
               {lang === 'en' ? 'Popular This Week' : 'Sikat Ngayong Linggo'}
             </Text>
-            <Pressable onPress={() => router.push('/recipe-book' as any)} hitSlop={8}>
+            <Pressable onPress={() => router.push('/(tabs)/meal-plan?tab=recipes&filter=all' as any)} hitSlop={8}>
               <Text className="text-xs font-semibold text-brand-600">
                 {lang === 'en' ? 'See all' : 'Lahat'}
               </Text>

@@ -85,11 +85,7 @@ function RouteGuard() {
         name="report-price"
         options={{
           presentation: 'modal',
-          headerTitle: lang === 'en' ? 'Report a Price' : 'Mag-report ng Presyo',
-          headerTitleStyle: HEADER_TITLE_STYLE,
-          headerStyle: { backgroundColor: '#E7653B' },
-          headerShadowVisible: false,
-          headerTintColor: '#fff',
+          headerShown: false,
         }}
       />
       <Stack.Screen

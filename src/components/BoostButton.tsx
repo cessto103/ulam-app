@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type BoostOption = { target: string; duration_days: number; price: number };
 type BoostCatalog = {
@@ -47,6 +48,7 @@ export function BoostButton({
   refetchKey: unknown[];
 }) {
   const { lang } = useLanguage();
+  const insets = useSafeAreaInsets();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<BoostOption | null>(null);
@@ -94,7 +96,7 @@ export function BoostButton({
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(41,37,34,0.5)' }}>
-          <View className="bg-white rounded-t-3xl px-5 pt-5 pb-8">
+          <View className="bg-white rounded-t-3xl px-5 pt-5" style={{ paddingBottom: insets.bottom + 24 }}>
             <View className="flex-row items-center justify-between mb-4">
               <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000' }}>
                 {lang === 'en' ? 'Boost this' : 'I-boost ito'}

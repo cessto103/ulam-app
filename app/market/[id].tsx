@@ -292,6 +292,17 @@ export default function MarketDetailScreen() {
             contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
             refreshControl={<RefreshControl refreshing={pullRefreshing} onRefresh={onPullRefresh} tintColor="#6E7B4A" />}
           >
+            {categories.length > 0 && (
+              <View style={{ flexDirection: 'row', gap: 8, backgroundColor: '#FDF0EA', borderRadius: 12, padding: 10, marginBottom: 12 }}>
+                <Text style={{ fontSize: 14 }}>ℹ️</Text>
+                <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#9A4A2C', lineHeight: 17 }}>
+                  {lang === 'en'
+                    ? 'Prices here come from a mix of sources — community reports, store owners, and government references (DTI/DA) — so they may not always match exactly.'
+                    : 'Ang mga presyo dito ay galing sa iba’t ibang pinagmulan — community reports, mga tindera, at government reference (DTI/DA) — kaya minsan hindi ito eksaktong magkatugma.'}
+                </Text>
+              </View>
+            )}
+
             {categories.length === 0 ? (
               <View className="bg-white rounded-2xl border border-cream-200 p-8 items-center">
                 <Text className="text-3xl mb-2">🏪</Text>

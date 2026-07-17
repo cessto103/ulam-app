@@ -23,9 +23,11 @@ import {
   Dimensions,
   FlatList,
   Image,
+  KeyboardAvoidingView,
   Linking,
   Modal,
   PanResponder,
+  Platform,
   Pressable,
   ScrollView,
   Share,
@@ -538,7 +540,6 @@ export default function RecipeDetailScreen() {
   const [commentBody,     setCommentBody]     = useState('');
   const [replyTo,         setReplyTo]         = useState<RecipeCommentUser | null>(null);
   const [editCommentId,   setEditCommentId]   = useState<number | null>(null);
-  const [editCommentBody, setEditCommentBody] = useState('');
   const [savingComment,   setSavingComment]   = useState(false);
   const commentInputRef = useRef<TextInput>(null);
 
@@ -560,22 +561,36 @@ export default function RecipeDetailScreen() {
   });
 
   const handleSendComment = () => {
+    if (editCommentId !== null) {
+      saveEditComment();
+      return;
+    }
     const text = replyTo ? `@${replyTo.name.split(' ')[0]} ${commentBody.trim()}` : commentBody.trim();
     if (text) submitComment(text);
   };
 
+  // Editing reuses the same bottom compose field instead of a separate
+  // inline box — same pattern as the existing "replying to" state below.
   const startEditComment = (commentId: number, currentBody: string) => {
+    setReplyTo(null);
     setEditCommentId(commentId);
-    setEditCommentBody(currentBody);
+    setCommentBody(currentBody);
+    commentInputRef.current?.focus();
+  };
+
+  const cancelEditComment = () => {
+    setEditCommentId(null);
+    setCommentBody('');
   };
 
   const saveEditComment = async () => {
-    if (!editCommentBody.trim() || !editCommentId) return;
+    if (!commentBody.trim() || !editCommentId) return;
     setSavingComment(true);
     try {
-      await client.patch(`/recipe-comments/${editCommentId}`, { body: editCommentBody.trim() });
+      await client.patch(`/recipe-comments/${editCommentId}`, { body: commentBody.trim() });
       qc.invalidateQueries({ queryKey: ['recipe-comments', id] });
       setEditCommentId(null);
+      setCommentBody('');
     } catch (e: any) {
       Alert.alert('Error', e?.response?.data?.message ?? (lang === 'en' ? 'Could not edit comment.' : 'Hindi ma-edit ang komento.'));
     } finally {
@@ -757,6 +772,11 @@ export default function RecipeDetailScreen() {
   }
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'android' ? 30 : 0}
+    >
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ paddingBottom: 48 }}>
       {/* Cover photo is full-bleed behind the status bar — light icons stay
           visible against it; unmounting this screen reverts to the app-wide dark style. */}
@@ -1334,24 +1354,6 @@ export default function RecipeDetailScreen() {
             {lang === 'en' ? 'Comments' : 'Mga Komento'} ({comments.length})
           </Text>
 
-          {editCommentId !== null && (
-            <View style={{ backgroundColor: '#FDEFC9', borderRadius: 12, padding: 10, marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <TextInput
-                style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#000000', backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, maxHeight: 80 }}
-                value={editCommentBody}
-                onChangeText={setEditCommentBody}
-                multiline
-                autoFocus
-              />
-              <Pressable onPress={saveEditComment} disabled={savingComment} style={{ backgroundColor: '#386641', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 }}>
-                {savingComment ? <ActivityIndicator color="white" size="small" /> : <Text style={{ color: 'white', fontFamily: 'NunitoSans_700Bold', fontSize: 13 }}>{lang === 'en' ? 'Save' : 'I-save'}</Text>}
-              </Pressable>
-              <Pressable onPress={() => setEditCommentId(null)}>
-                <Text style={{ color: '#6F655A', fontSize: 14 }}>✕</Text>
-              </Pressable>
-            </View>
-          )}
-
           {comments.length === 0 ? (
             <View style={{ alignItems: 'center', paddingVertical: 20 }}>
               <Text style={{ fontSize: 26, marginBottom: 6 }}>💬</Text>
@@ -1368,12 +1370,21 @@ export default function RecipeDetailScreen() {
                 lang={lang === 'en' ? 'en' : 'tl'}
                 onDelete={confirmDeleteComment}
                 onEdit={startEditComment}
-                onReply={(user) => { setReplyTo(user); commentInputRef.current?.focus(); }}
+                onReply={(user) => { setEditCommentId(null); setReplyTo(user); commentInputRef.current?.focus(); }}
               />
             ))
           )}
 
-          {replyTo && (
+          {editCommentId !== null ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FDEFC9', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, marginTop: 8 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#9A6A12', flex: 1 }}>
+                ✏️ {lang === 'en' ? 'Editing your comment' : 'Ine-edit ang komento mo'}
+              </Text>
+              <Pressable onPress={cancelEditComment} hitSlop={8}>
+                <Ionicons name="close" size={15} color="#9A6A12" />
+              </Pressable>
+            </View>
+          ) : replyTo && (
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#EFF4EC', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, marginTop: 8 }}>
               <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#386641', flex: 1 }}>
                 ↩ {lang === 'en' ? 'Replying to' : 'Tumutugon kay'} <Text style={{ fontFamily: 'NunitoSans_700Bold' }}>{replyTo.name.split(' ')[0]}</Text>
@@ -1395,9 +1406,11 @@ export default function RecipeDetailScreen() {
               ref={commentInputRef}
               style={{ flex: 1, backgroundColor: '#F9EDD3', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, fontFamily: 'NunitoSans_400Regular', color: '#000000', maxHeight: 100 }}
               placeholder={
-                replyTo
-                  ? (lang === 'en' ? `Reply to ${replyTo.name.split(' ')[0]}...` : `Tumugon kay ${replyTo.name.split(' ')[0]}...`)
-                  : (lang === 'en' ? 'Write a comment...' : 'Sumulat ng komento...')
+                editCommentId !== null
+                  ? (lang === 'en' ? 'Edit your comment...' : 'I-edit ang komento...')
+                  : replyTo
+                    ? (lang === 'en' ? `Reply to ${replyTo.name.split(' ')[0]}...` : `Tumugon kay ${replyTo.name.split(' ')[0]}...`)
+                    : (lang === 'en' ? 'Write a comment...' : 'Sumulat ng komento...')
               }
               placeholderTextColor="#B0A18C"
               value={commentBody}
@@ -1408,10 +1421,12 @@ export default function RecipeDetailScreen() {
             />
             <Pressable
               onPress={handleSendComment}
-              disabled={!commentBody.trim() || sendingComment}
-              style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: '#C45E3A', alignItems: 'center', justifyContent: 'center', opacity: !commentBody.trim() || sendingComment ? 0.4 : 1 }}
+              disabled={!commentBody.trim() || sendingComment || savingComment}
+              style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: '#C45E3A', alignItems: 'center', justifyContent: 'center', opacity: !commentBody.trim() || sendingComment || savingComment ? 0.4 : 1 }}
             >
-              {sendingComment ? <ActivityIndicator color="white" size="small" /> : <Ionicons name="arrow-up" size={17} color="#fff" />}
+              {(sendingComment || savingComment)
+                ? <ActivityIndicator color="white" size="small" />
+                : <Ionicons name={editCommentId !== null ? 'checkmark' : 'arrow-up'} size={17} color="#fff" />}
             </Pressable>
           </View>
         </View>
@@ -1419,5 +1434,6 @@ export default function RecipeDetailScreen() {
       </View>
     <ReportContentSheet visible={reportSheetOpen} onClose={() => setReportSheetOpen(false)} contentType="recipe" contentId={recipe.id} />
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
