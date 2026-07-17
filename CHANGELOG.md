@@ -5,6 +5,17 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.28.3] — 2026-07-17
+
+Collapsing-header polish, a real regional-coverage fix for Report a Price, and a themed header pass on three utility pages.
+
+### Changed
+- **Community and Prices tabs**: the collapsing header now stops shrinking once it reaches the logo/search/notifications/avatar row, instead of collapsing that row away too — that row now stays pinned near the top while browsing, with the tabs/filters sitting right below it.
+- **Log Spending, Spending History, and My Recipe Book**: headers now use the app's terracotta gradient theme (matching Home/Community/Prices) instead of a plain white bar.
+
+### Fixed
+- **Report a Price location field**: the city/municipality picker added last release was a hardcoded Metro Manila-only list, which broke the field for anyone outside that area (e.g. Mindanao or Visayas users would see no relevant options). It's now built from the same region-aware `/markets` lookup the store picker already uses — which falls back to the signed-in user's own registered municipality — so the options shown are always relevant to wherever in the Philippines the user actually is.
+
 ## [1.28.2] — 2026-07-17
 
 A round of layout/UX fixes across onboarding, Log Spending, Prices, budgeting, meal planning, and Report a Price, plus a smarter Community feed header.

@@ -22,6 +22,12 @@ type GradientPageHeaderProps = {
   waveFill?: string;
   /** Renders a photo background (admin-themeable) behind the gradient instead of a flat gradient. */
   photo?: boolean;
+  /**
+   * Reports the height of the logo/rightSlot row (including its top safe-area
+   * padding) so a caller doing a scroll-collapsing header can shrink down to
+   * exactly this height instead of collapsing away the row entirely.
+   */
+  onTopRowLayout?: (height: number) => void;
 };
 
 const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'];
@@ -34,6 +40,7 @@ export default function GradientPageHeader({
   children,
   waveFill = '#FFF8E8',
   photo = false,
+  onTopRowLayout,
 }: GradientPageHeaderProps) {
   const insets = useSafeAreaInsets();
   const Wrapper = photo ? ThemedSection : LinearGradient;
@@ -51,13 +58,15 @@ export default function GradientPageHeader({
 
   return (
     <Wrapper {...(wrapperProps as any)}>
-      <View
-        className={tabs?.length ? 'px-4' : 'px-4 pb-1'}
-        style={{ paddingTop: insets.top + 10 }}
-      >
-        <View className="flex-row items-center justify-between">
-          <BrandLogo size={21} light />
-          {rightSlot}
+      <View className={tabs?.length ? 'px-4' : 'px-4 pb-1'}>
+        <View
+          style={{ paddingTop: insets.top + 10 }}
+          onLayout={onTopRowLayout ? (e) => onTopRowLayout(e.nativeEvent.layout.height) : undefined}
+        >
+          <View className="flex-row items-center justify-between">
+            <BrandLogo size={21} light />
+            {rightSlot}
+          </View>
         </View>
 
         {(title || subtitle) && (

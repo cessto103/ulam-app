@@ -118,13 +118,18 @@ export default function KomunidadScreen() {
   const [pusoCounts, setPusoCounts]  = useState<Record<number, number>>({});
   const pendingReact                 = useRef<Set<number>>(new Set());
 
-  // Collapsing header: the gradient hero shrinks away on scroll-down, letting the
-  // All/Following tabs and filter chips (static siblings below it) ride up to take
-  // its place, then everything slides back down once the feed is scrolled to top.
+  // Collapsing header: the title/subtitle portion shrinks away on scroll-down,
+  // letting the All/Following tabs and filter chips ride up to sit right below
+  // the pinned logo/avatar row, then everything slides back down at the top.
   const [headerHeight, setHeaderHeight] = useState<number | null>(null);
+  const [pinnedHeight, setPinnedHeight] = useState<number | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
-  const animatedHeaderHeight = headerHeight != null
-    ? scrollY.interpolate({ inputRange: [0, headerHeight], outputRange: [headerHeight, 0], extrapolate: 'clamp' })
+  const animatedHeaderHeight = (headerHeight != null && pinnedHeight != null)
+    ? scrollY.interpolate({
+        inputRange: [0, Math.max(headerHeight - pinnedHeight, 1)],
+        outputRange: [headerHeight, pinnedHeight],
+        extrapolate: 'clamp',
+      })
     : undefined;
 
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -336,6 +341,7 @@ export default function KomunidadScreen() {
             subtitle={lang === 'en' ? 'Tips, prices, and favorite recipes from your neighbors.' : 'Mga tip, presyo, at paboritong recipe ng kapitbahay.'}
             rightSlot={<HeaderIconRow />}
             photo
+            onTopRowLayout={(h) => { if (pinnedHeight == null) setPinnedHeight(h); }}
           />
         </View>
       </Animated.View>

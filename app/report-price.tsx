@@ -1,9 +1,9 @@
 import { ITEM_CATEGORIES } from '@/src/constants/itemCategories';
-import { PH_CITIES } from '@/src/constants/phCities';
 import client from '@/src/api/client';
 import RewardCelebration, { type Reward } from '@/src/components/RewardCelebration';
 import { postMultipart, resizeForUpload } from '@/src/utils/uploadImage';
 import * as ImagePicker from 'expo-image-picker';
+import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -46,6 +46,7 @@ const UNITS = ['kg', 'bundle', 'pcs', '100g', 'pack', 'bottle', 'tray', 'lata', 
 
 export default function ReportPriceScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const { lang } = useLanguage();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ item?: string }>();
@@ -54,7 +55,7 @@ export default function ReportPriceScreen() {
   const [category, setCategory]     = useState('');
   const [price, setPrice]           = useState('');
   const [unit, setUnit]             = useState('kg');
-  const [municipality, setMunicipality] = useState('Antipolo');
+  const [municipality, setMunicipality] = useState(user?.municipality ?? '');
   const [loading, setLoading]       = useState(false);
   const [photoUri, setPhotoUri]     = useState<string | null>(null);
   const [success, setSuccess]       = useState(false);
@@ -65,13 +66,15 @@ export default function ReportPriceScreen() {
   const [targetSearch, setTargetSearch] = useState('');
   const [cityPickerOpen, setCityPickerOpen] = useState(false);
 
+  // No lat/lng params — the API falls back to the signed-in user's own
+  // registered municipality (wherever in the Philippines that is), so this
+  // list is always regionally relevant instead of a fixed Metro Manila set.
   const { data: nearbyTargets = [] } = useQuery<NearbyTarget[]>({
     queryKey: ['markets-for-report'],
     queryFn: async () => {
       const { data } = await client.get('/markets');
       return data.markets ?? [];
     },
-    enabled: pickerOpen,
     staleTime: 5 * 60_000,
   });
 
@@ -82,6 +85,15 @@ export default function ReportPriceScreen() {
       (m) => m.name.toLowerCase().includes(q) || m.barangay?.toLowerCase().includes(q)
     );
   }, [nearbyTargets, targetSearch]);
+
+  const municipalityOptions = useMemo(() => {
+    const set = new Set<string>();
+    if (user?.municipality) set.add(user.municipality);
+    for (const m of nearbyTargets) {
+      if (m.municipality) set.add(m.municipality);
+    }
+    return Array.from(set);
+  }, [nearbyTargets, user?.municipality]);
 
   const canSubmit = itemName.trim() && category && price && parseFloat(price) > 0;
 
@@ -459,18 +471,38 @@ export default function ReportPriceScreen() {
                 <Text className="text-ink-soft text-sm">✕</Text>
               </Pressable>
             </View>
-            <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ paddingBottom: 12 }}>
-              {PH_CITIES.map((city) => (
-                <Pressable
-                  key={city}
-                  onPress={() => { setMunicipality(city); setCityPickerOpen(false); }}
-                  className="flex-row items-center justify-between px-4 py-3 border-b border-cream-200 active:opacity-70"
-                >
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>{city}</Text>
-                  {municipality === city && <Text style={{ color: '#386641' }}>✓</Text>}
-                </Pressable>
-              ))}
-            </ScrollView>
+            {municipalityOptions.length > 0 ? (
+              <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ paddingBottom: 12 }}>
+                {municipalityOptions.map((city) => (
+                  <Pressable
+                    key={city}
+                    onPress={() => { setMunicipality(city); setCityPickerOpen(false); }}
+                    className="flex-row items-center justify-between px-4 py-3 border-b border-cream-200 active:opacity-70"
+                  >
+                    <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>{city}</Text>
+                    {municipality === city && <Text style={{ color: '#386641' }}>✓</Text>}
+                  </Pressable>
+                ))}
+              </ScrollView>
+            ) : (
+              <View style={{ padding: 20 }}>
+                <Text className="text-xs text-ink-soft mb-3">
+                  {lang === 'en'
+                    ? "We don't have your area on file yet. Set it in your profile, or type it below just this once."
+                    : 'Wala pa kaming nakatalang lugar mo. I-set ito sa iyong profile, o i-type sa ibaba sa ngayon.'}
+                </Text>
+                <TextInput
+                  className="w-full rounded-xl border border-cream-300 bg-cream-50 px-4 py-3 text-sm text-ink"
+                  placeholder={lang === 'en' ? 'e.g. Antipolo, Davao City...' : 'hal. Antipolo, Davao City...'}
+                  placeholderTextColor="#B0A18C"
+                  value={municipality}
+                  onChangeText={setMunicipality}
+                  autoCapitalize="words"
+                  onSubmitEditing={() => setCityPickerOpen(false)}
+                  returnKeyType="done"
+                />
+              </View>
+            )}
           </Pressable>
         </Pressable>
       </Modal>

@@ -2,6 +2,7 @@ import client from '@/src/api/client';
 import RewardCelebration, { type Reward } from '@/src/components/RewardCelebration';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -14,6 +15,8 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -196,21 +199,26 @@ export default function LogSpendingScreen() {
       keyboardShouldPersistTaps="handled"
     >
       {/* Header */}
-      <View style={{ backgroundColor: '#fff', paddingHorizontal: 16, paddingTop: insets.top + 12, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ paddingHorizontal: 16, paddingTop: insets.top + 12, paddingBottom: 16 }}
+      >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Pressable onPress={() => router.back()} hitSlop={8} className="active:opacity-60">
-            <Text style={{ fontSize: 20 }}>←</Text>
+          <Pressable onPress={() => router.back()} hitSlop={8} className="active:opacity-70">
+            <Text style={{ fontSize: 20, color: '#fff' }}>←</Text>
           </Pressable>
           <View>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff' }}>
               {lang === 'en' ? 'Log Spending' : 'I-log ang Gastos'}
             </Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
               {lang === 'en' ? "Tap any amount to edit it" : "I-tap ang halaga para baguhin"}
             </Text>
           </View>
         </View>
-      </View>
+      </LinearGradient>
 
       <View style={{ padding: 16 }}>
 

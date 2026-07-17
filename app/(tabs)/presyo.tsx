@@ -4,8 +4,9 @@ import { SkeletonMarketCard, SkeletonPriceCard } from '@/src/components/Skeleton
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
+  Animated,
   ActivityIndicator,
   Pressable,
   RefreshControl,
@@ -145,6 +146,20 @@ export default function PresyoScreen() {
   const router = useRouter();
   const qc     = useQueryClient();
 
+  // Collapsing header: same pattern as the Community tab — the title/subtitle
+  // portion shrinks away on scroll-down so more of the list is visible, while
+  // the logo/avatar row stays pinned near the top.
+  const [headerHeight, setHeaderHeight] = useState<number | null>(null);
+  const [pinnedHeight, setPinnedHeight] = useState<number | null>(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const animatedHeaderHeight = (headerHeight != null && pinnedHeight != null)
+    ? scrollY.interpolate({
+        inputRange: [0, Math.max(headerHeight - pinnedHeight, 1)],
+        outputRange: [headerHeight, pinnedHeight],
+        extrapolate: 'clamp',
+      })
+    : undefined;
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
@@ -205,12 +220,17 @@ export default function PresyoScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#FFF8E8' }}>
-      <GradientPageHeader
-        title={lang === 'en' ? 'Prices' : 'Presyo'}
-        subtitle={lang === 'en' ? 'Compare prices and help the community.' : 'Maghambing ng presyo at tumulong sa komunidad.'}
-        rightSlot={<HeaderIconRow />}
-        photo
-      />
+      <Animated.View style={{ height: animatedHeaderHeight, overflow: 'hidden' }}>
+        <View onLayout={(e) => { if (headerHeight == null) setHeaderHeight(e.nativeEvent.layout.height); }}>
+          <GradientPageHeader
+            title={lang === 'en' ? 'Prices' : 'Presyo'}
+            subtitle={lang === 'en' ? 'Compare prices and help the community.' : 'Maghambing ng presyo at tumulong sa komunidad.'}
+            rightSlot={<HeaderIconRow />}
+            photo
+            onTopRowLayout={(h) => { if (pinnedHeight == null) setPinnedHeight(h); }}
+          />
+        </View>
+      </Animated.View>
 
       <ScrollView
         className="flex-1"
@@ -219,6 +239,8 @@ export default function PresyoScreen() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />
         }
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+        scrollEventThrottle={16}
       >
       <View className="px-4 pt-1">
 

@@ -5,6 +5,7 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
@@ -68,6 +69,7 @@ const MEAL_TYPES = [
 
 const BUDGET_FILTERS = ['budget_100','budget_200','budget_400','budget_600','budget_800','budget_1000','budget_1000plus'];
 const DIFF_FILTERS   = ['easy','medium','hard'];
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 // ─── API ──────────────────────────────────────────────────────────────────────
 
@@ -298,24 +300,28 @@ export default function RecipeBookScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFCF5' }} edges={['top']}>
       {/* Header */}
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', gap: 12,
-        paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10,
-        backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3',
-      }}>
-        <Pressable onPress={() => router.back()} className="active:opacity-60">
-          <Ionicons name="arrow-back" size={20} color="#000000" />
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          flexDirection: 'row', alignItems: 'center', gap: 12,
+          paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14,
+        }}
+      >
+        <Pressable onPress={() => router.back()} className="active:opacity-70">
+          <Ionicons name="arrow-back" size={20} color="#fff" />
         </Pressable>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff' }}>
             {lang === 'en' ? 'My Recipe Book' : 'Aking Recipe Book'}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
             {filtered.length} {lang === 'en' ? `of ${recipes.length} saved` : `sa ${recipes.length} na naka-save`}
           </Text>
         </View>
         <Ionicons name="bookmark" size={20} color="#F4B942" />
-      </View>
+      </LinearGradient>
 
       {/* Search bar */}
       <View style={{ backgroundColor: '#fff', paddingHorizontal: 16, paddingBottom: 10, paddingTop: 8 }}>

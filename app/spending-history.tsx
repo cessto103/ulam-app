@@ -2,10 +2,13 @@ import client from '@/src/api/client';
 import { Skeleton, SkeletonListItem } from '@/src/components/Skeleton';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -112,14 +115,19 @@ export default function SpendingHistoryScreen() {
   if (!data?.has_budget) {
     return (
       <SafeAreaView className="flex-1 bg-cream-50">
-        <View className="flex-row items-center px-4 pt-4 pb-3 gap-3 bg-white border-b border-cream-200">
-          <Pressable onPress={() => router.back()} className="p-2 active:opacity-60">
-            <Text style={{ fontSize: 20 }}>←</Text>
+        <LinearGradient
+          colors={HEADER_GRADIENT}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="flex-row items-center px-4 pt-4 pb-4 gap-3"
+        >
+          <Pressable onPress={() => router.back()} className="p-2 active:opacity-70">
+            <Text style={{ fontSize: 20, color: '#fff' }}>←</Text>
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff' }}>
             {lang === 'en' ? 'Spending History' : 'Kasaysayan ng Gastos'}
           </Text>
-        </View>
+        </LinearGradient>
         <View className="flex-1 items-center justify-center px-8">
           <Text style={{ fontSize: 48, marginBottom: 16 }}>📊</Text>
           <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 8, textAlign: 'center' }}>
@@ -145,21 +153,26 @@ export default function SpendingHistoryScreen() {
   return (
     <SafeAreaView className="flex-1 bg-cream-50">
       {/* Header */}
-      <View className="flex-row items-center px-4 pt-4 pb-3 gap-3 bg-white border-b border-cream-200">
-        <Pressable onPress={() => router.back()} className="p-2 active:opacity-60">
-          <Text style={{ fontSize: 20 }}>←</Text>
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        className="flex-row items-center px-4 pt-4 pb-4 gap-3"
+      >
+        <Pressable onPress={() => router.back()} className="p-2 active:opacity-70">
+          <Text style={{ fontSize: 20, color: '#fff' }}>←</Text>
         </Pressable>
         <View className="flex-1">
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#000000' }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff' }}>
             {lang === 'en' ? 'Spending History' : 'Kasaysayan ng Gastos'}
           </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
             {lang === 'en'
               ? `${data.period.total_days}-day period · ${daysLogged} logged`
               : `${data.period.total_days} araw na period · ${daysLogged} na-log`}
           </Text>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView
         className="flex-1"
