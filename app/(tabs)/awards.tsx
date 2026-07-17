@@ -71,8 +71,8 @@ type SavedPage = { data: SavedEntry[]; current_page: number; last_page: number }
 const LEVEL_XP = [0, 100, 250, 500, 1000, 2000, 3500, 6000, 10000, 15000];
 
 const BUDGET_LABEL: Record<string, string> = {
-  budget_100: '₱100', budget_200: '₱200',
-  budget_400: '₱400', budget_400plus: '₱400+',
+  budget_100: '₱100', budget_200: '₱200', budget_400: '₱400',
+  budget_600: '₱600', budget_800: '₱800', budget_1000: '₱1,000', budget_1000plus: '₱1,000+',
 };
 
 const MEAL_TYPE_OPTIONS = [

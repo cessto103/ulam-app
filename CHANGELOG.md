@@ -5,6 +5,14 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.29.2] — 2026-07-17
+
+### Fixed
+- **Recipes tab (Menu Plan > Recipes) felt laggy on every interaction** — bookmark, share, even scrolling. Root cause: the recipe card's render function was being redefined on every single re-render (including on every mutation's pending-state flip), which forced every visible card to fully rebuild itself each time. Extracted it into a proper memoized component so only the specific card that actually changed re-renders.
+- **Bookmarking a recipe didn't visually save** (icon stayed grey, no feedback) — it waited for a full network round-trip and list refetch before showing anything. Now updates instantly (optimistically), same pattern already used for the share toggle, and reverts automatically if the request fails.
+- **A recipe's budget tag sometimes showed as a raw "budget_400plus" string** instead of a price like "₱600" — 3 official recipes (Kare-Kare, Pork Ribs BBQ, Lechon Kawali) had an old, invalid budget tag left over from before the app's budget scheme was expanded from 4 tiers to 7. Corrected the 3 recipes' data and the seed data behind them; also fixed the same stale 4-tier scheme in the My Achievements budget label map and in the admin recipe editor (which could only ever tag a recipe over ₱400 as "₱400+", not the correct 600/800/1,000/1,000+ tier — that's how the bad data got there in the first place).
+- **Community feed felt laggy** (react/scroll interactions) for the same root cause as the Recipes tab above — the post card's render function was being redefined on every puso reaction, forcing every visible post to rebuild. Same memoized-component fix applied.
+
 ## [1.29.1] — 2026-07-17
 
 ### Fixed

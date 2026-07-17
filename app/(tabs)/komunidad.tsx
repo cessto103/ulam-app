@@ -7,7 +7,7 @@ import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/r
 import { formatCount } from '@/src/utils/formatCount';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -104,6 +104,150 @@ async function fetchFeed(type: string | null, mode: FeedMode, page = 1): Promise
   const { data } = await client.get(`/community/feed?${params}`);
   return data;
 }
+
+// Extracted + memoized so an unrelated re-render of KomunidadScreen (a
+// puso tap on ANY post, a filter/tab change, the header collapse ticking)
+// doesn't force every visible post card to tear down and rebuild — only
+// the specific card whose own data actually changed re-renders. Depends
+// on the callback props staying referentially stable (useCallback in the
+// parent) for the memo comparison to actually pay off.
+const PostCard = memo(function PostCard({
+  post,
+  lang,
+  reacted,
+  pusoCount,
+  onPress,
+  onUserPress,
+  onRecipePress,
+  onTogglePuso,
+}: {
+  post: Post;
+  lang: 'en' | 'tl';
+  reacted: boolean;
+  pusoCount: number;
+  onPress: (id: number) => void;
+  onUserPress: (userId: number) => void;
+  onRecipePress: (recipeId: number) => void;
+  onTogglePuso: (id: number) => void;
+}) {
+  const meta = TYPE_META[post.post_type] ?? TYPE_META.general;
+
+  return (
+    <Pressable
+      onPress={() => onPress(post.id)}
+      className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 mx-4 active:opacity-95"
+    >
+      <View className="flex-row items-center gap-3 mb-3">
+        <Pressable
+          onPress={() => onUserPress(post.user.id)}
+          className="w-12 h-12 rounded-full bg-cream-200 items-center justify-center overflow-hidden active:opacity-70"
+        >
+          {post.user.avatar ? (
+            <Image source={{ uri: `${API_URL}${post.user.avatar}` }} style={{ width: '100%', height: '100%' }} />
+          ) : (
+            <Text className="text-xs font-semibold text-ink">
+              {initials(post.user.name)}
+            </Text>
+          )}
+        </Pressable>
+        <Pressable
+          className="flex-1 active:opacity-70"
+          onPress={() => onUserPress(post.user.id)}
+        >
+          <Text className="text-sm font-medium text-ink">{post.user.name}</Text>
+          <Text className="text-xs text-ink-soft">{timeAgo(post.created_at, lang)}</Text>
+        </Pressable>
+        <View className="rounded-full px-2.5 py-0.5" style={{ backgroundColor: meta.bg }}>
+          <Text className="text-xs font-semibold" style={{ color: meta.text }}>
+            {meta.emoji} {meta.label}
+          </Text>
+        </View>
+      </View>
+
+      {post.body.trim() && post.body.trim() !== ' ' && (
+        <Text className="text-sm text-ink leading-5 mb-3" numberOfLines={6}>{post.body.trim()}</Text>
+      )}
+
+      {/* Embedded recipe card — uses RecipeCoverPhoto header style */}
+      {post.recipe && (
+        <Pressable
+          onPress={(e) => { e.stopPropagation(); onRecipePress(post.recipe!.id); }}
+          style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#F0DEBB', marginBottom: 12 }}
+        >
+          {/* Cover — clipped to 150px so it matches the card width */}
+          <View style={{ height: 150, overflow: 'hidden' }}>
+            <RecipeCoverPhoto
+              photos={post.recipe.image_urls ?? (post.recipe.image_url ? [post.recipe.image_url] : [])}
+              collageStyle={post.recipe.collage_style ?? 'gradient'}
+              gradientKey={post.recipe.gradient_key ?? 'grad_a'}
+              fontKey={post.recipe.font_key ?? 'baloo'}
+              title={post.recipe.title}
+            />
+          </View>
+          {/* Footer bar */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fff' }}>
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000', flex: 1 }} numberOfLines={1}>
+              {post.recipe.title}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 8 }}>
+              <View style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 2 }}>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
+                  {BUDGET_LABEL[post.recipe.budget_tag] ?? post.recipe.budget_tag}
+                </Text>
+              </View>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>View →</Text>
+            </View>
+          </View>
+        </Pressable>
+      )}
+
+      {/* Post images */}
+      {Array.isArray(post.images) && post.images.length > 0 && (
+        post.images.length === 1 ? (
+          <Image
+            source={{ uri: post.images[0] }}
+            className="w-full rounded-xl mb-3"
+            style={{ height: 200, resizeMode: 'cover' }}
+          />
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-3"
+            style={{ marginHorizontal: -16 }}
+            contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
+          >
+            {post.images.map((uri, i) => (
+              <Image
+                key={i}
+                source={{ uri }}
+                style={{ width: 160, height: 140, borderRadius: 10, resizeMode: 'cover' }}
+              />
+            ))}
+          </ScrollView>
+        )
+      )}
+
+      <View className="flex-row gap-5 pt-1">
+        <HeartReactButton
+          reacted={reacted}
+          count={pusoCount}
+          onPress={(e) => { e.stopPropagation(); onTogglePuso(post.id); }}
+        />
+        <View className="flex-row items-center gap-1.5">
+          <Text style={{ fontSize: 16 }}>💬</Text>
+          <Text className="text-xs text-ink-soft">{post.comments_count ?? 0}</Text>
+        </View>
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name="eye-outline" size={14} color="#B0A18C" />
+          <Text className="text-xs text-ink-soft">{formatCount(post.views_count ?? 0)}</Text>
+        </View>
+        <View style={{ flex: 1 }} />
+        <Text style={{ fontSize: 13, color: '#6F655A', alignSelf: 'center' }}>Read more →</Text>
+      </View>
+    </Pressable>
+  );
+});
 
 export default function KomunidadScreen() {
   const router       = useRouter();
@@ -210,12 +354,15 @@ export default function KomunidadScreen() {
     refetch();
   }, [feedMode, activeFilter, queryClient, refetch]);
 
-  const togglePuso = async (postId: number) => {
+  // Stable identity (no closure over reactedIds — read via the setter's
+  // updater instead) so it can be passed straight into PostCard's memo().
+  const togglePuso = useCallback(async (postId: number) => {
     if (pendingReact.current.has(postId)) return;
     pendingReact.current.add(postId);
 
-    const wasReacted = reactedIds.has(postId);
+    let wasReacted = false;
     setReactedIds((prev) => {
+      wasReacted = prev.has(postId);
       const next = new Set(prev);
       wasReacted ? next.delete(postId) : next.add(postId);
       return next;
@@ -240,129 +387,26 @@ export default function KomunidadScreen() {
     } finally {
       pendingReact.current.delete(postId);
     }
-  };
+  }, []);
 
-  const renderPost = ({ item: post }: { item: Post }) => {
-    const meta      = TYPE_META[post.post_type] ?? TYPE_META.general;
-    const reacted   = reactedIds.has(post.id);
-    const pusoCount = pusoCounts[post.id] ?? post.puso_count;
+  // Stable callback identities — required for PostCard's memo() to
+  // actually skip re-rendering unaffected cards.
+  const navigateToPost   = useCallback((id: number) => router.push(`/post/${id}` as any), [router]);
+  const navigateToUser   = useCallback((userId: number) => router.push(`/user/${userId}` as any), [router]);
+  const navigateToRecipe = useCallback((recipeId: number) => router.push(`/recipe/${recipeId}` as any), [router]);
 
-    return (
-      <Pressable
-        onPress={() => router.push(`/post/${post.id}` as any)}
-        className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 mx-4 active:opacity-95"
-      >
-        <View className="flex-row items-center gap-3 mb-3">
-          <Pressable
-            onPress={() => router.push(`/user/${post.user.id}` as any)}
-            className="w-12 h-12 rounded-full bg-cream-200 items-center justify-center overflow-hidden active:opacity-70"
-          >
-            {post.user.avatar ? (
-              <Image source={{ uri: `${API_URL}${post.user.avatar}` }} style={{ width: '100%', height: '100%' }} />
-            ) : (
-              <Text className="text-xs font-semibold text-ink">
-                {initials(post.user.name)}
-              </Text>
-            )}
-          </Pressable>
-          <Pressable
-            className="flex-1 active:opacity-70"
-            onPress={() => router.push(`/user/${post.user.id}` as any)}
-          >
-            <Text className="text-sm font-medium text-ink">{post.user.name}</Text>
-            <Text className="text-xs text-ink-soft">{timeAgo(post.created_at, lang)}</Text>
-          </Pressable>
-          <View className="rounded-full px-2.5 py-0.5" style={{ backgroundColor: meta.bg }}>
-            <Text className="text-xs font-semibold" style={{ color: meta.text }}>
-              {meta.emoji} {meta.label}
-            </Text>
-          </View>
-        </View>
-
-        {post.body.trim() && post.body.trim() !== ' ' && (
-          <Text className="text-sm text-ink leading-5 mb-3" numberOfLines={6}>{post.body.trim()}</Text>
-        )}
-
-        {/* Embedded recipe card — uses RecipeCoverPhoto header style */}
-        {post.recipe && (
-          <Pressable
-            onPress={(e) => { e.stopPropagation(); router.push(`/recipe/${post.recipe!.id}` as any); }}
-            style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#F0DEBB', marginBottom: 12 }}
-          >
-            {/* Cover — clipped to 150px so it matches the card width */}
-            <View style={{ height: 150, overflow: 'hidden' }}>
-              <RecipeCoverPhoto
-                photos={post.recipe.image_urls ?? (post.recipe.image_url ? [post.recipe.image_url] : [])}
-                collageStyle={post.recipe.collage_style ?? 'gradient'}
-                gradientKey={post.recipe.gradient_key ?? 'grad_a'}
-                fontKey={post.recipe.font_key ?? 'baloo'}
-                title={post.recipe.title}
-              />
-            </View>
-            {/* Footer bar */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fff' }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000', flex: 1 }} numberOfLines={1}>
-                {post.recipe.title}
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 8 }}>
-                <View style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 2 }}>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
-                    {BUDGET_LABEL[post.recipe.budget_tag] ?? post.recipe.budget_tag}
-                  </Text>
-                </View>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>View →</Text>
-              </View>
-            </View>
-          </Pressable>
-        )}
-
-        {/* Post images */}
-        {Array.isArray(post.images) && post.images.length > 0 && (
-          post.images.length === 1 ? (
-            <Image
-              source={{ uri: post.images[0] }}
-              className="w-full rounded-xl mb-3"
-              style={{ height: 200, resizeMode: 'cover' }}
-            />
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="mb-3"
-              style={{ marginHorizontal: -16 }}
-              contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
-            >
-              {post.images.map((uri, i) => (
-                <Image
-                  key={i}
-                  source={{ uri }}
-                  style={{ width: 160, height: 140, borderRadius: 10, resizeMode: 'cover' }}
-                />
-              ))}
-            </ScrollView>
-          )
-        )}
-
-        <View className="flex-row gap-5 pt-1">
-          <HeartReactButton
-            reacted={reacted}
-            count={pusoCount}
-            onPress={(e) => { e.stopPropagation(); togglePuso(post.id); }}
-          />
-          <View className="flex-row items-center gap-1.5">
-            <Text style={{ fontSize: 16 }}>💬</Text>
-            <Text className="text-xs text-ink-soft">{post.comments_count ?? 0}</Text>
-          </View>
-          <View className="flex-row items-center gap-1.5">
-            <Ionicons name="eye-outline" size={14} color="#B0A18C" />
-            <Text className="text-xs text-ink-soft">{formatCount(post.views_count ?? 0)}</Text>
-          </View>
-          <View style={{ flex: 1 }} />
-          <Text style={{ fontSize: 13, color: '#6F655A', alignSelf: 'center' }}>Read more →</Text>
-        </View>
-      </Pressable>
-    );
-  };
+  const renderPost = useCallback(({ item: post }: { item: Post }) => (
+    <PostCard
+      post={post}
+      lang={lang}
+      reacted={reactedIds.has(post.id)}
+      pusoCount={pusoCounts[post.id] ?? post.puso_count}
+      onPress={navigateToPost}
+      onUserPress={navigateToUser}
+      onRecipePress={navigateToRecipe}
+      onTogglePuso={togglePuso}
+    />
+  ), [lang, reactedIds, pusoCounts, navigateToPost, navigateToUser, navigateToRecipe, togglePuso]);
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#FFF8E8' }}>

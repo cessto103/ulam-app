@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useRouter, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState, useEffect } from 'react';
+import { memo, useCallback, useMemo, useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -659,6 +659,176 @@ const SOURCE_FILTERS: { label: string; value: SourceFilter }[] = [
   { label: 'Community', value: 'community' },
 ];
 
+// Extracted + memoized so an unrelated re-render of RecipeListView (a
+// keystroke in search, any mutation's isPending flipping, a filter tap)
+// doesn't force every visible card to tear down and rebuild — only the
+// specific card whose own data actually changed re-renders. Depends on
+// the callback props staying referentially stable (useCallback in the
+// parent) for the memo comparison to actually pay off.
+const RecipeCard = memo(function RecipeCard({
+  recipe: r,
+  onPress,
+  onEdit,
+  onDelete,
+  onToggleSave,
+  onShare,
+  shareDisabled,
+}: {
+  recipe: Recipe;
+  onPress: (id: number) => void;
+  onEdit: (id: number) => void;
+  onDelete: (recipe: Recipe) => void;
+  onToggleSave: (recipe: Recipe) => void;
+  onShare: (id: number) => void;
+  shareDisabled: boolean;
+}) {
+  const router = useRouter();
+  const isMine   = r.is_mine;
+  const totalMin = (r.prep_time_minutes ?? 0) + (r.cook_time_minutes ?? 0);
+  const photos   = r.image_urls ?? (r.image_url ? [r.image_url] : []);
+
+  return (
+    <Pressable
+      onPress={() => onPress(r.id)}
+      style={{
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        borderWidth: isMine ? 1.5 : 0.5,
+        borderColor: isMine ? '#E3A32A' : '#F0DEBB',
+        marginBottom: 12,
+        marginHorizontal: 16,
+        overflow: 'hidden',
+      }}
+      className="active:opacity-80"
+    >
+      {/* Cover photo */}
+      <RecipeCoverPhoto
+        photos={photos}
+        collageStyle={r.collage_style ?? 'gradient'}
+        gradientKey={r.gradient_key ?? 'grad_a'}
+        fontKey={r.font_key ?? 'baloo'}
+        title={r.title}
+      />
+
+      {/* Card body */}
+      <View style={{ padding: 14 }}>
+        {/* Source badge + action icons */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
+          <SourceBadge source={r.source} isMine={isMine} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            {isMine && (
+              <>
+                <Pressable
+                  onPress={(e) => { e.stopPropagation(); onEdit(r.id); }}
+                  hitSlop={8}
+                >
+                  <Ionicons name="create-outline" size={18} color="#E3A32A" />
+                </Pressable>
+                <Pressable
+                  onPress={(e) => { e.stopPropagation(); onDelete(r); }}
+                  hitSlop={8}
+                >
+                  <Ionicons name="trash-outline" size={18} color="#E24B4A" />
+                </Pressable>
+              </>
+            )}
+            <Pressable
+              onPress={(e) => { e.stopPropagation(); onToggleSave(r); }}
+              hitSlop={8}
+            >
+              <Ionicons
+                name={r.is_saved ? 'bookmark' : 'bookmark-outline'}
+                size={20}
+                color={r.is_saved ? '#F4B942' : '#D3C5AB'}
+              />
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Author row (community only) */}
+        {!isMine && r.source === 'community' && r.user && (
+          <Pressable
+            onPress={(e) => { e.stopPropagation(); router.push(`/user/${r.user!.id}` as any); }}
+            style={{ marginBottom: 5 }}
+          >
+              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
+                by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{r.user.name}</Text>
+              </Text>
+          </Pressable>
+        )}
+
+        {/* Title + description */}
+        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
+          {r.title}
+        </Text>
+        <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
+          {r.description}
+        </Text>
+
+        {/* Meta chips */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12' }}>
+              {BUDGET_LABEL[r.budget_tag] ?? r.budget_tag}
+            </Text>
+          </View>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.servings} servings</Text>
+          {totalMin > 0 && <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{totalMin} min</Text>}
+        </View>
+
+        {/* Reactions + share row */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 10, paddingTop: 8, borderTopWidth: 0.5, borderTopColor: '#F0DEBB' }}>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>👍 {r.vote_up_count ?? 0}</Text>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>👎 {r.vote_down_count ?? 0}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Ionicons name="bookmark-outline" size={12} color="#6F655A" />
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.save_count}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Ionicons name="eye-outline" size={12} color="#6F655A" />
+            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{formatCount(r.views_count ?? 0)}</Text>
+          </View>
+          {(r.share_count ?? 0) > 0 && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Ionicons name="paper-plane-outline" size={12} color="#6F655A" />
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.share_count}</Text>
+            </View>
+          )}
+          {isMine && (
+            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 6 }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+                {r.is_published ? 'Public' : 'Private'}
+              </Text>
+              <ShareToggle
+                value={r.is_published}
+                onPress={() => onShare(r.id)}
+                disabled={shareDisabled}
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Publish status chip */}
+        {isMine && (
+          <View style={{ marginTop: 6, alignItems: 'flex-end' }}>
+            {r.is_published ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
+                <Ionicons name="checkmark" size={10} color="#5E693F" />
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#5E693F' }}>Public – visible to community</Text>
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#F9EDD3', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
+                <Ionicons name="lock-closed-outline" size={10} color="#6F655A" />
+                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A' }}>Private – only you can see this</Text>
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+    </Pressable>
+  );
+});
+
 function RecipeListView({ initialFilter }: { initialFilter?: string }) {
   const router = useRouter();
   const qc = useQueryClient();
@@ -715,12 +885,32 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
     onSettled: () => qc.invalidateQueries({ queryKey: ['recipes'] }),
   });
 
-  const toggleSave = async (r: Recipe) => {
-    try {
-      await client.post(`/recipes/${r.id}/save`);
-      qc.invalidateQueries({ queryKey: ['recipes'] });
-    } catch {}
-  };
+  // Optimistic toggle for save/unsave — was firing the request and waiting
+  // for a full refetch before the bookmark icon changed at all, which read
+  // as "not saving" since there was no immediate feedback.
+  const saveMutation = useMutation({
+    mutationFn: (id: number) => client.post(`/recipes/${id}/save`).then(r => r.data),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['recipes', budgetFilter, debouncedSearch] });
+      const prev = qc.getQueryData<RecipePage>(['recipes', budgetFilter, debouncedSearch]);
+      qc.setQueryData<RecipePage>(['recipes', budgetFilter, debouncedSearch], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.map(r => r.id === id
+            ? { ...r, is_saved: !r.is_saved, save_count: r.save_count + (r.is_saved ? -1 : 1) }
+            : r),
+        };
+      });
+      return { prev };
+    },
+    onError: (_e, _id, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['recipes', budgetFilter, debouncedSearch], ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['recipes'] }),
+  });
+
+  const toggleSave = useCallback((r: Recipe) => saveMutation.mutate(r.id), [saveMutation]);
 
   const { mutate: deleteRecipe } = useMutation({
     mutationFn: (id: number) => client.delete(`/recipes/${id}`),
@@ -728,7 +918,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
     onError: () => Alert.alert('Error', lang === 'en' ? 'Could not delete recipe.' : 'Hindi mabura ang recipe.'),
   });
 
-  const confirmDeleteRecipe = (r: Recipe) => {
+  const confirmDeleteRecipe = useCallback((r: Recipe) => {
     Alert.alert(
       lang === 'en' ? 'Delete this recipe?' : 'Burahin ang recipe na ito?',
       lang === 'en'
@@ -739,7 +929,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
         { text: lang === 'en' ? 'Delete' : 'Burahin', style: 'destructive', onPress: () => deleteRecipe(r.id) },
       ],
     );
-  };
+  }, [lang, deleteRecipe]);
 
   const { mutate: deleteAllRecipes, isPending: isDeletingAll } = useMutation({
     mutationFn: () => client.delete('/recipes'),
@@ -761,11 +951,15 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
   };
 
   const allRecipes = data?.data ?? [];
-  const official  = allRecipes.filter(r => !r.is_mine && r.source === 'official');
-  const community = allRecipes.filter(r => !r.is_mine && r.source === 'community');
-  const mine      = allRecipes.filter(r => r.is_mine);
+  // Memoized so an unrelated re-render (search keystroke, a mutation's
+  // isPending flip) doesn't recompute new array/object references every
+  // time — that alone would defeat RecipeCard's memoization below, since
+  // SectionList would see a "new" sections prop and re-render everything.
+  const official  = useMemo(() => allRecipes.filter(r => !r.is_mine && r.source === 'official'),  [allRecipes]);
+  const community = useMemo(() => allRecipes.filter(r => !r.is_mine && r.source === 'community'), [allRecipes]);
+  const mine      = useMemo(() => allRecipes.filter(r => r.is_mine),                               [allRecipes]);
 
-  const sections: Section[] = sourceFilter === 'all'
+  const sections: Section[] = useMemo(() => sourceFilter === 'all'
     ? [
         ...(official.length  ? [{ key: 'official',  title: 'Official recipes',  data: official }]  : []),
         ...(community.length ? [{ key: 'community', title: 'Community recipes', data: community }] : []),
@@ -775,154 +969,26 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
       ? (mine.length      ? [{ key: 'mine',      title: 'Your recipes',      data: mine }]      : [])
       : sourceFilter === 'official'
         ? (official.length  ? [{ key: 'official',  title: 'Official recipes',  data: official }]  : [])
-        : (community.length ? [{ key: 'community', title: 'Community recipes', data: community }] : []);
+        : (community.length ? [{ key: 'community', title: 'Community recipes', data: community }] : []),
+    [sourceFilter, official, community, mine]);
 
-  const renderRecipe = ({ item: r }: { item: Recipe }) => {
-    const isMine   = r.is_mine;
-    const totalMin = (r.prep_time_minutes ?? 0) + (r.cook_time_minutes ?? 0);
-    const photos   = r.image_urls ?? (r.image_url ? [r.image_url] : []);
+  // Stable callback identities — required for RecipeCard's memo() to
+  // actually skip re-rendering unaffected cards.
+  const navigateToRecipe = useCallback((id: number) => router.push(`/recipe/${id}` as any), [router]);
+  const navigateToEdit   = useCallback((id: number) => router.push(`/edit-recipe/${id}` as any), [router]);
+  const shareRecipe      = useCallback((id: number) => shareMutation.mutate(id), [shareMutation]);
 
-    return (
-      <Pressable
-        onPress={() => router.push(`/recipe/${r.id}` as any)}
-        style={{
-          backgroundColor: '#fff',
-          borderRadius: 16,
-          borderWidth: isMine ? 1.5 : 0.5,
-          borderColor: isMine ? '#E3A32A' : '#F0DEBB',
-          marginBottom: 12,
-          marginHorizontal: 16,
-          overflow: 'hidden',
-        }}
-        className="active:opacity-80"
-      >
-        {/* Cover photo */}
-        <RecipeCoverPhoto
-          photos={photos}
-          collageStyle={r.collage_style ?? 'gradient'}
-          gradientKey={r.gradient_key ?? 'grad_a'}
-          fontKey={r.font_key ?? 'baloo'}
-          title={r.title}
-        />
-
-        {/* Card body */}
-        <View style={{ padding: 14 }}>
-          {/* Source badge + action icons */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
-            <SourceBadge source={r.source} isMine={isMine} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              {isMine && (
-                <>
-                  <Pressable
-                    onPress={(e) => { e.stopPropagation(); router.push(`/edit-recipe/${r.id}` as any); }}
-                    hitSlop={8}
-                  >
-                    <Ionicons name="create-outline" size={18} color="#E3A32A" />
-                  </Pressable>
-                  <Pressable
-                    onPress={(e) => { e.stopPropagation(); confirmDeleteRecipe(r); }}
-                    hitSlop={8}
-                  >
-                    <Ionicons name="trash-outline" size={18} color="#E24B4A" />
-                  </Pressable>
-                </>
-              )}
-              <Pressable
-                onPress={(e) => { e.stopPropagation(); toggleSave(r); }}
-                hitSlop={8}
-              >
-                <Ionicons
-                  name={r.is_saved ? 'bookmark' : 'bookmark-outline'}
-                  size={20}
-                  color={r.is_saved ? '#F4B942' : '#D3C5AB'}
-                />
-              </Pressable>
-            </View>
-          </View>
-
-          {/* Author row (community only) */}
-          {!isMine && r.source === 'community' && r.user && (
-            <Pressable
-              onPress={(e) => { e.stopPropagation(); router.push(`/user/${r.user!.id}` as any); }}
-              style={{ marginBottom: 5 }}
-            >
-              <Text style={{ fontSize: 13, fontFamily: 'NunitoSans_400Regular', color: '#6F655A' }}>
-                by <Text style={{ fontFamily: 'NunitoSans_700Bold', color: '#000000' }}>{r.user.name}</Text>
-              </Text>
-            </Pressable>
-          )}
-
-          {/* Title + description */}
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
-            {r.title}
-          </Text>
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
-            {r.description}
-          </Text>
-
-          {/* Meta chips */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12' }}>
-                {BUDGET_LABEL[r.budget_tag] ?? r.budget_tag}
-              </Text>
-            </View>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.servings} servings</Text>
-            {totalMin > 0 && <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{totalMin} min</Text>}
-          </View>
-
-          {/* Reactions + share row */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 10, paddingTop: 8, borderTopWidth: 0.5, borderTopColor: '#F0DEBB' }}>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>👍 {r.vote_up_count ?? 0}</Text>
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>👎 {r.vote_down_count ?? 0}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Ionicons name="bookmark-outline" size={12} color="#6F655A" />
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.save_count}</Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Ionicons name="eye-outline" size={12} color="#6F655A" />
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{formatCount(r.views_count ?? 0)}</Text>
-            </View>
-            {(r.share_count ?? 0) > 0 && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Ionicons name="paper-plane-outline" size={12} color="#6F655A" />
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{r.share_count}</Text>
-              </View>
-            )}
-            {isMine && (
-              <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-                  {r.is_published ? 'Public' : 'Private'}
-                </Text>
-                <ShareToggle
-                  value={r.is_published}
-                  onPress={() => shareMutation.mutate(r.id)}
-                  disabled={shareMutation.isPending && shareMutation.variables === r.id}
-                />
-              </View>
-            )}
-          </View>
-
-          {/* Publish status chip */}
-          {isMine && (
-            <View style={{ marginTop: 6, alignItems: 'flex-end' }}>
-              {r.is_published ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-                  <Ionicons name="checkmark" size={10} color="#5E693F" />
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#5E693F' }}>Public – visible to community</Text>
-                </View>
-              ) : (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#F9EDD3', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-                  <Ionicons name="lock-closed-outline" size={10} color="#6F655A" />
-                  <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A' }}>Private – only you can see this</Text>
-                </View>
-              )}
-            </View>
-          )}
-        </View>
-      </Pressable>
-    );
-  };
+  const renderRecipe = useCallback(({ item: r }: { item: Recipe }) => (
+    <RecipeCard
+      recipe={r}
+      onPress={navigateToRecipe}
+      onEdit={navigateToEdit}
+      onDelete={confirmDeleteRecipe}
+      onToggleSave={toggleSave}
+      onShare={shareRecipe}
+      shareDisabled={shareMutation.isPending && shareMutation.variables === r.id}
+    />
+  ), [navigateToRecipe, navigateToEdit, confirmDeleteRecipe, toggleSave, shareRecipe, shareMutation.isPending, shareMutation.variables]);
 
   const ListHeader = (
     <>
