@@ -121,8 +121,13 @@ export default function KomunidadScreen() {
   // Collapsing header: the title/subtitle portion shrinks away on scroll-down,
   // letting the All/Following tabs and filter chips ride up to sit right below
   // the pinned logo/avatar row, then everything slides back down at the top.
-  const [headerHeight, setHeaderHeight] = useState<number | null>(null);
-  const [pinnedHeight, setPinnedHeight] = useState<number | null>(null);
+  // Both the header and the tabs/filters block are absolutely positioned
+  // overlays on top of the FlatList — never layout siblings of it — so
+  // animating them never resizes the FlatList's own box while it's being
+  // actively scrolled (that was causing the scroll jitter).
+  const [headerHeight, setHeaderHeight]         = useState<number | null>(null);
+  const [pinnedHeight, setPinnedHeight]         = useState<number | null>(null);
+  const [tabsFilterHeight, setTabsFilterHeight] = useState(0);
   const scrollY = useRef(new Animated.Value(0)).current;
   const animatedHeaderHeight = (headerHeight != null && pinnedHeight != null)
     ? scrollY.interpolate({
@@ -130,7 +135,8 @@ export default function KomunidadScreen() {
         outputRange: [headerHeight, pinnedHeight],
         extrapolate: 'clamp',
       })
-    : undefined;
+    : (headerHeight ?? 0);
+  const contentTopPadding = (headerHeight ?? 0) + tabsFilterHeight;
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['community-feed', feedMode, activeFilter, page],
@@ -334,66 +340,6 @@ export default function KomunidadScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#FFF8E8' }}>
-      <Animated.View style={{ height: animatedHeaderHeight, overflow: 'hidden' }}>
-        <View onLayout={(e) => { if (headerHeight == null) setHeaderHeight(e.nativeEvent.layout.height); }}>
-          <GradientPageHeader
-            title={lang === 'en' ? 'Community' : 'Komunidad'}
-            subtitle={lang === 'en' ? 'Tips, prices, and favorite recipes from your neighbors.' : 'Mga tip, presyo, at paboritong recipe ng kapitbahay.'}
-            rightSlot={<HeaderIconRow />}
-            photo
-            onTopRowLayout={(h) => { if (pinnedHeight == null) setPinnedHeight(h); }}
-          />
-        </View>
-      </Animated.View>
-
-      {/* Feed mode tabs (Lahat | Sinusundan) */}
-      <View className="flex-row bg-cream-200 rounded-xl mx-4 p-1 mb-3 mt-1">
-        {([
-          { key: 'all',       icon: 'earth' as const,  label: lang === 'en' ? 'All' : 'Lahat' },
-          { key: 'following', icon: 'people' as const, label: lang === 'en' ? 'Following' : 'Sinusundan' },
-        ] as const).map((m) => {
-          const active = feedMode === m.key;
-          return (
-            <Pressable
-              key={m.key}
-              onPress={() => changeFeedMode(m.key)}
-              className={`flex-1 flex-row items-center justify-center gap-1.5 rounded-lg py-2 ${active ? 'bg-olive-400' : ''}`}
-            >
-              <Ionicons
-                name={active ? m.icon : (`${m.icon}-outline` as any)}
-                size={13}
-                color={active ? '#fff' : '#B0A18C'}
-              />
-              <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#6F655A' }}>
-                {m.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {/* Type filter chips — only in "Lahat" mode */}
-      {feedMode === 'all' && (
-        <View className="flex-row gap-2 px-4 pb-3">
-          {TYPE_FILTERS.map((f) => {
-            const active = activeFilter === f.value;
-            return (
-              <Pressable
-                key={f.label}
-                onPress={() => changeFilter(f.value)}
-                className={`rounded-full px-3 py-1.5 ${
-                  active ? 'bg-olive-400' : 'bg-white border border-cream-300'
-                }`}
-              >
-                <Text className={`text-xs font-medium ${active ? 'text-white' : 'text-ink-soft'}`}>
-                  {f.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
-
       <FlatList
         data={allPosts}
         keyExtractor={(item) => String(item.id)}
@@ -449,10 +395,78 @@ export default function KomunidadScreen() {
             <View style={{ height: 32 }} />
           )
         }
-        contentContainerStyle={{ paddingTop: 4, paddingBottom: 12 }}
+        contentContainerStyle={{ paddingTop: contentTopPadding + 4, paddingBottom: 12 }}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
         scrollEventThrottle={16}
       />
+
+      {/* Collapsing header — absolute overlay, never a layout sibling of the
+          FlatList, so animating it can't disturb the list's own scroll gesture. */}
+      <Animated.View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: animatedHeaderHeight, overflow: 'hidden', zIndex: 2 }}>
+        <View onLayout={(e) => { if (headerHeight == null) setHeaderHeight(e.nativeEvent.layout.height); }}>
+          <GradientPageHeader
+            title={lang === 'en' ? 'Community' : 'Komunidad'}
+            subtitle={lang === 'en' ? 'Tips, prices, and favorite recipes from your neighbors.' : 'Mga tip, presyo, at paboritong recipe ng kapitbahay.'}
+            rightSlot={<HeaderIconRow />}
+            photo
+            onTopRowLayout={(h) => { if (pinnedHeight == null) setPinnedHeight(h); }}
+          />
+        </View>
+      </Animated.View>
+
+      {/* Tabs + filters — also an absolute overlay, fixed height, riding up via
+          `top` tracking the header's current bottom edge until it settles. */}
+      <Animated.View style={{ position: 'absolute', top: animatedHeaderHeight, left: 0, right: 0, zIndex: 1, backgroundColor: '#FFF8E8' }}>
+        <View onLayout={(e) => setTabsFilterHeight(e.nativeEvent.layout.height)}>
+          {/* Feed mode tabs (Lahat | Sinusundan) */}
+          <View className="flex-row bg-cream-200 rounded-xl mx-4 p-1 mb-3 mt-1">
+            {([
+              { key: 'all',       icon: 'earth' as const,  label: lang === 'en' ? 'All' : 'Lahat' },
+              { key: 'following', icon: 'people' as const, label: lang === 'en' ? 'Following' : 'Sinusundan' },
+            ] as const).map((m) => {
+              const active = feedMode === m.key;
+              return (
+                <Pressable
+                  key={m.key}
+                  onPress={() => changeFeedMode(m.key)}
+                  className={`flex-1 flex-row items-center justify-center gap-1.5 rounded-lg py-2 ${active ? 'bg-olive-400' : ''}`}
+                >
+                  <Ionicons
+                    name={active ? m.icon : (`${m.icon}-outline` as any)}
+                    size={13}
+                    color={active ? '#fff' : '#B0A18C'}
+                  />
+                  <Text style={{ fontFamily: active ? 'NunitoSans_700Bold' : 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#6F655A' }}>
+                    {m.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {/* Type filter chips — only in "Lahat" mode */}
+          {feedMode === 'all' && (
+            <View className="flex-row gap-2 px-4 pb-3">
+              {TYPE_FILTERS.map((f) => {
+                const active = activeFilter === f.value;
+                return (
+                  <Pressable
+                    key={f.label}
+                    onPress={() => changeFilter(f.value)}
+                    className={`rounded-full px-3 py-1.5 ${
+                      active ? 'bg-olive-400' : 'bg-white border border-cream-300'
+                    }`}
+                  >
+                    <Text className={`text-xs font-medium ${active ? 'text-white' : 'text-ink-soft'}`}>
+                      {f.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+        </View>
+      </Animated.View>
     </View>
   );
 }

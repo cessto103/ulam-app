@@ -5,6 +5,11 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.28.4] — 2026-07-17
+
+### Fixed
+- **Community and Prices tabs**: fixed the feed shaking/jittering while scrolling under the collapsing header. Root cause was the header shrinking as a real layout sibling of the list, which resized the list's own box while it was being actively dragged and fought with native scroll tracking. The header (and, on Community, the tabs/filter row) are now absolute overlays on top of the list instead, so the list's own box never changes size during a scroll gesture.
+
 ## [1.28.3] — 2026-07-17
 
 Collapsing-header polish, a real regional-coverage fix for Report a Price, and a themed header pass on three utility pages.

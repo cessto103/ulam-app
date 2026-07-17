@@ -148,7 +148,10 @@ export default function PresyoScreen() {
 
   // Collapsing header: same pattern as the Community tab — the title/subtitle
   // portion shrinks away on scroll-down so more of the list is visible, while
-  // the logo/avatar row stays pinned near the top.
+  // the logo/avatar row stays pinned near the top. It's an absolute overlay
+  // on top of the ScrollView (not a layout sibling), so animating it never
+  // resizes the ScrollView's own box while it's being actively dragged —
+  // resizing an actively-scrolling view's box is what caused the jitter.
   const [headerHeight, setHeaderHeight] = useState<number | null>(null);
   const [pinnedHeight, setPinnedHeight] = useState<number | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -158,7 +161,7 @@ export default function PresyoScreen() {
         outputRange: [headerHeight, pinnedHeight],
         extrapolate: 'clamp',
       })
-    : undefined;
+    : (headerHeight ?? 0);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -220,21 +223,10 @@ export default function PresyoScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#FFF8E8' }}>
-      <Animated.View style={{ height: animatedHeaderHeight, overflow: 'hidden' }}>
-        <View onLayout={(e) => { if (headerHeight == null) setHeaderHeight(e.nativeEvent.layout.height); }}>
-          <GradientPageHeader
-            title={lang === 'en' ? 'Prices' : 'Presyo'}
-            subtitle={lang === 'en' ? 'Compare prices and help the community.' : 'Maghambing ng presyo at tumulong sa komunidad.'}
-            rightSlot={<HeaderIconRow />}
-            photo
-            onTopRowLayout={(h) => { if (pinnedHeight == null) setPinnedHeight(h); }}
-          />
-        </View>
-      </Animated.View>
-
       <ScrollView
         className="flex-1"
         contentContainerClassName="pb-8"
+        contentContainerStyle={{ paddingTop: headerHeight ?? 0 }}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />
@@ -577,6 +569,20 @@ export default function PresyoScreen() {
       </View>
       </View>
       </ScrollView>
+
+      {/* Collapsing header — absolute overlay, never a layout sibling of the
+          ScrollView, so animating it can't disturb the list's own scroll gesture. */}
+      <Animated.View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: animatedHeaderHeight, overflow: 'hidden' }}>
+        <View onLayout={(e) => { if (headerHeight == null) setHeaderHeight(e.nativeEvent.layout.height); }}>
+          <GradientPageHeader
+            title={lang === 'en' ? 'Prices' : 'Presyo'}
+            subtitle={lang === 'en' ? 'Compare prices and help the community.' : 'Maghambing ng presyo at tumulong sa komunidad.'}
+            rightSlot={<HeaderIconRow />}
+            photo
+            onTopRowLayout={(h) => { if (pinnedHeight == null) setPinnedHeight(h); }}
+          />
+        </View>
+      </Animated.View>
     </View>
   );
 }
