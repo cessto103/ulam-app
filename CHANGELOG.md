@@ -5,6 +5,11 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.28.6] — 2026-07-17
+
+### Fixed
+- **Community feed's collapsing header stuttered while Prices' didn't**: Community's list virtualizes/recycles post cards as you scroll, which keeps the JS thread busy enough that continuously tracking scroll position to drive the header's collapse (a JS-thread-only animation — height/position can't run on the native thread) visibly lagged and jumped a few pixels behind. Switched to a threshold-triggered snap: the header now smoothly animates between expanded/collapsed once via a single short transition when you cross a scroll threshold, instead of trying to update on every scroll frame. Prices (a plain, non-virtualized list) was already smooth and is unchanged.
+
 ## [1.28.5] — 2026-07-17
 
 ### Fixed

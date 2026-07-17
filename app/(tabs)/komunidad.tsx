@@ -13,6 +13,8 @@ import {
   Animated,
   FlatList,
   Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -125,19 +127,37 @@ export default function KomunidadScreen() {
   // overlays on top of the FlatList — never layout siblings of it — so
   // animating them never resizes the FlatList's own box while it's being
   // actively scrolled (that was causing the scroll jitter).
+  //
+  // Unlike Prices (a plain ScrollView), this list virtualizes/recycles cells
+  // as you scroll, which keeps the JS thread busy enough that a continuous
+  // scroll-position-driven interpolation (height/top can't run on the native
+  // thread) visibly lags and jumps. Snapping between two states past a
+  // threshold — a single short Animated.timing per crossing, not one update
+  // per scroll frame — sidesteps that instead of fighting it.
+  const COLLAPSE_THRESHOLD = 40;
   const [headerHeight, setHeaderHeight]         = useState<number | null>(null);
   const [pinnedHeight, setPinnedHeight]         = useState<number | null>(null);
   const [tabsFilterHeight, setTabsFilterHeight] = useState(0);
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const collapseProgress = useRef(new Animated.Value(0)).current;
+  const isCollapsedRef   = useRef(false);
+
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const shouldCollapse = e.nativeEvent.contentOffset.y > COLLAPSE_THRESHOLD;
+    if (shouldCollapse !== isCollapsedRef.current) {
+      isCollapsedRef.current = shouldCollapse;
+      Animated.timing(collapseProgress, {
+        toValue: shouldCollapse ? 1 : 0,
+        duration: 220,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [collapseProgress]);
+
   // The header's own height stays `undefined` (auto-size) until measured —
   // constraining it to 0 pre-measurement stops its child from ever reporting
   // a natural size via onLayout, so headerHeight would never leave null.
   const animatedHeaderHeight = (headerHeight != null && pinnedHeight != null)
-    ? scrollY.interpolate({
-        inputRange: [0, Math.max(headerHeight - pinnedHeight, 1)],
-        outputRange: [headerHeight, pinnedHeight],
-        extrapolate: 'clamp',
-      })
+    ? collapseProgress.interpolate({ inputRange: [0, 1], outputRange: [headerHeight, pinnedHeight] })
     : undefined;
   // The tabs/filters row's `top`, unlike the header's own height, always
   // needs a concrete number (it's a position, not a self-measured box).
@@ -402,8 +422,8 @@ export default function KomunidadScreen() {
           )
         }
         contentContainerStyle={{ paddingTop: contentTopPadding + 4, paddingBottom: 12 }}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
-        scrollEventThrottle={16}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
       />
 
       {/* Collapsing header — absolute overlay, never a layout sibling of the
