@@ -5,6 +5,18 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.30.1] — 2026-07-17
+
+### Changed
+- **"Saved" tab removed from the Awards screen** — saved recipes now live at Profile > Saved Recipes (a new button right below Connections), pointing at the existing My Recipe Book screen instead of a second, separate saved-recipes list that duplicated it.
+- **My Insights, Seller Subscription, and My Store headers** now use the app's terracotta gradient theme instead of plain white, matching the rest of the app. Seller Subscription's refresh icon and My Store's Add button were recolored to white/light so they stay visible against the new background instead of nearly disappearing into it.
+
+### Added
+- **Community post images are now tappable** — opens a full-screen enlarged view with a close button.
+
+### Fixed
+- **Community's type filter chips (All/Recipes/Price Tips/etc.) could get pushed off-screen** with no way to reach them, same issue as the Prices page radius chips fixed earlier — that row is now horizontally scrollable.
+
 ## [1.30.0] — 2026-07-17
 
 ### Added

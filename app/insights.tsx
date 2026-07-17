@@ -2,12 +2,15 @@ import client from '@/src/api/client';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Dimensions, ScrollView, Text, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 type Period = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type Metric = 'posts_count' | 'posts_engagement' | 'recipes_count' | 'recipes_engagement' | 'store_popularity';
@@ -158,28 +161,29 @@ export default function InsightsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
-      <View
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={{
           paddingTop: insets.top + 8,
-          paddingBottom: 12,
+          paddingBottom: 14,
           paddingHorizontal: 16,
-          backgroundColor: '#fff',
-          borderBottomWidth: 1,
-          borderBottomColor: '#F9EDD3',
         }}
       >
         <View className="flex-row items-center gap-3">
           <Pressable
             onPress={() => router.back()}
-            className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
+            className="w-8 h-8 rounded-full items-center justify-center active:opacity-70"
+            style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
           >
-            <Ionicons name="arrow-back" size={18} color="#000000" />
+            <Ionicons name="arrow-back" size={18} color="#fff" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#fff', flex: 1 }}>
             {lang === 'en' ? 'My Insights' : 'Aking Insights'}
           </Text>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView contentContainerClassName="px-4 pt-4 pb-12">
         {/* Subscription + totals */}

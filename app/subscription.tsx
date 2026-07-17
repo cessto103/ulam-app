@@ -2,11 +2,14 @@ import client from '@/src/api/client';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, Alert, AppState, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 type PlanPrice = {
   id: number;
@@ -111,19 +114,25 @@ export default function SubscriptionScreen() {
 
   return (
     <View className="flex-1 bg-cream-50">
-      <View style={{ paddingTop: insets.top + 8 }} className="px-4 pb-3 bg-white border-b border-cream-200">
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ paddingTop: insets.top + 8 }}
+        className="px-4 pb-3"
+      >
         <View className="flex-row items-center gap-3">
-          <Pressable onPress={() => router.back()} className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center">
-            <Ionicons name="arrow-back" size={18} color="#000000" />
+          <Pressable onPress={() => router.back()} className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+            <Ionicons name="arrow-back" size={18} color="#fff" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#fff', flex: 1 }}>
             {lang === 'en' ? 'Seller Subscription' : 'Seller Subscription'}
           </Text>
           <Pressable onPress={() => catalog.refetch()} disabled={catalog.isFetching}>
-            <Ionicons name="refresh" size={20} color="#C45E3A" />
+            <Ionicons name="refresh" size={20} color="#fff" />
           </Pressable>
         </View>
-      </View>
+      </LinearGradient>
 
       {catalog.isLoading || !data ? (
         <View className="flex-1 items-center justify-center"><ActivityIndicator color="#E7653B" /></View>

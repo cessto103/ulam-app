@@ -11,8 +11,10 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
+  Dimensions,
   FlatList,
   Image,
+  Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -131,6 +133,7 @@ const PostCard = memo(function PostCard({
   onTogglePuso: (id: number) => void;
 }) {
   const meta = TYPE_META[post.post_type] ?? TYPE_META.general;
+  const [lightboxUri, setLightboxUri] = useState<string | null>(null);
 
   return (
     <Pressable
@@ -201,14 +204,16 @@ const PostCard = memo(function PostCard({
         </Pressable>
       )}
 
-      {/* Post images */}
+      {/* Post images — tap to view enlarged */}
       {Array.isArray(post.images) && post.images.length > 0 && (
         post.images.length === 1 ? (
-          <Image
-            source={{ uri: post.images[0] }}
-            className="w-full rounded-xl mb-3"
-            style={{ height: 200, resizeMode: 'cover' }}
-          />
+          <Pressable onPress={(e) => { e.stopPropagation(); setLightboxUri(post.images![0]); }}>
+            <Image
+              source={{ uri: post.images[0] }}
+              className="w-full rounded-xl mb-3"
+              style={{ height: 200, resizeMode: 'cover' }}
+            />
+          </Pressable>
         ) : (
           <ScrollView
             horizontal
@@ -218,11 +223,12 @@ const PostCard = memo(function PostCard({
             contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
           >
             {post.images.map((uri, i) => (
-              <Image
-                key={i}
-                source={{ uri }}
-                style={{ width: 160, height: 140, borderRadius: 10, resizeMode: 'cover' }}
-              />
+              <Pressable key={i} onPress={(e) => { e.stopPropagation(); setLightboxUri(uri); }}>
+                <Image
+                  source={{ uri }}
+                  style={{ width: 160, height: 140, borderRadius: 10, resizeMode: 'cover' }}
+                />
+              </Pressable>
             ))}
           </ScrollView>
         )
@@ -245,6 +251,27 @@ const PostCard = memo(function PostCard({
         <View style={{ flex: 1 }} />
         <Text style={{ fontSize: 13, color: '#6F655A', alignSelf: 'center' }}>Read more →</Text>
       </View>
+
+      <Modal visible={!!lightboxUri} transparent animationType="fade" onRequestClose={() => setLightboxUri(null)}>
+        <Pressable
+          onPress={() => setLightboxUri(null)}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', alignItems: 'center', justifyContent: 'center' }}
+        >
+          {lightboxUri && (
+            <Image
+              source={{ uri: lightboxUri }}
+              style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height * 0.75, resizeMode: 'contain' }}
+            />
+          )}
+          <Pressable
+            onPress={() => setLightboxUri(null)}
+            hitSlop={12}
+            style={{ position: 'absolute', top: 50, right: 20, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Ionicons name="close" size={20} color="#fff" />
+          </Pressable>
+        </Pressable>
+      </Modal>
     </Pressable>
   );
 });
@@ -516,7 +543,11 @@ export default function KomunidadScreen() {
 
           {/* Type filter chips — only in "Lahat" mode */}
           {feedMode === 'all' && (
-            <View className="flex-row gap-2 px-4 pb-3">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingBottom: 12 }}
+            >
               {TYPE_FILTERS.map((f) => {
                 const active = activeFilter === f.value;
                 return (
@@ -533,7 +564,7 @@ export default function KomunidadScreen() {
                   </Pressable>
                 );
               })}
-            </View>
+            </ScrollView>
           )}
         </View>
       </Animated.View>

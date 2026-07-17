@@ -1,5 +1,4 @@
 import client from '@/src/api/client';
-import AddButton from '@/src/components/AddButton';
 import ItemThumb from '@/src/components/ItemThumb';
 import { Skeleton } from '@/src/components/Skeleton';
 import { DECLINE_REASONS } from '@/src/constants/reportReasons';
@@ -7,10 +6,13 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { isStoreOpenNow, StoreHoursValue } from '@/src/types/storeHours';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Modal, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -109,29 +111,43 @@ export default function MyStoresScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
       {/* Header */}
-      <View
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={{
           paddingTop: insets.top + 8,
           paddingBottom: 12,
           paddingHorizontal: 16,
-          backgroundColor: '#fff',
-          borderBottomWidth: 1,
-          borderBottomColor: '#F9EDD3',
         }}
       >
         <View className="flex-row items-center gap-3">
           <Pressable
             onPress={() => router.back()}
-            className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
+            className="w-8 h-8 rounded-full items-center justify-center active:opacity-70"
+            style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
           >
-            <Ionicons name="arrow-back" size={18} color="#000000" />
+            <Ionicons name="arrow-back" size={18} color="#fff" />
           </Pressable>
-          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', flex: 1 }}>
+          <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#fff', flex: 1 }}>
             {lang === 'en' ? 'My Stores' : 'Aking mga Tindahan'}
           </Text>
-          <AddButton label={lang === 'en' ? 'Add' : 'Idagdag'} onPress={() => router.push('/add-listing' as any)} />
+          {/* AddButton's terracotta pill would nearly disappear against this
+              same-family gradient — inverted to white here for contrast. */}
+          <Pressable
+            onPress={() => router.push('/add-listing' as any)}
+            className="flex-row items-center gap-1.5 active:opacity-80"
+            style={{ backgroundColor: '#fff', borderRadius: 999, paddingLeft: 4, paddingRight: 12, paddingVertical: 4 }}
+          >
+            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#FDEFC9', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="add" size={15} color="#C45E3A" />
+            </View>
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 12, color: '#C45E3A' }}>
+              {lang === 'en' ? 'Add' : 'Idagdag'}
+            </Text>
+          </Pressable>
         </View>
-      </View>
+      </LinearGradient>
 
       {/* Tabs */}
       <View className="flex-row bg-cream-200 rounded-xl mx-4 mt-3 p-1">

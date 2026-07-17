@@ -10,7 +10,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { API_URL } from '@/src/api/client';
 import { Ionicons } from '@expo/vector-icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -19,7 +19,6 @@ import {
   Alert,
   FlatList,
   Image,
-  Modal,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -60,39 +59,9 @@ type DailyTaskItem = {
   frequency: 'daily' | 'weekly'; is_completed: boolean;
 };
 
-type SavedEntry = {
-  id: number; recipe_id: number;
-  recipe: {
-    id: number; title: string; budget_tag: string;
-    estimated_cost: number; servings: number;
-    prep_time_minutes: number; cook_time_minutes: number;
-    tags: string[];
-  };
-};
-
-type SavedPage = { data: SavedEntry[]; current_page: number; last_page: number };
-
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
 const LEVEL_XP = [0, 100, 250, 500, 1000, 2000, 3500, 6000, 10000, 15000];
-
-const BUDGET_LABEL: Record<string, string> = {
-  budget_100: '₱100', budget_200: '₱200', budget_400: '₱400',
-  budget_600: '₱600', budget_800: '₱800', budget_1000: '₱1,000', budget_1000plus: '₱1,000+',
-};
-
-const MEAL_TYPE_OPTIONS = [
-  { key: 'almusal',    label: 'Breakfast', emoji: '🌅' },
-  { key: 'tanghalian', label: 'Lunch',     emoji: '☀️' },
-  { key: 'meryenda',   label: 'Snack',     emoji: '🍌' },
-  { key: 'hapunan',    label: 'Dinner',    emoji: '🌙' },
-  { key: 'iba pa',     label: 'Others',    emoji: '🍽️' },
-];
-
-const TAG_EMOJI: Record<string, string> = {
-  isda: '🐟', manok: '🍗', baboy: '🥩', gulay: '🥦',
-  sabaw: '🍲', prito: '🍳', espesyal: '⭐', itlog: '🥚',
-};
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -127,11 +96,6 @@ async function fetchStats(): Promise<UserStats> {
 async function fetchDailyTasks(): Promise<DailyTaskItem[]> {
   const { data } = await client.get('/user/daily-tasks');
   return data.tasks;
-}
-
-async function fetchRecipeBook(page: number): Promise<SavedPage> {
-  const { data } = await client.get(`/recipe-book?page=${page}`);
-  return data;
 }
 
 // ─── Sub-tabs ──────────────────────────────────────────────────────────────────
@@ -318,202 +282,6 @@ function AwardsTab({
   );
 }
 
-function RecipeBookTab() {
-  const router = useRouter();
-  const qc     = useQueryClient();
-  const { lang } = useLanguage();
-  const [page, setPage] = useState(1);
-
-  const { data, isLoading } = useQuery({
-    queryKey: ['recipe-book', page],
-    queryFn:  () => fetchRecipeBook(page),
-    staleTime: 60_000,
-  });
-
-  const { mutate: unsave } = useMutation({
-    mutationFn: (recipeId: number) => client.post(`/recipes/${recipeId}/save`),
-    onSuccess:  () => qc.invalidateQueries({ queryKey: ['recipe-book'] }),
-  });
-
-  // Add-to-meal-plan modal — same flow as the recipe detail screen.
-  const [addingRecipe, setAddingRecipe] = useState<SavedEntry['recipe'] | null>(null);
-  const [mealType, setMealType] = useState('almusal');
-  const todayIso = new Date().toISOString().slice(0, 10);
-
-  const { mutate: assignMeal, isPending: assigning } = useMutation({
-    mutationFn: (payload: { date: string; meal_type: string; recipe_id: number; estimated_cost?: number }) =>
-      client.post('/meal-plan/add-item', payload),
-    onSuccess: () => {
-      setAddingRecipe(null);
-      qc.invalidateQueries({ queryKey: ['meal-plan-today'] });
-      qc.invalidateQueries({ queryKey: ['meal-plan-date'] });
-    },
-    onError: (e: any) => {
-      const slotLabel = MEAL_TYPE_OPTIONS.find(m => m.key === mealType)?.label ?? mealType;
-      const msg = e?.response?.status === 422
-        ? (lang === 'en' ? `This recipe is already in your ${slotLabel} meal plan.` : `Nasa ${slotLabel} na ang recipe na ito sa meal plan mo.`)
-        : (e?.response?.data?.message ?? (lang === 'en' ? 'Could not add to meal plan.' : 'Hindi maidagdag sa meal plan.'));
-      Alert.alert(lang === 'en' ? 'Error' : 'Error', msg);
-    },
-  });
-
-  const entries = data?.data ?? [];
-
-  if (isLoading) {
-    return (
-      <View style={{ paddingTop: 8 }}>
-        <Skeleton style={{ height: 110, marginBottom: 16 }} radius={16} />
-        {[0, 1, 2, 3].map((i) => <SkeletonListItem key={i} />)}
-      </View>
-    );
-  }
-
-  if (entries.length === 0) {
-    return (
-      <View className="items-center pt-12 px-8">
-        <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
-        <Text className="text-sm font-medium text-ink mb-2 text-center">{lang === 'en' ? 'No saved recipes yet' : 'Walang na-save pang recipe'}</Text>
-        <Text className="text-xs text-ink-soft text-center leading-5">
-          {lang === 'en' ? 'Tap 🏷️ on any recipe to save it here.' : 'Mag-tap ng 🏷️ sa kahit anong recipe para i-save dito.'}
-        </Text>
-      </View>
-    );
-  }
-
-  return (
-    <>
-      {entries.map((entry) => {
-        const r         = entry.recipe;
-        const firstTag  = r.tags?.[0];
-        const emoji     = firstTag ? (TAG_EMOJI[firstTag] ?? '🍽️') : '🍽️';
-        const totalTime = (r.prep_time_minutes ?? 0) + (r.cook_time_minutes ?? 0);
-
-        return (
-          <Pressable
-            key={entry.id}
-            onPress={() => router.push(`/recipe/${r.id}` as any)}
-            className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 active:opacity-80"
-          >
-            <View className="flex-row items-start gap-3">
-              <View className="w-11 h-11 rounded-xl bg-leaf-50 items-center justify-center shrink-0">
-                <Text style={{ fontSize: 20 }}>{emoji}</Text>
-              </View>
-              <View className="flex-1">
-                <View className="flex-row items-center gap-2 mb-0.5">
-                  <View className="rounded-full bg-gold-50 px-2 py-0.5">
-                    <Text className="text-xs font-semibold text-gold-700">
-                      {BUDGET_LABEL[r.budget_tag] ?? r.budget_tag}
-                    </Text>
-                  </View>
-                </View>
-                <Text className="text-sm font-medium text-ink mb-1">{r.title}</Text>
-                <View className="flex-row gap-3">
-                  <Text className="text-xs text-brand-600 font-semibold">
-                    ₱{Number(r.estimated_cost).toFixed(0)}
-                  </Text>
-                  <Text className="text-xs text-ink-soft">{r.servings} {lang === 'en' ? 'servings' : 'tao'}</Text>
-                  {totalTime > 0 && (
-                    <Text className="text-xs text-ink-soft">{totalTime} min</Text>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            {/* Labeled actions — icon-only buttons confused users */}
-            <View className="flex-row gap-2 mt-3 pt-3 border-t border-cream-200">
-              <Pressable
-                onPress={(e) => { e.stopPropagation(); setMealType('almusal'); setAddingRecipe(r); }}
-                className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl py-2.5 active:opacity-80"
-                style={{ backgroundColor: '#386641' }}
-              >
-                <Ionicons name="add-circle-outline" size={16} color="#fff" />
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
-                  {lang === 'en' ? 'Add to Meal Plan' : 'Idagdag sa Plan'}
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={(e) => { e.stopPropagation(); unsave(r.id); }}
-                className="flex-row items-center justify-center gap-1.5 rounded-xl py-2.5 px-4 border active:opacity-70"
-                style={{ borderColor: '#F0DEBB', backgroundColor: '#FFFCF5' }}
-              >
-                <Ionicons name="trash-outline" size={14} color="#C45E3A" />
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#6F655A' }}>
-                  {lang === 'en' ? 'Remove' : 'Alisin'}
-                </Text>
-              </Pressable>
-            </View>
-          </Pressable>
-        );
-      })}
-
-      {data && data.current_page < data.last_page && (
-        <Pressable
-          onPress={() => setPage((p) => p + 1)}
-          className="rounded-xl border border-cream-300 py-3 items-center mb-4"
-        >
-          <Text className="text-xs text-ink-soft">{lang === 'en' ? 'View more' : 'Tignan ang higit pa'}</Text>
-        </Pressable>
-      )}
-
-      {/* ── Add-to-meal-plan modal ── */}
-      <Modal visible={!!addingRecipe} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAddingRecipe(null)}>
-        <View style={{ flex: 1, backgroundColor: '#FFF8E8' }}>
-          <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
-                {lang === 'en' ? "Add to Today's Meal Plan" : "Idagdag sa Meal Plan Ngayon"}
-              </Text>
-              {addingRecipe && (
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 2 }} numberOfLines={1}>
-                  {addingRecipe.title}
-                </Text>
-              )}
-            </View>
-            <Pressable onPress={() => setAddingRecipe(null)} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F9EDD3', alignItems: 'center', justifyContent: 'center' }} className="active:opacity-70">
-              <Ionicons name="close" size={16} color="#6F655A" />
-            </Pressable>
-          </View>
-
-          <ScrollView contentContainerStyle={{ padding: 20, gap: 8 }}>
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 }}>
-              {lang === 'en' ? 'Pick meal type' : 'Pumili ng meal type'}
-            </Text>
-            {MEAL_TYPE_OPTIONS.map((mt) => {
-              const active = mt.key === mealType;
-              return (
-                <Pressable
-                  key={mt.key}
-                  onPress={() => setMealType(mt.key)}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 14, borderWidth: 1.5, borderColor: active ? '#6E7B4A' : '#F0DEBB', backgroundColor: active ? '#EFF4EC' : '#fff', marginBottom: 8 }}
-                >
-                  <Text style={{ fontSize: 20 }}>{mt.emoji}</Text>
-                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? '#5E693F' : '#000000', flex: 1 }}>{mt.label}</Text>
-                  {active && <Ionicons name="checkmark-circle" size={20} color="#6E7B4A" />}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff' }}>
-            <Pressable
-              onPress={() => {
-                if (!addingRecipe) return;
-                assignMeal({ date: todayIso, meal_type: mealType, recipe_id: addingRecipe.id, estimated_cost: addingRecipe.estimated_cost });
-              }}
-              disabled={assigning}
-              style={{ backgroundColor: '#C45E3A', borderRadius: 14, paddingVertical: 14, alignItems: 'center', opacity: assigning ? 0.7 : 1 }}
-            >
-              {assigning
-                ? <ActivityIndicator color="#fff" />
-                : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 15, color: '#fff' }}>{lang === 'en' ? 'Add to Meal Plan' : 'Idagdag sa Meal Plan'}</Text>}
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-    </>
-  );
-}
-
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 
 export default function AwardsScreen() {
@@ -521,7 +289,6 @@ export default function AwardsScreen() {
   const { t, lang } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [tab, setTab]         = useState<'awards' | 'book'>('awards');
   const [uploading, setUploading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const qc = useQueryClient();
@@ -769,41 +536,17 @@ export default function AwardsScreen() {
 
       </>}
 
-      {/* ── Tab switcher ─────────────────────────────────────────────── */}
-      <View className="flex-row bg-cream-200 rounded-xl p-1 mb-4">
-        {([
-          { key: 'awards', label: `🏆 ${lang === 'en' ? 'Awards' : 'Gantimpala'}` },
-          { key: 'book',   label: `📖 ${lang === 'en' ? 'Saved' : 'Naka-save'}` },
-        ] as const).map((t) => (
-          <Pressable
-            key={t.key}
-            onPress={() => setTab(t.key)}
-            className={`flex-1 rounded-lg py-2 items-center ${tab === t.key ? 'bg-white' : ''}`}
-            style={tab === t.key
-              ? { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 }
-              : {}}
-          >
-            <Text className={`text-xs font-semibold ${tab === t.key ? 'text-leaf-700' : 'text-ink-soft'}`}>
-              {t.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      {/* ── Tab content ──────────────────────────────────────────────── */}
-      {tab === 'awards' ? (
-        <AwardsTab
-          achievements={achievements}
-          loadingAch={loadingAch}
-          leaderData={leaderData}
-          loadingLb={loadingLb}
-          stats={stats}
-          dailyTasks={dailyTasks}
-          loadingTasks={loadingTasks}
-        />
-      ) : (
-        <RecipeBookTab />
-      )}
+      {/* Saved recipes moved to Profile > Saved Recipes — this screen is
+          Awards-only now, so there's no more tab switcher here. */}
+      <AwardsTab
+        achievements={achievements}
+        loadingAch={loadingAch}
+        leaderData={leaderData}
+        loadingLb={loadingLb}
+        stats={stats}
+        dailyTasks={dailyTasks}
+        loadingTasks={loadingTasks}
+      />
 
       {/* ── Account section ──────────────────────────────────────────── */}
       <Text className="text-xs font-medium text-ink-soft uppercase tracking-wider mb-2 mt-2">

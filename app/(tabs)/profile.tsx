@@ -243,6 +243,20 @@ export default function ProfileScreen() {
         <Text className="text-ink-soft text-base">›</Text>
       </Pressable>
 
+      {/* Saved Recipes (relocated from the Awards page's "Saved" tab) */}
+      <Pressable
+        onPress={() => router.push('/recipe-book' as any)}
+        className="flex-row items-center gap-3 rounded-2xl border border-cream-200 bg-white p-4 mb-4 active:opacity-70"
+      >
+        <View className="w-10 h-10 rounded-xl bg-gold-50 items-center justify-center">
+          <Text className="text-lg">📖</Text>
+        </View>
+        <Text className="flex-1 text-sm font-semibold text-ink">
+          {lang === 'en' ? 'Saved Recipes' : 'Na-save na Recipe'}
+        </Text>
+        <Text className="text-ink-soft text-base">›</Text>
+      </Pressable>
+
       {/* Awards & Achievements (relocated from the tab bar) */}
       <Pressable
         onPress={() => router.push('/(tabs)/awards' as any)}
