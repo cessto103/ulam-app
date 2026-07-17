@@ -129,13 +129,19 @@ export default function KomunidadScreen() {
   const [pinnedHeight, setPinnedHeight]         = useState<number | null>(null);
   const [tabsFilterHeight, setTabsFilterHeight] = useState(0);
   const scrollY = useRef(new Animated.Value(0)).current;
+  // The header's own height stays `undefined` (auto-size) until measured —
+  // constraining it to 0 pre-measurement stops its child from ever reporting
+  // a natural size via onLayout, so headerHeight would never leave null.
   const animatedHeaderHeight = (headerHeight != null && pinnedHeight != null)
     ? scrollY.interpolate({
         inputRange: [0, Math.max(headerHeight - pinnedHeight, 1)],
         outputRange: [headerHeight, pinnedHeight],
         extrapolate: 'clamp',
       })
-    : (headerHeight ?? 0);
+    : undefined;
+  // The tabs/filters row's `top`, unlike the header's own height, always
+  // needs a concrete number (it's a position, not a self-measured box).
+  const tabsOverlayTop = animatedHeaderHeight ?? (headerHeight ?? 0);
   const contentTopPadding = (headerHeight ?? 0) + tabsFilterHeight;
 
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -416,7 +422,7 @@ export default function KomunidadScreen() {
 
       {/* Tabs + filters — also an absolute overlay, fixed height, riding up via
           `top` tracking the header's current bottom edge until it settles. */}
-      <Animated.View style={{ position: 'absolute', top: animatedHeaderHeight, left: 0, right: 0, zIndex: 1, backgroundColor: '#FFF8E8' }}>
+      <Animated.View style={{ position: 'absolute', top: tabsOverlayTop, left: 0, right: 0, zIndex: 1, backgroundColor: '#FFF8E8' }}>
         <View onLayout={(e) => setTabsFilterHeight(e.nativeEvent.layout.height)}>
           {/* Feed mode tabs (Lahat | Sinusundan) */}
           <View className="flex-row bg-cream-200 rounded-xl mx-4 p-1 mb-3 mt-1">

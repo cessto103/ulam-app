@@ -155,13 +155,16 @@ export default function PresyoScreen() {
   const [headerHeight, setHeaderHeight] = useState<number | null>(null);
   const [pinnedHeight, setPinnedHeight] = useState<number | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
+  // Stays `undefined` (auto-size) until measured — constraining it to 0
+  // pre-measurement stops its child from ever reporting a natural size via
+  // onLayout, so headerHeight would never leave null.
   const animatedHeaderHeight = (headerHeight != null && pinnedHeight != null)
     ? scrollY.interpolate({
         inputRange: [0, Math.max(headerHeight - pinnedHeight, 1)],
         outputRange: [headerHeight, pinnedHeight],
         extrapolate: 'clamp',
       })
-    : (headerHeight ?? 0);
+    : undefined;
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

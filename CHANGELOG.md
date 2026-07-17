@@ -5,6 +5,11 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.28.5] — 2026-07-17
+
+### Fixed
+- **Community and Prices headers disappeared** (last release's jitter fix had a bug): the header's animated height defaulted to 0 before its first measurement, and a 0-height clipped container prevented it from ever reporting its real size back — so it stayed collapsed to nothing, with page content sitting under the status bar. The header now starts at its natural auto-size until measured, then switches to the scroll-driven animation.
+
 ## [1.28.4] — 2026-07-17
 
 ### Fixed
