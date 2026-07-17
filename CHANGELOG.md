@@ -5,6 +5,19 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.28.2] — 2026-07-17
+
+A round of layout/UX fixes across onboarding, Log Spending, Prices, budgeting, meal planning, and Report a Price, plus a smarter Community feed header.
+
+### Fixed
+- **Onboarding "Where do you live?" step**: the "Updated terms" gate now shows Terms & Conditions and Privacy Policy in a sliding-up sheet in place, instead of navigating to a separate page that ended up hidden behind the gate's own overlay. The "I have read and agree" button no longer sits under the Android navigation bar.
+- **Onboarding budget field ("Or enter your own amount")**: every keystroke was closing the keyboard, forcing you to tap back into the field for each digit. Root cause was each onboarding step being redefined as a new component on every render (losing focus on re-render); all four steps are now stable components.
+- **Log Spending**: removed a duplicate header (native router header stacked on top of the screen's own header) and fixed the bottom of the confirmation screen overlapping the Android navigation bar.
+- **Prices page**: the "Within 3/5/10/15 km" radius chips and Map button could get pushed off-screen with no way to reach them; that row is now horizontally scrollable.
+- **Add to Today's Meal Plan** (from a recipe page): top and bottom of the sheet now clear the Android status bar and navigation bar.
+- **Report a Price**: bottom of the form no longer overlaps the Android navigation bar; the market/store picker list is no longer cut off by the nav bar on its last item; and Location (city/municipality) is now a pick-list instead of free text, to avoid misspellings and inconsistent capitalization.
+- **Community feed**: the gradient header now collapses out of view as you scroll down, letting the All/Following tabs and filter chips ride up and stay put near the top instead of permanently taking up a quarter of the screen; scrolling back to the top brings the header back.
+
 ## [1.28.1] — 2026-07-17
 
 Fixes status/navigation bar contrast when the phone is in system dark mode.

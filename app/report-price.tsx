@@ -1,4 +1,5 @@
 import { ITEM_CATEGORIES } from '@/src/constants/itemCategories';
+import { PH_CITIES } from '@/src/constants/phCities';
 import client from '@/src/api/client';
 import RewardCelebration, { type Reward } from '@/src/components/RewardCelebration';
 import { postMultipart, resizeForUpload } from '@/src/utils/uploadImage';
@@ -20,6 +21,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type NearbyTarget = {
   id: number;
@@ -45,6 +47,7 @@ const UNITS = ['kg', 'bundle', 'pcs', '100g', 'pack', 'bottle', 'tray', 'lata', 
 export default function ReportPriceScreen() {
   const router = useRouter();
   const { lang } = useLanguage();
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ item?: string }>();
 
   const [itemName, setItemName]     = useState(params.item ?? '');
@@ -60,6 +63,7 @@ export default function ReportPriceScreen() {
   const [target, setTarget]         = useState<NearbyTarget | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [targetSearch, setTargetSearch] = useState('');
+  const [cityPickerOpen, setCityPickerOpen] = useState(false);
 
   const { data: nearbyTargets = [] } = useQuery<NearbyTarget[]>({
     queryKey: ['markets-for-report'],
@@ -179,7 +183,11 @@ export default function ReportPriceScreen() {
       behavior="padding"
       keyboardVerticalOffset={Platform.OS === 'android' ? 30 : 0}
     >
-      <ScrollView contentContainerClassName="px-5 py-6" keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerClassName="px-5 py-6"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        keyboardShouldPersistTaps="handled"
+      >
 
         {/* Info banner */}
         <View className="bg-leaf-50 rounded-2xl p-4 mb-6 flex-row gap-3">
@@ -338,14 +346,13 @@ export default function ReportPriceScreen() {
           <Text className="text-xs font-semibold text-ink-soft mb-1.5">
             {lang === 'en' ? 'Location (city / municipality)' : 'Lugar (lungsod / munisipyo)'}
           </Text>
-          <TextInput
-            className="w-full rounded-xl border border-cream-300 bg-cream-50 px-4 py-3 text-sm text-ink"
-            placeholder={lang === 'en' ? 'e.g. Antipolo, Marikina, Pasig...' : 'hal. Antipolo, Marikina, Pasig...'}
-            placeholderTextColor="#B0A18C"
-            value={municipality}
-            onChangeText={setMunicipality}
-            autoCapitalize="words"
-          />
+          <Pressable
+            onPress={() => setCityPickerOpen(true)}
+            className="w-full flex-row items-center justify-between rounded-xl border border-cream-300 bg-cream-50 px-4 py-3"
+          >
+            <Text className="text-sm text-ink">{municipality}</Text>
+            <Text className="text-xs text-brand-600">{lang === 'en' ? 'Change' : 'Palitan'}</Text>
+          </Pressable>
           <Text className="mt-1 text-xs text-ink-soft">
             {lang === 'en'
               ? 'So people in the same area can find it.'
@@ -376,7 +383,7 @@ export default function ReportPriceScreen() {
         >
           <Pressable
             onPress={(e) => e.stopPropagation()}
-            style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%' }}
+            style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: insets.bottom }}
           >
             <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -395,7 +402,7 @@ export default function ReportPriceScreen() {
                 onChangeText={setTargetSearch}
               />
             </View>
-            <ScrollView style={{ maxHeight: 360 }}>
+            <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ paddingBottom: 12 }}>
               <Pressable
                 onPress={() => { setTarget(null); setPickerOpen(false); }}
                 className="flex-row items-center gap-2 px-4 py-3 border-b border-cream-200 active:opacity-70"
@@ -430,6 +437,39 @@ export default function ReportPriceScreen() {
                   </Pressable>
                 ))
               )}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <Modal visible={cityPickerOpen} animationType="slide" transparent onRequestClose={() => setCityPickerOpen(false)}>
+        <Pressable
+          onPress={() => setCityPickerOpen(false)}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' }}
+        >
+          <Pressable
+            onPress={(e) => e.stopPropagation()}
+            style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: insets.bottom }}
+          >
+            <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#000000' }}>
+                {lang === 'en' ? 'Select city / municipality' : 'Pumili ng lungsod / munisipyo'}
+              </Text>
+              <Pressable onPress={() => setCityPickerOpen(false)} hitSlop={8}>
+                <Text className="text-ink-soft text-sm">✕</Text>
+              </Pressable>
+            </View>
+            <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ paddingBottom: 12 }}>
+              {PH_CITIES.map((city) => (
+                <Pressable
+                  key={city}
+                  onPress={() => { setMunicipality(city); setCityPickerOpen(false); }}
+                  className="flex-row items-center justify-between px-4 py-3 border-b border-cream-200 active:opacity-70"
+                >
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000' }}>{city}</Text>
+                  {municipality === city && <Text style={{ color: '#386641' }}>✓</Text>}
+                </Pressable>
+              ))}
             </ScrollView>
           </Pressable>
         </Pressable>

@@ -135,11 +135,7 @@ function RouteGuard() {
         name="log-spending"
         options={{
           presentation: 'modal',
-          headerTitle: lang === 'en' ? 'Log Spending' : 'I-log ang Gastos',
-          headerTitleStyle: HEADER_TITLE_STYLE,
-          headerStyle: { backgroundColor: '#E7653B' },
-          headerShadowVisible: false,
-          headerTintColor: '#fff',
+          headerShown: false,
         }}
       />
       <Stack.Screen

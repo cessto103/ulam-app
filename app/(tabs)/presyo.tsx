@@ -255,7 +255,12 @@ export default function PresyoScreen() {
 
       {/* Radius selector — only meaningful for a GPS search */}
       {gpsCoords && (
-        <View className="flex-row items-center gap-2 mb-3">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 4 }}
+          style={{ marginBottom: 12 }}
+        >
           <Ionicons name="navigate-circle-outline" size={16} color="#6F655A" />
           <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
             {lang === 'en' ? 'Within' : 'Sa loob ng'}
@@ -277,14 +282,14 @@ export default function PresyoScreen() {
           <Pressable
             onPress={() => router.push(`/market-map?lat=${gpsCoords.lat}&lng=${gpsCoords.lng}` as any)}
             className="flex-row items-center gap-1.5 rounded-full px-3 py-1.5 active:opacity-80"
-            style={{ backgroundColor: '#E7653B', marginLeft: 'auto' }}
+            style={{ backgroundColor: '#E7653B', marginLeft: 4 }}
           >
             <Ionicons name="map-outline" size={13} color="#fff" />
             <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#fff' }}>
               {lang === 'en' ? 'Map' : 'Mapa'}
             </Text>
           </Pressable>
-        </View>
+        </ScrollView>
       )}
 
       {marketsLoading ? (

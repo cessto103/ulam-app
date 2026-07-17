@@ -1133,7 +1133,7 @@ export default function RecipeDetailScreen() {
         {/* ── Add-to-meal-plan modal ── */}
         <Modal visible={mealModal} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setMealModal(false)}>
           <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
-            <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>Add to Today's Meal Plan</Text>
                 {recipe && (
@@ -1167,7 +1167,7 @@ export default function RecipeDetailScreen() {
               })}
             </ScrollView>
 
-            <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff' }}>
+            <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: insets.bottom + 16, borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff' }}>
               <Pressable
                 onPress={() => {
                   if (!recipe) return;

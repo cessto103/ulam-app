@@ -10,6 +10,7 @@ import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   FlatList,
   Image,
   Pressable,
@@ -116,6 +117,15 @@ export default function KomunidadScreen() {
   const [reactedIds, setReactedIds]  = useState<Set<number>>(new Set());
   const [pusoCounts, setPusoCounts]  = useState<Record<number, number>>({});
   const pendingReact                 = useRef<Set<number>>(new Set());
+
+  // Collapsing header: the gradient hero shrinks away on scroll-down, letting the
+  // All/Following tabs and filter chips (static siblings below it) ride up to take
+  // its place, then everything slides back down once the feed is scrolled to top.
+  const [headerHeight, setHeaderHeight] = useState<number | null>(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const animatedHeaderHeight = headerHeight != null
+    ? scrollY.interpolate({ inputRange: [0, headerHeight], outputRange: [headerHeight, 0], extrapolate: 'clamp' })
+    : undefined;
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['community-feed', feedMode, activeFilter, page],
@@ -319,12 +329,16 @@ export default function KomunidadScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#FFF8E8' }}>
-      <GradientPageHeader
-        title={lang === 'en' ? 'Community' : 'Komunidad'}
-        subtitle={lang === 'en' ? 'Tips, prices, and favorite recipes from your neighbors.' : 'Mga tip, presyo, at paboritong recipe ng kapitbahay.'}
-        rightSlot={<HeaderIconRow />}
-        photo
-      />
+      <Animated.View style={{ height: animatedHeaderHeight, overflow: 'hidden' }}>
+        <View onLayout={(e) => { if (headerHeight == null) setHeaderHeight(e.nativeEvent.layout.height); }}>
+          <GradientPageHeader
+            title={lang === 'en' ? 'Community' : 'Komunidad'}
+            subtitle={lang === 'en' ? 'Tips, prices, and favorite recipes from your neighbors.' : 'Mga tip, presyo, at paboritong recipe ng kapitbahay.'}
+            rightSlot={<HeaderIconRow />}
+            photo
+          />
+        </View>
+      </Animated.View>
 
       {/* Feed mode tabs (Lahat | Sinusundan) */}
       <View className="flex-row bg-cream-200 rounded-xl mx-4 p-1 mb-3 mt-1">
@@ -430,6 +444,8 @@ export default function KomunidadScreen() {
           )
         }
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 12 }}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+        scrollEventThrottle={16}
       />
     </View>
   );
