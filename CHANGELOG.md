@@ -5,6 +5,11 @@ Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Remove
 
 ---
 
+## [1.29.0] — 2026-07-17
+
+### Added
+- **Full-screen confetti burst on level-up**: reaching a new XP level now bursts ~60 animated SVG confetti pieces in brand colors across the whole screen, alongside the existing "LEVEL UP!" card. Built with `react-native-svg` (already a dependency) and transform/opacity-only animation, so it runs on the native thread and won't compete with anything happening on the JS thread.
+
 ## [1.28.6] — 2026-07-17
 
 ### Fixed

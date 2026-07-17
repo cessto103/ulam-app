@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import ConfettiBurst from '@/src/components/ConfettiBurst';
 import { useLanguage } from '@/src/context/LanguageContext';
 
 export type UnlockedAchievement = {
@@ -35,6 +36,7 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
   const [displayXp, setDisplayXp] = useState(0);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [achievementIndex, setAchievementIndex] = useState(-1);
+  const [confettiKey, setConfettiKey] = useState(0);
 
   const pillScale = useRef(new Animated.Value(0)).current;
   const pillOpacity = useRef(new Animated.Value(0)).current;
@@ -84,10 +86,13 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
     if (reward.leveledUp) {
       timers.push(setTimeout(() => {
         setShowLevelUp(true);
+        setConfettiKey((k) => k + 1);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         Animated.spring(levelUpScale, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 12 }).start();
       }, elapsed));
-      elapsed += 1100;
+      // Longer dwell than the other stages — gives the full-screen confetti
+      // burst room to actually play out before the sequence moves on.
+      elapsed += 1900;
     }
 
     // Stage 3 — achievement cards, one at a time
@@ -183,6 +188,8 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
           </Text>
         </Animated.View>
       )}
+
+      {showLevelUp && <ConfettiBurst key={confettiKey} />}
 
       {/* Achievement unlocked card */}
       {currentAchievement && (
