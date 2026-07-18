@@ -5,7 +5,8 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Modal, Pressable, Text, View } from 'react-native';
+import { Animated, Modal, Platform, Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ACTIVE    = '#E7653B'; // brand terracotta
 const INACTIVE  = '#6F655A'; // ink-soft — ink-faint was too low-contrast for older users
@@ -41,6 +42,13 @@ export default function TabLayout() {
   const { t, lang } = useLanguage();
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
+  const insets = useSafeAreaInsets();
+
+  // The system nav bar now renders as a solid black strip drawn by
+  // AndroidNavBarFiller (see app/_layout.tsx), covering exactly the safe-area
+  // inset this tab bar already reserves. That leaves no visible cream buffer
+  // between the tab icons and the black strip, so add a bit extra here.
+  const extraBottomPad = Platform.OS === 'android' ? 10 : 0;
 
   const createActions = [
     { icon: 'restaurant-outline' as const, label: lang === 'en' ? 'Create Recipe' : 'Gumawa ng Recipe', route: '/create-recipe' },
@@ -66,6 +74,8 @@ export default function TabLayout() {
             backgroundColor: '#FFFCF5',
             borderTopColor: '#F0DEBB',
             borderTopWidth: 0.5,
+            height: 49 + insets.bottom + extraBottomPad,
+            paddingBottom: insets.bottom + extraBottomPad,
           },
           tabBarLabelStyle: { fontFamily: 'NunitoSans_600SemiBold', fontSize: 13 },
           tabBarActiveTintColor: ACTIVE,

@@ -3,7 +3,7 @@
     "name": "uLam-app",
     "slug": "ulam",
     "scheme": "ulam",
-    "version": "1.30.5",
+    "version": "1.30.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,11 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "56",
+      "buildNumber": "57",
       "bundleIdentifier": "com.ulam.app"
     },
     "android": {
-      "versionCode": 56,
+      "versionCode": 57,
       "package": "com.ulam.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",

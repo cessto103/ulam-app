@@ -25,6 +25,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -337,6 +338,7 @@ function PlanView({ user }: { user: any }) {
   const { lang } = useLanguage();
   const router = useRouter();
   const qc = useQueryClient();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
 
   const { data: plan, isLoading } = useQuery({
@@ -422,7 +424,8 @@ function PlanView({ user }: { user: any }) {
       <>
       <ScrollView
         className="flex-1"
-        contentContainerClassName="px-4 pt-3 pb-8"
+        contentContainerClassName="px-4 pt-3"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" />
         }
@@ -833,6 +836,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
   const router = useRouter();
   const qc = useQueryClient();
   const { lang } = useLanguage();
+  const insets = useSafeAreaInsets();
   const [budgetFilter,  setBudgetFilter]  = useState<string | null>(null);
   const [sourceFilter,  setSourceFilter]  = useState<SourceFilter>(
     (['all', 'mine', 'official', 'community'].includes(initialFilter ?? '') ? initialFilter : 'all') as SourceFilter,
@@ -1114,7 +1118,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
           </Text>
         </View>
       }
-      ListFooterComponent={<View style={{ height: 32 }} />}
+      ListFooterComponent={<View style={{ height: insets.bottom + 80 }} />}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" />
       }

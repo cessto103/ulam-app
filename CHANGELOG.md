@@ -3,6 +3,13 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.6] — 2026-07-18
+
+### Fixed
+- **Report a Price / Recipe / Store page comment boxes**: switched keyboard-avoidance from Android's "height" resize behavior to "padding" on all three. "height" computes each shift relative to its own previous value, which under this app's edge-to-edge Android setup could drift — leaving a field still slightly covered by the keyboard (Report a Price), or a large blank gap left behind after the keyboard closed (Recipe page comments). "padding" recalculates from scratch each time, so it self-corrects instead of drifting.
+- **Bottom tab bar**: added a bit of extra Android-only bottom padding so the tab icons/labels aren't sitting flush against the new solid black nav-bar strip (that strip now covers exactly the safe-area space the tab bar used to blend into unnoticed).
+- **Recipes list and Meal Plan list**: increased bottom spacing so the last card's content isn't hidden behind the (now more visually solid) bottom tab bar.
+
 ## [1.30.5] — 2026-07-18
 
 ### Fixed

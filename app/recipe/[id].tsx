@@ -27,7 +27,6 @@ import {
   Linking,
   Modal,
   PanResponder,
-  Platform,
   Pressable,
   ScrollView,
   Share,
@@ -774,8 +773,8 @@ export default function RecipeDetailScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'android' ? 30 : 0}
+      behavior="padding"
+      keyboardVerticalOffset={0}
     >
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ paddingBottom: 48 }}>
       {/* Cover photo is full-bleed behind the status bar — light icons stay
