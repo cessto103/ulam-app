@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.7] — 2026-07-18
+
+### Fixed
+- **Recipe page comments**: the previous release's height→padding switch didn't fix the real cause. The comment compose row sits at the very bottom of one long ScrollView; when the keyboard shows or hides, the ScrollView's viewport resizes but its scroll position doesn't recompute on its own, leaving stale blank space (visible immediately on focus, worse after the keyboard closes). Now explicitly snaps the scroll position to the true bottom on both the show and hide keyboard events, instead of relying on the resize alone.
+
 ## [1.30.6] — 2026-07-18
 
 ### Fixed

@@ -23,10 +23,12 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Linking,
   Modal,
   PanResponder,
+  Platform,
   Pressable,
   ScrollView,
   Share,
@@ -541,6 +543,23 @@ export default function RecipeDetailScreen() {
   const [editCommentId,   setEditCommentId]   = useState<number | null>(null);
   const [savingComment,   setSavingComment]   = useState(false);
   const commentInputRef = useRef<TextInput>(null);
+  const scrollRef = useRef<ScrollView>(null);
+
+  // The comment compose row lives at the very bottom of this one long
+  // ScrollView. When the keyboard shows/hides, KeyboardAvoidingView resizes
+  // the ScrollView's viewport, but the ScrollView's own scroll offset doesn't
+  // recompute itself — leaving stale blank space (a well-known RN Android
+  // gap). Snapping to the end on both transitions keeps it flush.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const showSub = Keyboard.addListener('keyboardDidShow', () => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    });
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+      scrollRef.current?.scrollToEnd({ animated: false });
+    });
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
 
   const { data: commentsData } = useQuery<{ data: RecipeCommentItem[] }>({
     queryKey: ['recipe-comments', id],
@@ -776,7 +795,7 @@ export default function RecipeDetailScreen() {
       behavior="padding"
       keyboardVerticalOffset={0}
     >
-    <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ paddingBottom: 48 }}>
+    <ScrollView ref={scrollRef} style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ paddingBottom: 48 }}>
       {/* Cover photo is full-bleed behind the status bar — light icons stay
           visible against it; unmounting this screen reverts to the app-wide dark style. */}
       <StatusBar style="light" />
