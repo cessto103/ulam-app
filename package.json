@@ -1,6 +1,6 @@
 {
   "name": "ulam-app",
-  "version": "1.30.7",
+  "version": "1.30.8",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo-google-fonts/baloo-2": "^0.4.2",

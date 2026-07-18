@@ -5,6 +5,7 @@ export type User = {
   name: string;
   username: string;
   email: string;
+  email_verified_at: string | null;
   secondary_email: string | null;
   secondary_email_verified_at: string | null;
   avatar: string | null;
@@ -53,6 +54,15 @@ export async function register(payload: RegisterPayload) {
 
 export async function logout() {
   await client.post('/auth/logout');
+}
+
+export async function verifyEmail(code: string) {
+  const { data } = await client.post<{ user: User }>('/auth/verify-email', { code });
+  return data;
+}
+
+export async function resendEmailVerification() {
+  await client.post('/auth/resend-verification');
 }
 
 export async function getMe() {

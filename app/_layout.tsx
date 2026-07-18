@@ -73,12 +73,15 @@ function RouteGuard() {
     if (isLoading) return;
     const inAuth        = segments[0] === '(auth)';
     const inOnboarding  = segments[0] === 'onboarding';
+    const inVerify      = segments[0] === 'verify-email';
 
     if (!user && !inAuth) {
       router.replace('/(auth)/welcome');
-    } else if (user && !user.onboarding_completed && !inOnboarding) {
+    } else if (user && !user.email_verified_at && !inVerify) {
+      router.replace('/verify-email');
+    } else if (user && user.email_verified_at && !user.onboarding_completed && !inOnboarding) {
       router.replace('/onboarding');
-    } else if (user && user.onboarding_completed && (inAuth || inOnboarding)) {
+    } else if (user && user.email_verified_at && user.onboarding_completed && (inAuth || inOnboarding || inVerify)) {
       router.replace('/(tabs)');
     }
   }, [user, isLoading, segments]);
@@ -88,6 +91,7 @@ function RouteGuard() {
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen name="verify-email" options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen
         name="budget-setup"
         options={{
