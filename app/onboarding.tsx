@@ -52,7 +52,7 @@ function Dots({ step }: { step: number }) {
 // ── Step 1 — Location ────────────────────────────────────────────────────────
 
 function Step1({
-  lang, slideAnim, region, setRegion, municipality, setMunicipality, cityOptions,
+  lang, slideAnim, region, setRegion, municipality, cityCode, setMunicipality, cityOptions,
   barangay, setBarangay, barangayOptions, onNext,
 }: {
   lang: Lang;
@@ -60,8 +60,9 @@ function Step1({
   region: string;
   setRegion: (v: string) => void;
   municipality: string;
-  setMunicipality: (v: string) => void;
-  cityOptions: string[];
+  cityCode: string;
+  setMunicipality: (code: string) => void;
+  cityOptions: PhCity[];
   barangay: string;
   setBarangay: (v: string) => void;
   barangayOptions: string[];
@@ -83,15 +84,15 @@ function Step1({
         label={lang === 'en' ? 'Region' : 'Rehiyon'}
         placeholder={lang === 'en' ? 'Select region' : 'Pumili ng rehiyon'}
         value={region}
-        options={getPhRegions()}
+        options={getPhRegions().map((name) => ({ label: name, value: name }))}
         onSelect={setRegion}
       />
 
       <SelectField
         label={lang === 'en' ? 'City / Municipality' : 'Lungsod / Munisipyo'}
         placeholder={lang === 'en' ? 'Select city / municipality' : 'Pumili ng lungsod / munisipyo'}
-        value={municipality}
-        options={cityOptions}
+        value={cityCode || municipality}
+        options={cityOptions.map((c) => ({ label: c.label, value: c.code }))}
         onSelect={setMunicipality}
         disabled={!region}
         disabledHint={lang === 'en' ? 'Select a region first' : 'Pumili muna ng rehiyon'}
@@ -101,9 +102,9 @@ function Step1({
         label={lang === 'en' ? 'Barangay (optional)' : 'Barangay (opsyonal)'}
         placeholder={lang === 'en' ? 'Select barangay' : 'Pumili ng barangay'}
         value={barangay}
-        options={barangayOptions}
+        options={barangayOptions.map((name) => ({ label: name, value: name }))}
         onSelect={setBarangay}
-        disabled={!municipality}
+        disabled={!cityCode}
         disabledHint={lang === 'en' ? 'Select a city first' : 'Pumili muna ng lungsod'}
       />
 
@@ -386,11 +387,11 @@ export default function OnboardingScreen() {
     setBarangay('');
   };
 
-  const setMunicipality = (cityName: string) => {
-    setMunicipalityRaw(cityName);
+  const setMunicipality = (code: string) => {
     setBarangay('');
-    const match = cityOptions.find((c: PhCity) => c.name === cityName);
-    setCityCode(match?.code ?? '');
+    const match = cityOptions.find((c: PhCity) => c.code === code);
+    setMunicipalityRaw(match?.name ?? '');
+    setCityCode(code);
     setProvince(match?.province ?? '');
   };
 
@@ -502,8 +503,9 @@ export default function OnboardingScreen() {
           region={region}
           setRegion={setRegion}
           municipality={municipality}
+          cityCode={cityCode}
           setMunicipality={setMunicipality}
-          cityOptions={cityOptions.map((c) => c.name)}
+          cityOptions={cityOptions}
           barangay={barangay}
           setBarangay={setBarangay}
           barangayOptions={barangayOptions}

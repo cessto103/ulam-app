@@ -59,11 +59,11 @@ export default function LocationScreen() {
     setBarangay('');
   };
 
-  const setMunicipality = (cityName: string) => {
-    setMunicipalityRaw(cityName);
+  const setMunicipality = (code: string) => {
     setBarangay('');
-    const match = cityOptions.find((c: PhCity) => c.name === cityName);
-    setCityCode(match?.code ?? '');
+    const match = cityOptions.find((c: PhCity) => c.code === code);
+    setMunicipalityRaw(match?.name ?? '');
+    setCityCode(code);
     setProvince(match?.province ?? '');
   };
 
@@ -176,15 +176,15 @@ export default function LocationScreen() {
               label={lang === 'en' ? 'Region' : 'Rehiyon'}
               placeholder={lang === 'en' ? 'Select region' : 'Pumili ng rehiyon'}
               value={region}
-              options={getPhRegions()}
+              options={getPhRegions().map((name) => ({ label: name, value: name }))}
               onSelect={setRegion}
             />
 
             <SelectField
               label={lang === 'en' ? 'City / Municipality' : 'Lungsod / Munisipyo'}
               placeholder={lang === 'en' ? 'Select city / municipality' : 'Pumili ng lungsod / munisipyo'}
-              value={municipality}
-              options={cityOptions.map((c) => c.name)}
+              value={cityCode || municipality}
+              options={cityOptions.map((c) => ({ label: c.label, value: c.code }))}
               onSelect={setMunicipality}
               disabled={!region}
               disabledHint={lang === 'en' ? 'Select a region first' : 'Pumili muna ng rehiyon'}
@@ -194,7 +194,7 @@ export default function LocationScreen() {
               label={lang === 'en' ? 'Barangay' : 'Barangay'}
               placeholder={lang === 'en' ? 'Select barangay' : 'Pumili ng barangay'}
               value={barangay}
-              options={barangayOptions}
+              options={barangayOptions.map((name) => ({ label: name, value: name }))}
               onSelect={setBarangay}
               disabled={!cityCode}
               disabledHint={lang === 'en' ? 'Select a city first' : 'Pumili muna ng lungsod'}

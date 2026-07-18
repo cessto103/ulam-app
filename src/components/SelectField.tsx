@@ -4,11 +4,16 @@ import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+export type SelectOption = { label: string; value: string };
+
 type SelectFieldProps = {
   label: string;
   placeholder: string;
+  /** The currently selected option's `value` (not its `label`) — options
+   * are matched/keyed by `value`, since `label` alone isn't always unique
+   * (e.g. multiple same-named cities in different provinces). */
   value: string;
-  options: string[];
+  options: SelectOption[];
   onSelect: (value: string) => void;
   disabled?: boolean;
   disabledHint?: string;
@@ -34,10 +39,12 @@ export default function SelectField({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
+  const selected = options.find((o) => o.value === value);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return options;
-    return options.filter((o) => o.toLowerCase().includes(q));
+    return options.filter((o) => o.label.toLowerCase().includes(q));
   }, [options, search]);
 
   return (
@@ -49,8 +56,8 @@ export default function SelectField({
           disabled ? 'bg-cream-100 border-cream-200' : 'bg-cream-50 border-cream-300'
         }`}
       >
-        <Text className={`text-sm ${value ? 'text-ink' : 'text-ink-soft'}`} numberOfLines={1}>
-          {value || (disabled && disabledHint ? disabledHint : placeholder)}
+        <Text className={`text-sm ${selected ? 'text-ink' : 'text-ink-soft'}`} numberOfLines={1}>
+          {selected?.label || (disabled && disabledHint ? disabledHint : placeholder)}
         </Text>
         <Ionicons name="chevron-down" size={16} color="#B0A18C" />
       </Pressable>
@@ -88,14 +95,14 @@ export default function SelectField({
               ) : (
                 filtered.map((option) => (
                   <Pressable
-                    key={option}
-                    onPress={() => { onSelect(option); setOpen(false); }}
+                    key={option.value}
+                    onPress={() => { onSelect(option.value); setOpen(false); }}
                     className="flex-row items-center justify-between px-4 py-3 border-b border-cream-200 active:opacity-70"
                   >
-                    <Text style={{ fontFamily: option === value ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 14, color: '#000000' }}>
-                      {option}
+                    <Text style={{ fontFamily: option.value === value ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 14, color: '#000000' }}>
+                      {option.label}
                     </Text>
-                    {option === value && <Ionicons name="checkmark" size={16} color="#386641" />}
+                    {option.value === value && <Ionicons name="checkmark" size={16} color="#386641" />}
                   </Pressable>
                 ))
               )}

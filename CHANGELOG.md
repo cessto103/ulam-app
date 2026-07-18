@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.13] — 2026-07-19
+
+### Fixed
+- **Crash on the new city/municipality picker** ("Encountered two children with the same key"). Many Philippine city/municipality names are genuinely reused across different provinces within the same region — e.g. "BURGOS" appears 4 times in Region I alone — so a name-keyed list produced duplicate React keys and, worse, picking one could silently resolve to the wrong city. City selection is now keyed by its actual PSGC code (always unique) instead of its name, and the picker shows "City (Province)" only for the specific names that actually collide within a region, to disambiguate without cluttering the common case.
+
 ## [1.30.12] — 2026-07-19
 
 ### Changed
