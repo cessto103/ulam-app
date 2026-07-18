@@ -198,7 +198,12 @@ export default function ReportPriceScreen() {
     <KeyboardAvoidingView
       className="flex-1 bg-white"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'android' ? 30 : 0}
+      // The 30px Android offset was tuned for the old native header, which
+      // sat outside this KeyboardAvoidingView. The header is now rendered
+      // inside it (below), so that compensation is no longer needed — it
+      // was double-counting and pushing the focused field further down,
+      // into the keyboard, instead of clear of it.
+      keyboardVerticalOffset={0}
     >
       <LinearGradient
         colors={HEADER_GRADIENT}

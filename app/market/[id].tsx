@@ -5,6 +5,7 @@ import ReportModal from '@/src/components/ReportModal';
 import { Skeleton, SkeletonPriceCard, SkeletonRow } from '@/src/components/Skeleton';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -98,6 +99,8 @@ function relativeTime(dateStr: string, lang: 'en' | 'tl'): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
+const HEADER_GRADIENT = ['#CC5027', '#E7653B', '#EC8156'] as const;
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function MarketDetailScreen() {
@@ -141,39 +144,40 @@ export default function MarketDetailScreen() {
     <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
 
       {/* Header */}
-      <View
+      <LinearGradient
+        colors={HEADER_GRADIENT}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={{
           paddingTop: insets.top + 8,
-          paddingBottom: 12,
+          paddingBottom: 14,
           paddingHorizontal: 16,
-          backgroundColor: '#fff',
-          borderBottomWidth: 1,
-          borderBottomColor: '#F9EDD3',
         }}
       >
         <View className="flex-row items-center gap-3">
           <Pressable
             onPress={() => router.back()}
-            className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
+            className="w-8 h-8 rounded-full items-center justify-center active:opacity-70"
+            style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}
           >
-            <Ionicons name="arrow-back" size={18} color="#3C3A2F" />
+            <Ionicons name="arrow-back" size={18} color="#fff" />
           </Pressable>
           <View className="flex-1">
             {isLoading ? (
-              <View className="h-5 w-40 bg-cream-200 rounded" />
+              <View className="h-5 w-40 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.25)' }} />
             ) : (
               <>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#3C3A2F' }} numberOfLines={1}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#fff' }} numberOfLines={1}>
                   {data?.market.name ?? '-'}
                 </Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
                   {data?.market.barangay}, {data?.market.municipality}
                 </Text>
               </>
             )}
           </View>
         </View>
-      </View>
+      </LinearGradient>
 
       {isLoading ? (
         <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 12 }}>
@@ -297,8 +301,8 @@ export default function MarketDetailScreen() {
                 <Text style={{ fontSize: 14 }}>ℹ️</Text>
                 <Text style={{ flex: 1, fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#9A4A2C', lineHeight: 17 }}>
                   {lang === 'en'
-                    ? 'Prices here come from a mix of sources — community reports, store owners, and government references (DTI/DA) — so they may not always match exactly.'
-                    : 'Ang mga presyo dito ay galing sa iba’t ibang pinagmulan — community reports, mga tindera, at government reference (DTI/DA) — kaya minsan hindi ito eksaktong magkatugma.'}
+                    ? 'Prices here come from a mix of sources: community reports, store owners, and government references (DTI/DA). They may not always match exactly.'
+                    : 'Ang mga presyo dito ay galing sa iba’t ibang pinagmulan: community reports, mga tindera, at government reference (DTI/DA). Minsan hindi ito eksaktong magkatugma.'}
                 </Text>
               </View>
             )}

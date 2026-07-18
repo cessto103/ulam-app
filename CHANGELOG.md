@@ -3,6 +3,17 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.3] — 2026-07-18
+
+### Fixed
+- **Report a Price**: fixed a regression from the previous release where the Price field could get pushed down into the keyboard instead of clear of it (a keyboard offset that was tuned for the old native header no longer applied once that header moved inline).
+- **"Boost this" sheet and "Cover & Photo Style" sheet**: fixed a regression from the previous release where the bottom padding overshot, leaving a visible gap showing the page underneath instead of a clean edge-to-edge sheet.
+- **Recipe page comments**: tightened the spacing above the compose row and added a small margin below it instead.
+- **Market page**: header re-themed to the terracotta gradient.
+
+### Changed
+- Corrected two em dashes that slipped into the market price disclaimer added last release.
+
 ## [1.30.2] — 2026-07-18
 
 ### Fixed

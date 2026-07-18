@@ -1,7 +1,6 @@
 import { LinearGradient, type LinearGradientProps } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT_DEFS, FONT_KEYS, GRADIENT_DEFS, GRADIENT_KEYS, type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 
 interface Props {
@@ -94,7 +93,6 @@ function MiniPreview({ optKey, gradientKey }: { optKey: CollageStyle; gradientKe
 export default function CollageStylePicker({
   visible, currentStyle, currentGradient, currentFont, photoCount, onApply, onCancel,
 }: Props) {
-  const insets = useSafeAreaInsets();
   const [style, setStyle]       = useState<CollageStyle>(currentStyle);
   const [gradient, setGradient] = useState<GradientKey>(currentGradient);
   const [font, setFont]         = useState<FontKey>(currentFont);
@@ -114,7 +112,10 @@ export default function CollageStylePicker({
       <View style={styles.backdrop}>
         <Pressable style={{ flex: 1 }} onPress={onCancel} />
 
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + 24 }]}>
+        {/* Fixed, not insets.bottom — this Modal already renders above the
+            Android nav bar on its own here, so adding the inset on top
+            overshot and left a gap showing the page underneath. */}
+        <View style={[styles.sheet, { paddingBottom: 36 }]}>
           <View style={styles.handle} />
 
           <Text style={styles.sheetTitle}>Cover & Photo Style</Text>

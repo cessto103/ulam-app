@@ -1395,7 +1395,7 @@ export default function RecipeDetailScreen() {
             </View>
           )}
 
-          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 10 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 2, marginBottom: 10 }}>
             {me && (
               <CommentAvatar
                 user={{ id: me.id, name: me.name, username: me.username ?? null, avatar: me.avatar ?? null }}
