@@ -393,7 +393,7 @@ export default function AwardsScreen() {
       style={{ backgroundColor: '#FFF8E8' }}
       contentContainerClassName="pb-8"
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" colors={['#386641']} />
       }
     >
       <ThemedSection

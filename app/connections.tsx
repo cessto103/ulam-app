@@ -136,7 +136,7 @@ export default function ConnectionsScreen() {
           keyExtractor={(item) => String(item.id)}
           renderItem={renderEntry}
           style={{ backgroundColor: 'white' }}
-          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" />}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" colors={['#386641']} />}
           ListEmptyComponent={
             <View className="items-center pt-16 px-8">
               <Text style={{ fontSize: 36, marginBottom: 12 }}>👥</Text>

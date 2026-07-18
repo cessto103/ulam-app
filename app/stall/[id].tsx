@@ -291,7 +291,7 @@ export default function StallDetailScreen() {
         >
         <ScrollView
           contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />}
         >
           {/* Cover photo header */}
           <View style={{ marginHorizontal: -16, marginTop: -16, height: 200, backgroundColor: '#5E693F', overflow: 'hidden' }}>

@@ -176,7 +176,7 @@ export default function NotificationsScreen() {
         }
         renderItem={renderItem}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" />
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" colors={['#386641']} />
         }
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center pt-24">

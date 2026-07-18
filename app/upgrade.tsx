@@ -91,19 +91,39 @@ export default function UpgradeScreen() {
   const yearlyEffective = yearlyHasDiscount ? yearlyPromo! : yearlyBase;
   const showPromoBanner = (monthlyHasDiscount || yearlyHasDiscount) && !!pricing?.premium_promo_label;
 
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
   const handleCheckout = async (plan: 'monthly' | 'yearly') => {
     setLoading(plan);
     try {
       const { data } = await client.post('/upgrade/checkout', { plan });
       await WebBrowser.openBrowserAsync(data.checkout_url);
-      // Browser closed — refresh user to pick up premium status if webhook already fired
-      await refreshUser();
-      if (user?.plan === 'premium') {
+
+      // Browser closed — PayMongo's webhook is delivered async and can lag
+      // a few seconds behind the browser closing, so one immediate check
+      // isn't reliable. Poll briefly before giving up (checking `user` from
+      // this closure wouldn't work even after awaiting refreshUser() — a
+      // state setter doesn't update the variable already captured here, so
+      // the fresh value has to come from refreshUser()'s own return).
+      let fresh = await refreshUser();
+      for (let attempt = 0; attempt < 4 && fresh.plan !== 'premium'; attempt++) {
+        await sleep(2500);
+        fresh = await refreshUser();
+      }
+
+      if (fresh.plan === 'premium') {
         Alert.alert(
           lang === 'en' ? "🎉 You're Premium!" : '🎉 Premium na!',
           lang === 'en' ? 'Congrats on upgrading to uLam Premium!' : 'Maligayang bati sa iyong pag-upgrade sa uLam Premium!',
         );
         router.back();
+      } else {
+        Alert.alert(
+          lang === 'en' ? 'Still processing' : 'Pinoproseso pa',
+          lang === 'en'
+            ? "We haven't received confirmation yet. If you completed the payment, this can take a minute — pull down to refresh in a bit, or check My Account."
+            : 'Wala pa kaming natatanggap na kumpirmasyon. Kung natapos mo na ang bayad, maaaring umabot ng isang minuto — mag-swipe down para mag-refresh, o tingnan sa My Account.',
+        );
       }
     } catch (e: any) {
       const msg = e?.response?.data?.error ?? (lang === 'en' ? 'Could not process payment. Please try again.' : 'Hindi ma-proseso ang bayad. Subukan ulit.');

@@ -531,7 +531,7 @@ export default function HomeScreen() {
       style={{ backgroundColor: '#FFF8E8' }}
       contentContainerClassName="pb-24"
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" colors={['#386641']} />
       }
     >
       {/* Cream header — logo, icons, greeting, search (app-redesign mockup) */}

@@ -427,7 +427,7 @@ function PlanView({ user }: { user: any }) {
         contentContainerClassName="px-4 pt-3"
         contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />
         }
       >
         <View
@@ -1120,7 +1120,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
       }
       ListFooterComponent={<View style={{ height: insets.bottom + 80 }} />}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />
       }
       contentContainerStyle={{ paddingTop: 4 }}
     />

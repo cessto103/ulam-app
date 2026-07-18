@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.9] — 2026-07-18
+
+### Fixed
+- **Pull-to-refresh had no visible spinner on Android, app-wide.** Every one of the app's 23 pull-to-refresh instances set only `tintColor`, which is an iOS-only `RefreshControl` prop — Android needs the separate `colors` prop, which was never set anywhere. The refresh itself was likely firing, but with no visible indicator it looked broken. Added the matching Android `colors` prop to every instance.
+- **Upgrading to Premium could show "still free" even after a successful payment.** Two compounding bugs: (1) after returning from the PayMongo checkout browser, the code checked `user.plan` from a stale closure instead of the freshly-fetched value, so the success screen almost never fired even when the backend had already granted Premium; (2) PayMongo's webhook is delivered asynchronously and can lag a few seconds behind the checkout browser closing, so a single immediate check could read the account before the webhook had processed. Now uses the actual fresh value returned by the refresh call, and retries briefly (up to ~10s) before telling the user it's still processing instead of silently showing stale "Free" status.
+
 ## [1.30.8] — 2026-07-18
 
 ### Added

@@ -215,7 +215,7 @@ export default function UserProfileScreen() {
         data={posts.data}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderPost}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" colors={['#386641']} />}
         ListHeaderComponent={
           <View>
             {/* Profile card */}

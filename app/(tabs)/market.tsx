@@ -40,7 +40,7 @@ export default function MarketScreen() {
     <ScrollView
       className="flex-1 bg-cream-50"
       contentContainerClassName="px-4 py-6"
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" colors={['#386641']} />}
     >
       <View className="rounded-2xl bg-brand-500 p-5 mb-5">
         <Text className="text-white font-bold text-base">{lang === 'en' ? 'Market Prices 🏪' : 'Palengke Prices 🏪'}</Text>

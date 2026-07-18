@@ -139,7 +139,7 @@ export default function SubscriptionScreen() {
       ) : (
         <ScrollView
           contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32 }}
-          refreshControl={<RefreshControl refreshing={catalog.isFetching} onRefresh={() => catalog.refetch()} tintColor="#386641" />}
+          refreshControl={<RefreshControl refreshing={catalog.isFetching} onRefresh={() => catalog.refetch()} tintColor="#386641" colors={['#386641']} />}
         >
           <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-4">
             <View className="flex-row items-center gap-3">

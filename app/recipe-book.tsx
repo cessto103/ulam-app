@@ -404,7 +404,7 @@ export default function RecipeBookScreen() {
           data={filtered}
           keyExtractor={(r) => String(r.id)}
           contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 32 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" colors={['#386641']} />}
           ListEmptyComponent={
             <View style={{ alignItems: 'center', paddingTop: 80, paddingHorizontal: 32 }}>
               <Ionicons name="bookmark-outline" size={52} color="#D3C5AB" style={{ marginBottom: 14 }} />

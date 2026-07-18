@@ -195,7 +195,7 @@ export default function PriceHistoryScreen() {
       ) : (
         <ScrollView
           contentContainerClassName="px-4 pt-4 pb-8"
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" colors={['#386641']} />}
         >
 
           {/* Summary stats */}

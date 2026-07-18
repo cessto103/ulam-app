@@ -8,7 +8,7 @@ type AuthState = {
   isLoading: boolean;
   signIn: (token: string, user: User) => Promise<void>;
   signOut: () => Promise<void>;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<User>;
 };
 
 const AuthContext = createContext<AuthState>({} as AuthState);
@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = async () => {
     const me = await getMe();
     setUser(me);
+    return me;
   };
 
   return (

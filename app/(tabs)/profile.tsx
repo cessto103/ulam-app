@@ -127,7 +127,7 @@ export default function ProfileScreen() {
     <ScrollView
       className="flex-1 bg-cream-100"
       contentContainerClassName="pb-8"
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" colors={['#386641']} />}
     >
       {/* Food-photo curved header with terracotta overlay */}
       <ThemedSection

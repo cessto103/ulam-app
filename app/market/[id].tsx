@@ -294,7 +294,7 @@ export default function MarketDetailScreen() {
           <ScrollView
             style={{ flex: 1 }}
             contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
-            refreshControl={<RefreshControl refreshing={pullRefreshing} onRefresh={onPullRefresh} tintColor="#6E7B4A" />}
+            refreshControl={<RefreshControl refreshing={pullRefreshing} onRefresh={onPullRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />}
           >
             {categories.length > 0 && (
               <View style={{ flexDirection: 'row', gap: 8, backgroundColor: '#FDF0EA', borderRadius: 12, padding: 10, marginBottom: 12 }}>

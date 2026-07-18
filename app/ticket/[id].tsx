@@ -108,7 +108,7 @@ export default function TicketThreadScreen() {
         <ScrollView
           ref={scrollRef}
           contentContainerStyle={{ padding: 16, gap: 8 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#386641" colors={['#386641']} />}
           onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
         >
           {ticket.messages.map((m) => (

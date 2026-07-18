@@ -428,7 +428,7 @@ export default function PostDetailScreen() {
             }}
           />
         )}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#386641" colors={['#386641']} />}
         ListHeaderComponent={
           postLoading ? (
             <View style={{ padding: 16 }}>

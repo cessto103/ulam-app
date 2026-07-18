@@ -445,7 +445,7 @@ export default function KomunidadScreen() {
           <RefreshControl
             refreshing={isLoading && page === 1}
             onRefresh={onRefresh}
-            tintColor="#386641"
+            tintColor="#386641" colors={['#386641']}
           />
         }
         ListEmptyComponent={
