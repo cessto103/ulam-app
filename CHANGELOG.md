@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.5] — 2026-07-18
+
+### Fixed
+- **Store page**: the comment box was completely covered by the keyboard when focused (it sat inside a plain scroll view with nothing pushing it clear). Now wrapped in a keyboard-avoiding view like the recipe and Report a Price comment fields already were.
+
 ## [1.30.4] — 2026-07-18
 
 ### Changed
