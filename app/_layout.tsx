@@ -25,10 +25,28 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Platform } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Platform, View } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
+
+// Expo SDK 54 enforces edge-to-edge on Android (mandatory from Android 15
+// on regardless of config), which makes NavigationBar.setBackgroundColorAsync
+// a no-op — its own type defs say so ("supported only when edge-to-edge is
+// disabled"). Edge-to-edge means the system nav bar is transparent and just
+// shows whatever the app draws underneath it, so the only way to make that
+// area read as solid black is to actually draw a black view there ourselves,
+// once, at the root — covering every screen automatically.
+function AndroidNavBarFiller() {
+  const insets = useSafeAreaInsets();
+  if (Platform.OS !== 'android' || insets.bottom === 0) return null;
+  return (
+    <View
+      pointerEvents="none"
+      style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: insets.bottom, backgroundColor: '#000000', zIndex: 9999 }}
+    />
+  );
+}
 
 // Push notifications are not available in Expo Go (SDK 53+); skip setup there
 if (Constants.appOwnership !== 'expo') {
@@ -285,13 +303,14 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  // The app is a single, always-light cream theme — don't let the phone's
-  // system dark mode flip these to a light/white style that disappears
-  // against it (they don't follow app screens' own dark photo heroes either).
+  // Nav bar is pure black on Android now, so its buttons need to be light
+  // (white) to stay visible — the setBackgroundColorAsync call is kept as a
+  // harmless best-effort for any device where edge-to-edge isn't enforced;
+  // AndroidNavBarFiller below is what actually makes it black under edge-to-edge.
   useEffect(() => {
     if (Platform.OS !== 'android') return;
-    NavigationBar.setButtonStyleAsync('dark').catch(() => {});
-    NavigationBar.setBackgroundColorAsync('#FFFCF5').catch(() => {});
+    NavigationBar.setButtonStyleAsync('light').catch(() => {});
+    NavigationBar.setBackgroundColorAsync('#000000').catch(() => {});
   }, []);
 
   if (!fontsLoaded) return null;
@@ -304,6 +323,7 @@ export default function RootLayout() {
             <AuthProvider>
               <StatusBar style="dark" />
               <RouteGuard />
+              <AndroidNavBarFiller />
             </AuthProvider>
           </LanguageProvider>
         </QueryClientProvider>

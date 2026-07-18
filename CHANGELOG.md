@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.4] — 2026-07-18
+
+### Changed
+- **Android navigation bar is now pure black app-wide**, with light icons for contrast. The previous cream nav bar color never actually applied — this app's Android setup enforces edge-to-edge, under which the OS ignores a requested nav bar color entirely and just shows whatever the app draws underneath it. Now draws an actual black bar in that exact zone at the app root, so it's consistent on every screen regardless of edge-to-edge. Needs a fresh native build to show up in an installed APK.
+
 ## [1.30.3] — 2026-07-18
 
 ### Fixed
