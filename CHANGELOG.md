@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.12] — 2026-07-19
+
+### Changed
+- **Region/city/barangay are now cascading selects instead of free text**, on both the "Where do you live?" onboarding step and the Location settings page — region first, then city/municipality (filtered to that region), then barangay (filtered to that city), preventing misspelled or inconsistent location data. Backed by a bundled PSGC-derived dataset (17 regions, ~1,600 cities/municipalities, ~42,000 barangays), no network round trip needed. Onboarding now also saves `region`/`province` (auto-filled from the picked city), which it never collected before.
+- **"Use my current location" (GPS) on the Location page** still prefills from reverse geocoding as before, since the OS geocoder's names don't reliably match this dataset's exact spelling — the barangay picker stays locked until the city is re-confirmed through its own picker, which is what actually resolves a match.
+
 ## [1.30.11] — 2026-07-18
 
 ### Fixed

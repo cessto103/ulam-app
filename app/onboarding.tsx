@@ -1,9 +1,10 @@
 import client from '@/src/api/client';
-import { PH_CITIES } from '@/src/constants/phCities';
+import SelectField from '@/src/components/SelectField';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { getPhBarangaysForCity, getPhCitiesForRegion, getPhRegions, type PhCity } from '@/src/utils/phLocations';
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -51,18 +52,19 @@ function Dots({ step }: { step: number }) {
 // ── Step 1 — Location ────────────────────────────────────────────────────────
 
 function Step1({
-  lang, slideAnim, municipality, setMunicipality, barangay, setBarangay,
-  showCities, setShowCities, filteredCities, onNext,
+  lang, slideAnim, region, setRegion, municipality, setMunicipality, cityOptions,
+  barangay, setBarangay, barangayOptions, onNext,
 }: {
   lang: Lang;
   slideAnim: Animated.Value;
+  region: string;
+  setRegion: (v: string) => void;
   municipality: string;
   setMunicipality: (v: string) => void;
+  cityOptions: string[];
   barangay: string;
   setBarangay: (v: string) => void;
-  showCities: boolean;
-  setShowCities: (v: boolean) => void;
-  filteredCities: string[];
+  barangayOptions: string[];
   onNext: () => void;
 }) {
   return (
@@ -77,51 +79,36 @@ function Step1({
           : 'Para makita mo ang mga presyo at komunidad na malapit sa inyo.'}
       </Text>
 
-      <Text className="text-xs font-medium text-ink-soft mb-1.5">
-        {lang === 'en' ? 'City / Municipality' : 'Lungsod / Munisipyo'}
-      </Text>
-      <View className="relative mb-3">
-        <TextInput
-          className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink border border-cream-200"
-          placeholder="e.g. Antipolo, Marikina, Quezon City"
-          placeholderTextColor="#B0A18C"
-          value={municipality}
-          onChangeText={(v) => { setMunicipality(v); setShowCities(true); }}
-          onFocus={() => setShowCities(true)}
-          autoCapitalize="words"
-        />
-        {showCities && filteredCities.length > 0 && (
-          <View className="absolute top-full left-0 right-0 bg-white rounded-xl border border-cream-200 mt-1 z-20"
-            style={{ shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 4 }}
-          >
-            {filteredCities.map((city) => (
-              <Pressable
-                key={city}
-                onPress={() => { setMunicipality(city); setShowCities(false); }}
-                className="px-4 py-3 border-b border-cream-200 last:border-b-0"
-              >
-                <Text className="text-sm text-ink">{city}</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
-      </View>
+      <SelectField
+        label={lang === 'en' ? 'Region' : 'Rehiyon'}
+        placeholder={lang === 'en' ? 'Select region' : 'Pumili ng rehiyon'}
+        value={region}
+        options={getPhRegions()}
+        onSelect={setRegion}
+      />
 
-      <Text className="text-xs font-medium text-ink-soft mb-1.5">
-        {lang === 'en' ? 'Barangay (optional)' : 'Barangay (opsyonal)'}
-      </Text>
-      <TextInput
-        className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink border border-cream-200 mb-8"
-        placeholder="Barangay"
-        placeholderTextColor="#B0A18C"
+      <SelectField
+        label={lang === 'en' ? 'City / Municipality' : 'Lungsod / Munisipyo'}
+        placeholder={lang === 'en' ? 'Select city / municipality' : 'Pumili ng lungsod / munisipyo'}
+        value={municipality}
+        options={cityOptions}
+        onSelect={setMunicipality}
+        disabled={!region}
+        disabledHint={lang === 'en' ? 'Select a region first' : 'Pumili muna ng rehiyon'}
+      />
+
+      <SelectField
+        label={lang === 'en' ? 'Barangay (optional)' : 'Barangay (opsyonal)'}
+        placeholder={lang === 'en' ? 'Select barangay' : 'Pumili ng barangay'}
         value={barangay}
-        onChangeText={setBarangay}
-        autoCapitalize="words"
-        onFocus={() => setShowCities(false)}
+        options={barangayOptions}
+        onSelect={setBarangay}
+        disabled={!municipality}
+        disabledHint={lang === 'en' ? 'Select a city first' : 'Pumili muna ng lungsod'}
       />
 
       <Pressable
-        onPress={() => { setShowCities(false); onNext(); }}
+        onPress={onNext}
         className="w-full rounded-xl bg-brand-600 py-4 items-center active:opacity-80 mb-3"
       >
         <Text className="text-sm font-semibold text-white">
@@ -380,9 +367,32 @@ export default function OnboardingScreen() {
   const [step, setStep] = useState(1);
 
   // Step 1
-  const [municipality, setMunicipality] = useState(user?.municipality ?? '');
-  const [barangay, setBarangay]         = useState('');
-  const [showCities, setShowCities]     = useState(false);
+  const [region, setRegionRaw]           = useState(user?.region ?? '');
+  const [municipality, setMunicipalityRaw] = useState(user?.municipality ?? '');
+  const [province, setProvince]          = useState(user?.province ?? '');
+  const [cityCode, setCityCode]          = useState('');
+  const [barangay, setBarangay]          = useState('');
+
+  const cityOptions = useMemo(() => (region ? getPhCitiesForRegion(region) : []), [region]);
+  const barangayOptions = useMemo(() => (cityCode ? getPhBarangaysForCity(cityCode) : []), [cityCode]);
+
+  // Picking a new region invalidates whatever city/barangay were picked
+  // under the old one; picking a new city invalidates the barangay.
+  const setRegion = (v: string) => {
+    setRegionRaw(v);
+    setMunicipalityRaw('');
+    setProvince('');
+    setCityCode('');
+    setBarangay('');
+  };
+
+  const setMunicipality = (cityName: string) => {
+    setMunicipalityRaw(cityName);
+    setBarangay('');
+    const match = cityOptions.find((c: PhCity) => c.name === cityName);
+    setCityCode(match?.code ?? '');
+    setProvince(match?.province ?? '');
+  };
 
   // Step 2
   const [householdSize, setHouseholdSize] = useState(user?.household_size ?? 4);
@@ -418,6 +428,8 @@ export default function OnboardingScreen() {
     setSaving(true);
     try {
       await client.patch('/user/profile', {
+        region:               region || null,
+        province:             province || null,
         municipality:         municipality.trim() || null,
         barangay:             barangay.trim() || null,
         household_size:       householdSize,
@@ -449,6 +461,8 @@ export default function OnboardingScreen() {
         household_size: householdSize,
       });
       await client.patch('/user/profile', {
+        region:               region || null,
+        province:             province || null,
         municipality:         municipality.trim() || null,
         barangay:             barangay.trim() || null,
         household_size:       householdSize,
@@ -463,10 +477,6 @@ export default function OnboardingScreen() {
       setSaving(false);
     }
   };
-
-  const filteredCities = municipality.length >= 2
-    ? PH_CITIES.filter((c) => c.toLowerCase().startsWith(municipality.toLowerCase())).slice(0, 5)
-    : [];
 
   // ── Layout ───────────────────────────────────────────────────────────────────
 
@@ -489,13 +499,14 @@ export default function OnboardingScreen() {
         <Step1
           lang={lang}
           slideAnim={slideAnim}
+          region={region}
+          setRegion={setRegion}
           municipality={municipality}
           setMunicipality={setMunicipality}
+          cityOptions={cityOptions.map((c) => c.name)}
           barangay={barangay}
           setBarangay={setBarangay}
-          showCities={showCities}
-          setShowCities={setShowCities}
-          filteredCities={filteredCities}
+          barangayOptions={barangayOptions}
           onNext={goNext}
         />
       )}

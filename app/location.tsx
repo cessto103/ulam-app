@@ -1,12 +1,14 @@
 import client from '@/src/api/client';
+import SelectField from '@/src/components/SelectField';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { getPhBarangaysForCity, getPhCitiesForRegion, getPhRegions, type PhCity } from '@/src/utils/phLocations';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -15,7 +17,6 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,14 +35,37 @@ export default function LocationScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const [municipality, setMunicipality] = useState(user?.municipality ?? '');
-  const [barangay, setBarangay]         = useState(user?.barangay ?? '');
-  const [province, setProvince]         = useState(user?.province ?? '');
-  const [region, setRegion]             = useState(user?.region ?? '');
+  const [municipality, setMunicipalityRaw] = useState(user?.municipality ?? '');
+  const [barangay, setBarangay]            = useState(user?.barangay ?? '');
+  const [province, setProvince]            = useState(user?.province ?? '');
+  const [region, setRegionRaw]             = useState(user?.region ?? '');
+  const [cityCode, setCityCode]            = useState('');
   const [coords, setCoords]             = useState<{ lat: number; lng: number } | null>(
     user?.latitude != null && user?.longitude != null ? { lat: user.latitude, lng: user.longitude } : null
   );
   const [locating, setLocating] = useState(false);
+
+  const cityOptions = useMemo(() => (region ? getPhCitiesForRegion(region) : []), [region]);
+  const barangayOptions = useMemo(() => (cityCode ? getPhBarangaysForCity(cityCode) : []), [cityCode]);
+
+  // Picking a new region invalidates whatever city/barangay were set under
+  // the old one (whether picked or GPS-prefilled); picking a new city
+  // invalidates the barangay the same way.
+  const setRegion = (v: string) => {
+    setRegionRaw(v);
+    setMunicipalityRaw('');
+    setProvince('');
+    setCityCode('');
+    setBarangay('');
+  };
+
+  const setMunicipality = (cityName: string) => {
+    setMunicipalityRaw(cityName);
+    setBarangay('');
+    const match = cityOptions.find((c: PhCity) => c.name === cityName);
+    setCityCode(match?.code ?? '');
+    setProvince(match?.province ?? '');
+  };
 
   const { mutate: saveLocation, isPending: savingLocation } = useMutation({
     mutationFn: async (payload: {
@@ -84,10 +108,17 @@ export default function LocationScreen() {
           geocodedBarangay = place.district ?? barangay;
           geocodedProvince = place.subregion ?? province;
           geocodedRegion = place.region ?? region;
-          setMunicipality(geocodedMunicipality);
-          setBarangay(geocodedBarangay);
+          // The OS geocoder's names don't reliably match this dataset's exact
+          // PSGC spelling/casing, so these bypass the cascading setRegion/
+          // setMunicipality wrappers (which look the typed name up in the
+          // dataset) and go straight into state. cityCode is left unset —
+          // the barangay picker stays empty until the user re-confirms the
+          // city via its picker, which is what actually resolves a code.
+          setRegionRaw(geocodedRegion);
+          setMunicipalityRaw(geocodedMunicipality);
           setProvince(geocodedProvince);
-          setRegion(geocodedRegion);
+          setBarangay(geocodedBarangay);
+          setCityCode('');
         }
       } catch {
         // Reverse geocoding is best-effort, the GPS pin itself still saves below.
@@ -141,50 +172,33 @@ export default function LocationScreen() {
 
         <ScrollView contentContainerClassName="px-4 pt-4 pb-12" keyboardShouldPersistTaps="handled">
           <View className="rounded-2xl border border-cream-200 bg-white p-4">
-            <Text className="text-xs font-medium text-ink-soft mb-1.5">{lang === 'en' ? 'City / Municipality' : 'Lungsod / Munisipyo'}</Text>
-            <TextInput
-              className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink mb-3 border border-cream-200"
-              placeholder="e.g. Antipolo, Marikina, Quezon City"
-              placeholderTextColor="#B0A18C"
+            <SelectField
+              label={lang === 'en' ? 'Region' : 'Rehiyon'}
+              placeholder={lang === 'en' ? 'Select region' : 'Pumili ng rehiyon'}
+              value={region}
+              options={getPhRegions()}
+              onSelect={setRegion}
+            />
+
+            <SelectField
+              label={lang === 'en' ? 'City / Municipality' : 'Lungsod / Munisipyo'}
+              placeholder={lang === 'en' ? 'Select city / municipality' : 'Pumili ng lungsod / munisipyo'}
               value={municipality}
-              onChangeText={setMunicipality}
-              autoCapitalize="words"
+              options={cityOptions.map((c) => c.name)}
+              onSelect={setMunicipality}
+              disabled={!region}
+              disabledHint={lang === 'en' ? 'Select a region first' : 'Pumili muna ng rehiyon'}
             />
 
-            <Text className="text-xs font-medium text-ink-soft mb-1.5">Barangay</Text>
-            <TextInput
-              className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink mb-3 border border-cream-200"
-              placeholder={lang === 'en' ? 'Barangay (optional)' : 'Barangay (opsyonal)'}
-              placeholderTextColor="#B0A18C"
+            <SelectField
+              label={lang === 'en' ? 'Barangay' : 'Barangay'}
+              placeholder={lang === 'en' ? 'Select barangay' : 'Pumili ng barangay'}
               value={barangay}
-              onChangeText={setBarangay}
-              autoCapitalize="words"
+              options={barangayOptions}
+              onSelect={setBarangay}
+              disabled={!cityCode}
+              disabledHint={lang === 'en' ? 'Select a city first' : 'Pumili muna ng lungsod'}
             />
-
-            <View className="flex-row gap-3 mb-3">
-              <View className="flex-1">
-                <Text className="text-xs font-medium text-ink-soft mb-1.5">{lang === 'en' ? 'Province' : 'Probinsya'}</Text>
-                <TextInput
-                  className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink border border-cream-200"
-                  placeholder="e.g. Rizal"
-                  placeholderTextColor="#B0A18C"
-                  value={province}
-                  onChangeText={setProvince}
-                  autoCapitalize="words"
-                />
-              </View>
-              <View className="flex-1">
-                <Text className="text-xs font-medium text-ink-soft mb-1.5">{lang === 'en' ? 'Region' : 'Rehiyon'}</Text>
-                <TextInput
-                  className="bg-cream-50 rounded-xl px-4 py-3.5 text-sm text-ink border border-cream-200"
-                  placeholder="e.g. IV-A"
-                  placeholderTextColor="#B0A18C"
-                  value={region}
-                  onChangeText={setRegion}
-                  autoCapitalize="characters"
-                />
-              </View>
-            </View>
 
             <Pressable
               onPress={captureLocation}
