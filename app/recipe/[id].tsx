@@ -1,4 +1,5 @@
 import ReportContentSheet from '@/src/components/ReportContentSheet';
+import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import client, { API_URL } from '@/src/api/client';
 import { BoostBadge, BoostButton } from '@/src/components/BoostButton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
@@ -1219,6 +1220,7 @@ export default function RecipeDetailScreen() {
                   : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 15, color: '#fff' }}>Add to Meal Plan</Text>}
               </Pressable>
             </View>
+            <AndroidNavBarFiller />
           </View>
         </Modal>
 

@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.10] — 2026-07-18
+
+### Fixed
+- **"Add to Today's Meal Plan" sheet on the recipe page ran behind the Android nav bar.** The app-wide fix from v1.30.4 mounts its black filler at the root of the main navigation stack, but this sheet is a React Native `Modal`, which renders in its own separate native window outside that tree — so the filler never reached it. Extracted the filler into a shared `AndroidNavBarFiller` component and added it to this modal directly.
+
 ## [1.30.9] — 2026-07-18
 
 ### Fixed

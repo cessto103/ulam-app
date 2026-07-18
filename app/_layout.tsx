@@ -1,4 +1,5 @@
 ﻿import '../global.css';
+import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
 import { LanguageProvider, useLanguage } from '@/src/context/LanguageContext';
 import { usePushNotifications } from '@/src/hooks/usePushNotifications';
@@ -25,28 +26,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Platform, View } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
-
-// Expo SDK 54 enforces edge-to-edge on Android (mandatory from Android 15
-// on regardless of config), which makes NavigationBar.setBackgroundColorAsync
-// a no-op — its own type defs say so ("supported only when edge-to-edge is
-// disabled"). Edge-to-edge means the system nav bar is transparent and just
-// shows whatever the app draws underneath it, so the only way to make that
-// area read as solid black is to actually draw a black view there ourselves,
-// once, at the root — covering every screen automatically.
-function AndroidNavBarFiller() {
-  const insets = useSafeAreaInsets();
-  if (Platform.OS !== 'android' || insets.bottom === 0) return null;
-  return (
-    <View
-      pointerEvents="none"
-      style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: insets.bottom, backgroundColor: '#000000', zIndex: 9999 }}
-    />
-  );
-}
 
 // Push notifications are not available in Expo Go (SDK 53+); skip setup there
 if (Constants.appOwnership !== 'expo') {
