@@ -11,6 +11,7 @@ import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/r
 import { formatCount } from '@/src/utils/formatCount';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useRouter, useLocalSearchParams } from 'expo-router';
 import { memo, useCallback, useMemo, useState, useEffect } from 'react';
@@ -1131,13 +1132,25 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
 
 export default function MealPlanScreen() {
   const params = useLocalSearchParams<{ tab?: string; filter?: string }>();
-  const { user }  = useAuth();
+  const { user, refreshUser }  = useAuth();
   const router    = useRouter();
   const [tab, setTab] = useState<'plan' | 'recipes'>(params.tab === 'recipes' ? 'recipes' : 'plan');
 
   useEffect(() => {
     if (params.tab === 'recipes') setTab('recipes');
   }, [params.tab, params.filter]);
+
+  // The "Generate" button below gates on `user.plan` from context, which
+  // only updates when something explicitly refetches it. If an admin grants
+  // Premium while the user is already sitting in the app (not necessarily
+  // backgrounded — could just be on a different tab), switching to this tab
+  // is the one moment we can cheaply catch that without waiting on the
+  // AppState-based refresh in AuthContext.
+  useFocusEffect(
+    useCallback(() => {
+      refreshUser().catch(() => {});
+    }, [refreshUser])
+  );
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#FFF8E8' }}>

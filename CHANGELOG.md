@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.11] — 2026-07-18
+
+### Fixed
+- **Admin-side account changes (e.g. manually granting Premium) didn't reach an already-logged-in user until they logged out and back in.** Nothing ever refetched the signed-in user's data on its own — the in-memory account state just sat however it was at login until something explicitly refreshed it. Now refreshes automatically when the app returns to foreground (throttled to at most once per 30s) and whenever the Meal Plan tab gains focus, so a Premium upgrade (or any other admin-side account change) takes effect without a manual re-login.
+
 ## [1.30.10] — 2026-07-18
 
 ### Fixed
