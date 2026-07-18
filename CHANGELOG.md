@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.30.14] — 2026-07-19
+
+### Changed
+- **Report a Price no longer asks for city/municipality separately** — now that a market or store must be selected (see below), its own address is already known and more accurate than asking the user to type/pick it again. Removed the "Location" field and its picker entirely.
+- **"Which market or store?" is now required**, not optional. The "General area (no specific store)" option is gone. Backend now rejects a report that has neither `market_id` nor `tindahan_id`, and derives the report's `municipality`/`barangay` from the selected market/store's own address instead of falling back to the reporting user's registered address — more accurate, since a user could be reporting a price while out of their home area.
+
 ## [1.30.13] — 2026-07-19
 
 ### Fixed
