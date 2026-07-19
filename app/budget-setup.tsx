@@ -67,8 +67,8 @@ function getBudgetMeta(
         label: en ? "Today's food budget (₱)" : 'Food budget ngayon (₱)',
         hint: en ? 'For just one day' : 'Para sa isang araw lang',
         infoText: en
-          ? "Used directly as today's daily food budget."
-          : 'Direktang gagamitin bilang daily food budget ngayon.',
+          ? "Your custom expenses (if any) will be deducted from this to get today's daily food budget."
+          : 'Ibabawas dito ang iyong custom expenses (kung meron) para makuha ang daily food budget ngayon.',
       };
     case '7days':
       return {
@@ -235,7 +235,6 @@ export default function BudgetSetupScreen() {
     setExpenses((prev) => prev.filter((r) => r.key !== key));
   };
 
-  const isToday = duration === 'today';
   const totalDays = getDays(duration, customDays);
   const budgetMeta = getBudgetMeta(duration, customDays, lang);
 
@@ -246,10 +245,9 @@ export default function BudgetSetupScreen() {
 
   const dailyFoodBudget = useMemo(() => {
     const total = parseFloat(totalAmount) || 0;
-    const deduction = isToday ? 0 : expensesTotal;
     if (!total || totalDays <= 0) return null;
-    return (total / totalDays) - deduction;
-  }, [totalAmount, expensesTotal, totalDays, isToday]);
+    return (total / totalDays) - expensesTotal;
+  }, [totalAmount, expensesTotal, totalDays]);
 
   const perPerson = dailyFoodBudget !== null && parseInt(householdSize) > 0
     ? dailyFoodBudget / (parseInt(householdSize) || 1)
@@ -281,15 +279,13 @@ export default function BudgetSetupScreen() {
       return;
     }
 
-    const customExpenses = isToday
-      ? []
-      : expenses
-          .filter((e) => e.category && (parseFloat(e.amount) || 0) > 0)
-          .map((e) => ({
-            category: e.category,
-            amount: parseFloat(e.amount) || 0,
-            ...(e.category === 'other' ? { label: e.label.trim() || null } : {}),
-          }));
+    const customExpenses = expenses
+      .filter((e) => e.category && (parseFloat(e.amount) || 0) > 0)
+      .map((e) => ({
+        category: e.category,
+        amount: parseFloat(e.amount) || 0,
+        ...(e.category === 'other' ? { label: e.label.trim() || null } : {}),
+      }));
 
     setLoading(true);
     try {
@@ -425,41 +421,39 @@ export default function BudgetSetupScreen() {
           </View>
         </View>
 
-        {/* 5. Daily custom expense(s) — hidden when Ngayon */}
-        {!isToday && (
-          <View className="mb-4">
-            <View className="flex-row items-center mb-1.5">
-              <Text className="text-xs font-semibold text-ink-soft flex-1">
-                {lang === 'en' ? 'Daily custom expense(s)' : 'Daily custom na gastos'}
-              </Text>
-              <Text className="text-xs text-ink-soft">{lang === 'en' ? 'optional' : 'opsyonal'}</Text>
-            </View>
-            <Text className="text-xs text-ink-soft mb-2">
-              {lang === 'en' ? 'Will be deducted from your daily food budget' : 'Ibabawas sa iyong daily food budget'}
+        {/* 5. Daily custom expense(s) */}
+        <View className="mb-4">
+          <View className="flex-row items-center mb-1.5">
+            <Text className="text-xs font-semibold text-ink-soft flex-1">
+              {lang === 'en' ? 'Daily custom expense(s)' : 'Daily custom na gastos'}
             </Text>
-
-            {expenses.map((row) => (
-              <ExpenseRowCard
-                key={row.key}
-                row={row}
-                onChangeCategory={(v) => updateExpense(row.key, { category: v })}
-                onChangeAmount={(v) => updateExpense(row.key, { amount: v })}
-                onChangeLabel={(v) => updateExpense(row.key, { label: v })}
-                onRemove={() => removeExpense(row.key)}
-              />
-            ))}
-
-            <Pressable
-              onPress={addExpense}
-              className="flex-row items-center justify-center gap-1.5 rounded-xl border border-dashed border-olive-400 py-3 active:opacity-70"
-            >
-              <Ionicons name="add" size={16} color="#4E7A47" />
-              <Text className="text-xs font-semibold" style={{ color: '#386641' }}>
-                {lang === 'en' ? 'Add expense' : 'Magdagdag ng gastos'}
-              </Text>
-            </Pressable>
+            <Text className="text-xs text-ink-soft">{lang === 'en' ? 'optional' : 'opsyonal'}</Text>
           </View>
-        )}
+          <Text className="text-xs text-ink-soft mb-2">
+            {lang === 'en' ? 'Will be deducted from your daily food budget' : 'Ibabawas sa iyong daily food budget'}
+          </Text>
+
+          {expenses.map((row) => (
+            <ExpenseRowCard
+              key={row.key}
+              row={row}
+              onChangeCategory={(v) => updateExpense(row.key, { category: v })}
+              onChangeAmount={(v) => updateExpense(row.key, { amount: v })}
+              onChangeLabel={(v) => updateExpense(row.key, { label: v })}
+              onRemove={() => removeExpense(row.key)}
+            />
+          ))}
+
+          <Pressable
+            onPress={addExpense}
+            className="flex-row items-center justify-center gap-1.5 rounded-xl border border-dashed border-olive-400 py-3 active:opacity-70"
+          >
+            <Ionicons name="add" size={16} color="#4E7A47" />
+            <Text className="text-xs font-semibold" style={{ color: '#386641' }}>
+              {lang === 'en' ? 'Add expense' : 'Magdagdag ng gastos'}
+            </Text>
+          </Pressable>
+        </View>
 
         {/* 7. Live preview card */}
         {dailyFoodBudget !== null && (

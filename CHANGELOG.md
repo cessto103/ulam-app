@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.33.1] — 2026-07-20
+
+### Changed
+- **Daily custom expense(s) now also apply to a "Today" budget**, not just multi-day ones. Previously fare/allowance-style deductions were hidden and skipped for a single-day budget; now the same expense rows (and the "will be deducted" math) work the same way regardless of duration.
+
 ## [1.33.0] — 2026-07-20
 
 ### Changed
