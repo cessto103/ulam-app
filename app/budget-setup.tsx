@@ -1,10 +1,12 @@
 ﻿import client from '@/src/api/client';
+import SelectField from '@/src/components/SelectField';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { Lang } from '@/src/i18n/translations';
+import { Ionicons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -29,6 +31,22 @@ const DURATIONS: { key: DurationType; labelEn: string; labelTl: string; days: nu
   { key: '15days', labelEn: '15 days', labelTl: '15 araw', days: 15 },
   { key: '30days', labelEn: '30 days', labelTl: '30 araw', days: DAYS_IN_MONTH },
   { key: 'custom', labelEn: 'Custom',  labelTl: 'Custom',  days: 0  },
+];
+
+type ExpenseCategory = 'travel' | 'load' | 'baon' | 'other';
+
+type ExpenseRow = {
+  key: string;
+  category: ExpenseCategory | '';
+  amount: string;
+  label: string;
+};
+
+const EXPENSE_CATEGORIES: { value: ExpenseCategory; labelEn: string; labelTl: string }[] = [
+  { value: 'travel', labelEn: 'Travel expense', labelTl: 'Pamasahe' },
+  { value: 'load',   labelEn: 'Load/Data expense', labelTl: 'Load/Data' },
+  { value: 'baon',   labelEn: 'Baon/Student allowance', labelTl: 'Baon/Allowance ng estudyante' },
+  { value: 'other',  labelEn: 'Others', labelTl: 'Iba pa' },
 ];
 
 function getDays(duration: DurationType, customDays: string): number {
@@ -131,6 +149,67 @@ function NumInput({
   );
 }
 
+function ExpenseRowCard({
+  row,
+  onChangeCategory,
+  onChangeAmount,
+  onChangeLabel,
+  onRemove,
+}: {
+  row: ExpenseRow;
+  onChangeCategory: (v: ExpenseCategory) => void;
+  onChangeAmount: (v: string) => void;
+  onChangeLabel: (v: string) => void;
+  onRemove: () => void;
+}) {
+  const { lang } = useLanguage();
+  return (
+    <View className="mb-3 rounded-xl border border-cream-300 bg-cream-50 p-3">
+      <View className="flex-row items-start gap-2">
+        <View className="flex-1">
+          <SelectField
+            label={lang === 'en' ? 'Category' : 'Kategorya'}
+            placeholder={lang === 'en' ? 'Select category' : 'Pumili ng kategorya'}
+            value={row.category}
+            options={EXPENSE_CATEGORIES.map((c) => ({ value: c.value, label: lang === 'en' ? c.labelEn : c.labelTl }))}
+            onSelect={(v) => onChangeCategory(v as ExpenseCategory)}
+          />
+        </View>
+        <Pressable onPress={onRemove} hitSlop={8} style={{ marginTop: 30 }} className="p-1">
+          <Ionicons name="trash-outline" size={18} color="#B0473F" />
+        </Pressable>
+      </View>
+
+      {row.category === 'other' && (
+        <View className="mb-3 -mt-2">
+          <Text className="text-xs font-semibold text-ink-soft mb-1.5">
+            {lang === 'en' ? 'What is this for?' : 'Para saan ito?'}
+          </Text>
+          <TextInput
+            className="rounded-xl border border-cream-300 bg-white px-3 py-3 text-sm text-ink"
+            value={row.label}
+            onChangeText={onChangeLabel}
+            placeholder={lang === 'en' ? 'e.g. Parking, Ice' : 'hal. Parking, Yelo'}
+            placeholderTextColor="#B0A18C"
+          />
+        </View>
+      )}
+
+      <View className="flex-row items-center rounded-xl border border-cream-300 bg-white px-3">
+        <Text className="text-sm text-ink-soft mr-1">₱</Text>
+        <TextInput
+          className="flex-1 py-3 text-sm text-ink"
+          value={row.amount}
+          onChangeText={onChangeAmount}
+          keyboardType="numeric"
+          placeholder="0"
+          placeholderTextColor="#B0A18C"
+        />
+      </View>
+    </View>
+  );
+}
+
 export default function BudgetSetupScreen() {
   const { user, refreshUser } = useAuth();
   const router = useRouter();
@@ -141,21 +220,36 @@ export default function BudgetSetupScreen() {
   const [customDays, setCustomDays] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
   const [householdSize, setHouseholdSize] = useState(String(user?.household_size ?? 4));
-  const [dailyFare, setDailyFare] = useState('');
-  const [dailyAllowance, setDailyAllowance] = useState('');
+  const [expenses, setExpenses] = useState<ExpenseRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const nextExpenseKey = useRef(0);
+
+  const addExpense = () => {
+    nextExpenseKey.current += 1;
+    setExpenses((prev) => [...prev, { key: `e${nextExpenseKey.current}`, category: '', amount: '', label: '' }]);
+  };
+  const updateExpense = (key: string, patch: Partial<ExpenseRow>) => {
+    setExpenses((prev) => prev.map((r) => (r.key === key ? { ...r, ...patch } : r)));
+  };
+  const removeExpense = (key: string) => {
+    setExpenses((prev) => prev.filter((r) => r.key !== key));
+  };
 
   const isToday = duration === 'today';
   const totalDays = getDays(duration, customDays);
   const budgetMeta = getBudgetMeta(duration, customDays, lang);
 
+  const expensesTotal = useMemo(
+    () => expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0),
+    [expenses],
+  );
+
   const dailyFoodBudget = useMemo(() => {
     const total = parseFloat(totalAmount) || 0;
-    const fare = isToday ? 0 : (parseFloat(dailyFare) || 0);
-    const allowance = isToday ? 0 : (parseFloat(dailyAllowance) || 0);
+    const deduction = isToday ? 0 : expensesTotal;
     if (!total || totalDays <= 0) return null;
-    return (total / totalDays) - fare - allowance;
-  }, [totalAmount, dailyFare, dailyAllowance, totalDays, isToday]);
+    return (total / totalDays) - deduction;
+  }, [totalAmount, expensesTotal, totalDays, isToday]);
 
   const perPerson = dailyFoodBudget !== null && parseInt(householdSize) > 0
     ? dailyFoodBudget / (parseInt(householdSize) || 1)
@@ -181,11 +275,21 @@ export default function BudgetSetupScreen() {
       Alert.alert(
         lang === 'en' ? 'Invalid budget' : 'Mali ang budget',
         lang === 'en'
-          ? 'Your daily fare and allowance are bigger than your budget. Reduce your other expenses.'
-          : 'Ang daily fare at allowance ay mas malaki pa sa budget. Bawasan ang ibang gastos.',
+          ? 'Your custom expenses are bigger than your budget. Reduce them.'
+          : 'Ang custom expenses ay mas malaki pa sa budget. Bawasan ang mga ito.',
       );
       return;
     }
+
+    const customExpenses = isToday
+      ? []
+      : expenses
+          .filter((e) => e.category && (parseFloat(e.amount) || 0) > 0)
+          .map((e) => ({
+            category: e.category,
+            amount: parseFloat(e.amount) || 0,
+            ...(e.category === 'other' ? { label: e.label.trim() || null } : {}),
+          }));
 
     setLoading(true);
     try {
@@ -193,8 +297,7 @@ export default function BudgetSetupScreen() {
         total_amount:    total,
         total_days:      totalDays,
         household_size:  parseInt(householdSize) || 4,
-        daily_fare:      isToday ? 0 : (parseFloat(dailyFare) || 0),
-        daily_allowance: isToday ? 0 : (parseFloat(dailyAllowance) || 0),
+        custom_expenses: customExpenses,
       });
 
       await refreshUser();
@@ -322,24 +425,40 @@ export default function BudgetSetupScreen() {
           </View>
         </View>
 
-        {/* 5 & 6. Daily fare + allowance — hidden when Ngayon */}
+        {/* 5. Daily custom expense(s) — hidden when Ngayon */}
         {!isToday && (
-          <>
-            <NumInput
-              label={lang === 'en' ? 'Daily fare' : 'Daily pamasahe'}
-              value={dailyFare}
-              onChange={setDailyFare}
-              hint={lang === 'en' ? 'Will be deducted from daily food budget' : 'Ibabawas sa daily food budget'}
-              optional
-            />
-            <NumInput
-              label={lang === 'en' ? 'Daily allowance (other)' : 'Daily allowance (iba)'}
-              value={dailyAllowance}
-              onChange={setDailyAllowance}
-              hint={lang === 'en' ? 'Other regular expenses per day' : 'Ibang regular na gastos bawat araw'}
-              optional
-            />
-          </>
+          <View className="mb-4">
+            <View className="flex-row items-center mb-1.5">
+              <Text className="text-xs font-semibold text-ink-soft flex-1">
+                {lang === 'en' ? 'Daily custom expense(s)' : 'Daily custom na gastos'}
+              </Text>
+              <Text className="text-xs text-ink-soft">{lang === 'en' ? 'optional' : 'opsyonal'}</Text>
+            </View>
+            <Text className="text-xs text-ink-soft mb-2">
+              {lang === 'en' ? 'Will be deducted from your daily food budget' : 'Ibabawas sa iyong daily food budget'}
+            </Text>
+
+            {expenses.map((row) => (
+              <ExpenseRowCard
+                key={row.key}
+                row={row}
+                onChangeCategory={(v) => updateExpense(row.key, { category: v })}
+                onChangeAmount={(v) => updateExpense(row.key, { amount: v })}
+                onChangeLabel={(v) => updateExpense(row.key, { label: v })}
+                onRemove={() => removeExpense(row.key)}
+              />
+            ))}
+
+            <Pressable
+              onPress={addExpense}
+              className="flex-row items-center justify-center gap-1.5 rounded-xl border border-dashed border-olive-400 py-3 active:opacity-70"
+            >
+              <Ionicons name="add" size={16} color="#4E7A47" />
+              <Text className="text-xs font-semibold" style={{ color: '#386641' }}>
+                {lang === 'en' ? 'Add expense' : 'Magdagdag ng gastos'}
+              </Text>
+            </Pressable>
+          </View>
         )}
 
         {/* 7. Live preview card */}
@@ -373,8 +492,8 @@ export default function BudgetSetupScreen() {
             {dailyFoodBudget <= 0 && (
               <Text className="text-xs mt-1" style={{ color: '#E24B4A' }}>
                 {lang === 'en'
-                  ? 'Your fare/allowance is higher than your budget. Reduce your other expenses.'
-                  : 'Ang fare/allowance ay mas mataas sa budget mo. Bawasan ang ibang gastos.'}
+                  ? 'Your custom expenses are higher than your budget. Reduce them.'
+                  : 'Ang custom expenses ay mas mataas sa budget mo. Bawasan ang mga ito.'}
               </Text>
             )}
           </View>

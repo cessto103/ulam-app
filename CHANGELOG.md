@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.33.0] — 2026-07-20
+
+### Changed
+- **Budget setup: "Daily fare" and "Daily allowance (other)" replaced with Daily custom expense(s).** Instead of two flat number fields, add as many expense rows as you need, each picked from a category (Travel expense, Load/Data expense, Baon/Student allowance, or Others with your own label) plus an amount. All rows are deducted from your daily food budget the same way fare/allowance used to be. Categorizing instead of free-typing means this can feed real breakdown graphs later, the same way logged spending already does.
+
 ## [1.32.1] — 2026-07-20
 
 ### Changed
