@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.32.1] — 2026-07-20
+
+### Changed
+- **Home tile "My Recipe Book" is now "My Shopping List"**, opening the new shopping lists home. Recipe Book stays reachable via Profile > Saved Recipes and the Meal Plan tab's Bookmark tab. Any admin-uploaded theme background for this tile position keeps applying.
+
 ## [1.32.0] — 2026-07-19
 
 ### Added

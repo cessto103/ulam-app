@@ -660,7 +660,12 @@ export default function HomeScreen() {
           { icon: 'restaurant-outline' as const, label: lang === 'en' ? 'My Recipes' : 'Aking Recipes', route: '/(tabs)/meal-plan?tab=recipes&filter=mine', img: require('@/assets/tiles/tile-1.jpg'), wash: 'rgba(196,94,58,0.78)', sectionKey: 'dashboard_my_recipes' },
           { icon: 'bar-chart-outline' as const, label: lang === 'en' ? 'Spending History' : 'Gastos History', route: '/spending-history', img: require('@/assets/tiles/tile-2.jpg'), wash: 'rgba(227,163,42,0.72)', sectionKey: 'dashboard_spending_history' },
           { icon: 'trophy-outline' as const, label: lang === 'en' ? 'My Awards & Achievements' : 'Mga Award ko', route: '/(tabs)/awards', img: require('@/assets/tiles/tile-3.jpg'), wash: 'rgba(56,102,65,0.78)', sectionKey: 'dashboard_awards' },
-          { icon: 'book-outline' as const, label: lang === 'en' ? 'My Recipe Book' : 'Aking Recipe Book', route: '/recipe-book', img: require('@/assets/tiles/tile-4.jpg'), wash: 'rgba(60,58,47,0.78)', sectionKey: 'dashboard_recipe_book' },
+          // Recipe Book stays reachable via Profile > Saved Recipes and the
+          // meal-plan tab's Bookmark tab; this home tile now opens the new
+          // shopping lists. The theme sectionKey is intentionally unchanged so
+          // admin-uploaded backgrounds and saved presets keep applying to this
+          // tile position.
+          { icon: 'cart-outline' as const, label: lang === 'en' ? 'My Shopping List' : 'Aking Shopping List', route: '/shopping-list', img: require('@/assets/tiles/tile-4.jpg'), wash: 'rgba(60,58,47,0.78)', sectionKey: 'dashboard_recipe_book' },
         ]).map((item) => (
           <Pressable
             key={item.label}
