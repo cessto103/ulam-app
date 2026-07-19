@@ -3,6 +3,18 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.32.0] — 2026-07-19
+
+### Added
+- **Shareable shopping lists.** The shopping list now lives on the server (it used to exist only on your device), which unlocks sharing: pick any of your accepted connections and they see your list live. They can check items off as they buy, add missing items, and correct prices/quantities to what the tindera actually charged, with names shown beside who checked or added what. You watch it update as they shop (the list refreshes itself every few seconds while shared). Sharing is a Premium feature for the list owner only; the people you share with never need Premium.
+- **Event lists.** Besides today's list (built from your meal plan, same as before), you can now create standalone lists for team building, fiesta, or handaan, optionally shared with co-workers or kamag-anak. Event lists never touch anyone's personal budget: completing one just locks it with an itemized summary and total, ready to use as a liquidation record.
+- **Tingi prices on staples.** Ingredients like toyo, suka, and asin now show the price of the smallest amount you can actually buy (sachet, takal) instead of a proportional estimate nobody can hand a tindera, with the recipe's real amount kept as a note ("kailangan: 2 tbsp"). The staples list is admin-managed.
+- **Tapping a push notification now opens the right screen** (a shared list, a connection request, a profile), including from a cold start. Previously notification taps just opened the app.
+
+### Changed
+- **Shopping list screens restructured**: a lists home (today's list, event lists, shared with me) plus the familiar list detail. All the existing interactions are preserved: category grouping, check-all per category, inline price/qty editing with the "edited" badge, swipe-to-delete (owner only now), add-item row. The totals card now shows two numbers: "Cash to bring" (everything on the list) and "Bought so far" (checked items only).
+- **Completing a list logs only what was actually bought** (checked items, at the price actually paid). Unchecked items are excluded from the spend and flagged "not bought" in the final summary. If nothing is checked, the app offers to log the full total like before, so nothing changes for those who never used the checkboxes.
+
 ## [1.31.0] — 2026-07-19
 
 ### Added

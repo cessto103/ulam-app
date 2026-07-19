@@ -2,6 +2,7 @@
 import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
 import { LanguageProvider, useLanguage } from '@/src/context/LanguageContext';
+import { useNotificationTapRouting } from '@/src/hooks/useNotificationTapRouting';
 import { usePushNotifications } from '@/src/hooks/usePushNotifications';
 import {
   Baloo2_600SemiBold,
@@ -49,6 +50,7 @@ function RouteGuard() {
   const { user, isLoading } = useAuth();
   const { lang } = useLanguage();
   usePushNotifications();
+  useNotificationTapRouting(!isLoading && !!user && !!user.email_verified_at);
   const segments = useSegments();
   const router = useRouter();
 
@@ -188,7 +190,11 @@ function RouteGuard() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="shopping-list"
+        name="shopping-list/index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="shopping-list/[id]"
         options={{ headerShown: false }}
       />
       <Stack.Screen
