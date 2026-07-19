@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   Pressable,
@@ -24,6 +25,9 @@ type PublicUser = {
   municipality: string | null;
   followers_count: number; following_count: number;
   is_following: boolean; is_me: boolean;
+  connection_status: 'none' | 'pending_sent' | 'pending_received' | 'connected' | 'blocked';
+  connection_id: number | null;
+  my_label_id: number | null;
 };
 
 type PostUser = { id: number; name: string; username: string | null; avatar: string | null };
@@ -112,6 +116,33 @@ export default function UserProfileScreen() {
   const { mutate: unfollow, isPending: unfollowing } = useMutation({
     mutationFn: () => client.delete(`/users/${id}/follow`),
     onSuccess:  () => qc.invalidateQueries({ queryKey: ['user-profile', id] }),
+  });
+
+  const invalidateConnections = () => {
+    qc.invalidateQueries({ queryKey: ['user-profile', id] });
+    qc.invalidateQueries({ queryKey: ['connections-accepted'] });
+    qc.invalidateQueries({ queryKey: ['connections-pending'] });
+  };
+
+  const { mutate: requestConnection, isPending: requesting } = useMutation({
+    mutationFn: () => client.post('/connections/requests', { user_id: Number(id) }),
+    onSuccess: invalidateConnections,
+    onError: (e: any) => Alert.alert('Error', e?.response?.data?.message ?? 'Could not send request.'),
+  });
+
+  const { mutate: cancelConnectionRequest, isPending: cancellingReq } = useMutation({
+    mutationFn: (connectionId: number) => client.delete(`/connections/requests/${connectionId}`),
+    onSuccess: invalidateConnections,
+  });
+
+  const { mutate: acceptConnection, isPending: acceptingConn } = useMutation({
+    mutationFn: (connectionId: number) => client.post(`/connections/requests/${connectionId}/accept`),
+    onSuccess: invalidateConnections,
+  });
+
+  const { mutate: removeConnection, isPending: removingConn } = useMutation({
+    mutationFn: (connectionId: number) => client.delete(`/connections/${connectionId}`),
+    onSuccess: invalidateConnections,
   });
 
   if (isLoading) {
@@ -271,7 +302,7 @@ export default function UserProfileScreen() {
                 </View>
               </View>
 
-              {/* Follow / Message button */}
+              {/* Follow + Connect buttons */}
               {user.is_me ? (
                 <Pressable
                   onPress={() => router.push('/settings' as any)}
@@ -279,28 +310,105 @@ export default function UserProfileScreen() {
                 >
                   <Text className="text-xs font-medium text-ink-soft">✏️ Edit Profile</Text>
                 </Pressable>
-              ) : user.is_following ? (
-                <Pressable
-                  onPress={() => unfollow()}
-                  disabled={unfollowing}
-                  className="w-full rounded-xl border border-cream-300 py-2.5 items-center active:opacity-70"
-                >
-                  {unfollowing
-                    ? <ActivityIndicator color="#386641" size="small" />
-                    : <Text className="text-xs font-medium text-ink-soft">✓ Following</Text>
-                  }
-                </Pressable>
               ) : (
-                <Pressable
-                  onPress={() => follow()}
-                  disabled={following}
-                  className="w-full rounded-xl bg-brand-600 py-2.5 items-center active:opacity-80"
-                >
-                  {following
-                    ? <ActivityIndicator color="white" size="small" />
-                    : <Text className="text-xs font-semibold text-white">+ Follow</Text>
-                  }
-                </Pressable>
+                <View className="flex-row gap-2">
+                  {user.is_following ? (
+                    <Pressable
+                      onPress={() => unfollow()}
+                      disabled={unfollowing}
+                      className="flex-1 rounded-xl border border-cream-300 py-2.5 items-center active:opacity-70"
+                    >
+                      {unfollowing
+                        ? <ActivityIndicator color="#386641" size="small" />
+                        : <Text className="text-xs font-medium text-ink-soft">✓ Following</Text>
+                      }
+                    </Pressable>
+                  ) : (
+                    <Pressable
+                      onPress={() => follow()}
+                      disabled={following}
+                      className="flex-1 rounded-xl bg-brand-600 py-2.5 items-center active:opacity-80"
+                    >
+                      {following
+                        ? <ActivityIndicator color="white" size="small" />
+                        : <Text className="text-xs font-semibold text-white">+ Follow</Text>
+                      }
+                    </Pressable>
+                  )}
+
+                  {user.connection_status === 'none' && (
+                    <Pressable
+                      onPress={() => requestConnection()}
+                      disabled={requesting}
+                      className="flex-1 rounded-xl bg-olive-400 py-2.5 items-center active:opacity-80"
+                    >
+                      {requesting
+                        ? <ActivityIndicator color="white" size="small" />
+                        : <Text className="text-xs font-semibold text-white">🤝 {lang === 'en' ? 'Connect' : 'Kumonekta'}</Text>
+                      }
+                    </Pressable>
+                  )}
+                  {user.connection_status === 'pending_sent' && (
+                    <Pressable
+                      onPress={() => {
+                        if (!user.connection_id) return;
+                        Alert.alert(
+                          lang === 'en' ? 'Cancel request?' : 'Kanselahin ang request?',
+                          lang === 'en'
+                            ? `Your connection request to ${user.name} is still waiting for approval.`
+                            : `Hinihintay pa ang approval ni ${user.name} sa iyong request.`,
+                          [
+                            { text: lang === 'en' ? 'Keep waiting' : 'Hintayin pa', style: 'cancel' },
+                            { text: lang === 'en' ? 'Cancel request' : 'Kanselahin', style: 'destructive', onPress: () => cancelConnectionRequest(user.connection_id!) },
+                          ],
+                        );
+                      }}
+                      disabled={cancellingReq}
+                      className="flex-1 rounded-xl border border-cream-300 py-2.5 items-center active:opacity-70"
+                    >
+                      {cancellingReq
+                        ? <ActivityIndicator color="#386641" size="small" />
+                        : <Text className="text-xs font-medium text-ink-soft">⏳ {lang === 'en' ? 'Pending' : 'Naghihintay'}</Text>
+                      }
+                    </Pressable>
+                  )}
+                  {user.connection_status === 'pending_received' && (
+                    <Pressable
+                      onPress={() => user.connection_id && acceptConnection(user.connection_id)}
+                      disabled={acceptingConn}
+                      className="flex-1 rounded-xl bg-olive-400 py-2.5 items-center active:opacity-80"
+                    >
+                      {acceptingConn
+                        ? <ActivityIndicator color="white" size="small" />
+                        : <Text className="text-xs font-semibold text-white">{lang === 'en' ? 'Accept request' : 'Tanggapin'}</Text>
+                      }
+                    </Pressable>
+                  )}
+                  {user.connection_status === 'connected' && (
+                    <Pressable
+                      onPress={() => {
+                        if (!user.connection_id) return;
+                        Alert.alert(
+                          lang === 'en' ? 'Remove connection?' : 'Tanggalin ang koneksyon?',
+                          lang === 'en'
+                            ? `You and ${user.name} will no longer be connected.`
+                            : `Hindi na kayo magiging konektado ni ${user.name}.`,
+                          [
+                            { text: lang === 'en' ? 'Cancel' : 'Kanselahin', style: 'cancel' },
+                            { text: lang === 'en' ? 'Remove' : 'Tanggalin', style: 'destructive', onPress: () => removeConnection(user.connection_id!) },
+                          ],
+                        );
+                      }}
+                      disabled={removingConn}
+                      className="flex-1 rounded-xl border border-leaf-200 bg-leaf-50 py-2.5 items-center active:opacity-70"
+                    >
+                      {removingConn
+                        ? <ActivityIndicator color="#386641" size="small" />
+                        : <Text className="text-xs font-semibold text-leaf-700">✓ {lang === 'en' ? 'Connected' : 'Konektado'}</Text>
+                      }
+                    </Pressable>
+                  )}
+                </View>
               )}
             </View>
 

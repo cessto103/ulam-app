@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.31.0] — 2026-07-19
+
+### Added
+- **Connections, separate from Followers.** Following stays one-tap like before, but there's now a real "Connect" system too, like adding a friend: you send a request, the other user approves it, and only then are you connected. The Connections screen gains a third tab showing incoming requests (Accept/Decline), sent requests (Cancel), and your accepted connections. Profiles now show a Connect button beside Follow, reflecting the request state (Connect, Pending, Accept request, Connected).
+- **Relationship labels on connections** (Household, Relative, Normal, plus whatever the admin adds): tap the label chip on a connection to set one. Labels are private; only you see the labels you set. This is groundwork for shared shopping lists, where you'll pick connections to share with.
+
 ## [1.30.14] — 2026-07-19
 
 ### Changed
