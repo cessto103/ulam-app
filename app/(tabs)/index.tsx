@@ -1144,29 +1144,29 @@ export default function HomeScreen() {
               <Pressable
                 key={r.id}
                 onPress={() => router.push(`/recipe/${r.id}` as any)}
-                className="active:opacity-80"
+                className="active:opacity-80 rounded-2xl overflow-hidden border border-cream-200 bg-white"
                 style={{ width: 150 }}
               >
-                <View className="rounded-2xl overflow-hidden border border-cream-200 bg-white mb-1.5">
-                  <RecipeCoverPhoto
-                    photos={r.image_urls ?? []}
-                    collageStyle={(r.collage_style ?? 'gradient') as any}
-                    gradientKey={(r.gradient_key ?? 'grad_a') as any}
-                    fontKey={(r.font_key ?? 'baloo') as any}
-                    title={r.title}
-                    height={110}
-                  />
+                <RecipeCoverPhoto
+                  photos={r.image_urls ?? []}
+                  collageStyle={(r.collage_style ?? 'gradient') as any}
+                  gradientKey={(r.gradient_key ?? 'grad_a') as any}
+                  fontKey={(r.font_key ?? 'baloo') as any}
+                  title={r.title}
+                  height={170}
+                />
+                <View style={{ paddingHorizontal: 10, paddingVertical: 8 }}>
+                  <Text
+                    style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}
+                    numberOfLines={1}
+                  >
+                    {r.title}
+                  </Text>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C' }}>
+                    {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toLocaleString()}` : '-'}
+                    {r.servings ? ` / ${r.servings} servings` : ''}
+                  </Text>
                 </View>
-                <Text
-                  style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}
-                  numberOfLines={1}
-                >
-                  {r.title}
-                </Text>
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C' }}>
-                  {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toLocaleString()}` : '-'}
-                  {r.servings ? ` / ${r.servings} servings` : ''}
-                </Text>
               </Pressable>
             ))}
           </ScrollView>

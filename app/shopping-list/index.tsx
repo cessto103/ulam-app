@@ -9,7 +9,9 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -245,43 +247,48 @@ export default function ShoppingListsIndexScreen() {
 
       {/* New event list modal */}
       <Modal visible={newListOpen} animationType="slide" transparent onRequestClose={() => setNewListOpen(false)}>
-        <Pressable
-          onPress={() => setNewListOpen(false)}
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' }}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <Pressable
-            onPress={(e) => e.stopPropagation()}
-            style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, paddingBottom: insets.bottom + 16 }}
+            onPress={() => setNewListOpen(false)}
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#000000' }}>
-                {lang === 'en' ? 'New event list' : 'Bagong event list'}
-              </Text>
-              <Pressable onPress={() => setNewListOpen(false)} hitSlop={8}>
-                <Ionicons name="close" size={18} color="#6F655A" />
-              </Pressable>
-            </View>
-            <TextInput
-              className="w-full rounded-xl border border-cream-300 bg-cream-50 px-4 py-3 text-sm text-ink mb-3"
-              placeholder={lang === 'en' ? 'e.g. Team Building Rekados' : 'hal. Rekados para sa Team Building'}
-              placeholderTextColor="#B0A18C"
-              value={newListTitle}
-              onChangeText={setNewListTitle}
-              autoFocus
-              returnKeyType="done"
-              onSubmitEditing={() => newListTitle.trim() && createEvent()}
-            />
             <Pressable
-              onPress={() => createEvent()}
-              disabled={!newListTitle.trim() || creatingEvent}
-              className="w-full rounded-xl bg-brand-600 py-3.5 items-center active:opacity-80 disabled:opacity-50"
+              onPress={(e) => e.stopPropagation()}
+              style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, paddingBottom: insets.bottom + 16 }}
             >
-              {creatingEvent
-                ? <ActivityIndicator color="white" size="small" />
-                : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>{lang === 'en' ? 'Create' : 'Gumawa'}</Text>}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#000000' }}>
+                  {lang === 'en' ? 'New event list' : 'Bagong event list'}
+                </Text>
+                <Pressable onPress={() => setNewListOpen(false)} hitSlop={8}>
+                  <Ionicons name="close" size={18} color="#6F655A" />
+                </Pressable>
+              </View>
+              <TextInput
+                className="w-full rounded-xl border border-cream-300 bg-cream-50 px-4 py-3 text-sm text-ink mb-3"
+                placeholder={lang === 'en' ? 'e.g. Team Building Rekados' : 'hal. Rekados para sa Team Building'}
+                placeholderTextColor="#B0A18C"
+                value={newListTitle}
+                onChangeText={setNewListTitle}
+                autoFocus
+                returnKeyType="done"
+                onSubmitEditing={() => newListTitle.trim() && createEvent()}
+              />
+              <Pressable
+                onPress={() => createEvent()}
+                disabled={!newListTitle.trim() || creatingEvent}
+                className="w-full rounded-xl bg-brand-600 py-3.5 items-center active:opacity-80 disabled:opacity-50"
+              >
+                {creatingEvent
+                  ? <ActivityIndicator color="white" size="small" />
+                  : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>{lang === 'en' ? 'Create' : 'Gumawa'}</Text>}
+              </Pressable>
             </Pressable>
           </Pressable>
-        </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );

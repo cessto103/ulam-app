@@ -3,6 +3,15 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.41.0] — 2026-07-20
+
+### Fixed
+- **Connect request cancel could fail silently.** The Cancel/Accept/Remove/Follow/Unfollow buttons on a public profile had no error feedback at all — a failed request (network blip, stale state) just left the button stuck with no explanation. All five now show an error alert and re-sync from the server on failure. Also hardened the Connect button row so it can never render empty for an unexpected connection status.
+- **Keyboard covering fields on 3 screens**: the "New event list" sheet on Shopping Lists, the Category picker's search box on Set Budget (shared `SelectField` component, so this also covers Region/City/Barangay on the Location page), and the secondary email field on My Account. All three needed a `KeyboardAvoidingView` that was either missing entirely or inert on Android (`behavior: undefined` doesn't do anything — switched to `'height'`, matching React Native's own recommended cross-platform pattern).
+
+### Changed
+- **"Popular This Week" cards redesigned**: photo is now taller (110px → 170px) and the recipe name + price/servings moved inside the card itself instead of floating below it.
+
 ## [1.40.0] — 2026-07-20
 
 ### Fixed

@@ -1,7 +1,7 @@
 import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type SelectOption = { label: string; value: string };
@@ -63,53 +63,58 @@ export default function SelectField({
       </Pressable>
 
       <Modal visible={open} animationType="slide" transparent onRequestClose={() => setOpen(false)}>
-        <Pressable
-          onPress={() => setOpen(false)}
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' }}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <Pressable
-            onPress={(e) => e.stopPropagation()}
-            style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: insets.bottom }}
+            onPress={() => setOpen(false)}
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' }}
           >
-            <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#000000' }}>{label}</Text>
-                <Pressable onPress={() => setOpen(false)} hitSlop={8}>
-                  <Ionicons name="close" size={18} color="#6F655A" />
-                </Pressable>
-              </View>
-              <TextInput
-                className="w-full rounded-xl border border-cream-300 bg-cream-50 px-4 py-2.5 text-sm text-ink"
-                placeholder={searchPlaceholder}
-                placeholderTextColor="#B0A18C"
-                value={search}
-                onChangeText={setSearch}
-                autoCapitalize="words"
-              />
-            </View>
-            <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ paddingBottom: 12 }} keyboardShouldPersistTaps="handled">
-              {filtered.length === 0 ? (
-                <View className="p-6 items-center">
-                  <Text className="text-xs text-ink-soft">{emptyLabel}</Text>
-                </View>
-              ) : (
-                filtered.map((option) => (
-                  <Pressable
-                    key={option.value}
-                    onPress={() => { onSelect(option.value); setOpen(false); }}
-                    className="flex-row items-center justify-between px-4 py-3 border-b border-cream-200 active:opacity-70"
-                  >
-                    <Text style={{ fontFamily: option.value === value ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 14, color: '#000000' }}>
-                      {option.label}
-                    </Text>
-                    {option.value === value && <Ionicons name="checkmark" size={16} color="#386641" />}
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '75%', paddingBottom: insets.bottom }}
+            >
+              <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: '#F9EDD3' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: '#000000' }}>{label}</Text>
+                  <Pressable onPress={() => setOpen(false)} hitSlop={8}>
+                    <Ionicons name="close" size={18} color="#6F655A" />
                   </Pressable>
-                ))
-              )}
-            </ScrollView>
-            <AndroidNavBarFiller />
+                </View>
+                <TextInput
+                  className="w-full rounded-xl border border-cream-300 bg-cream-50 px-4 py-2.5 text-sm text-ink"
+                  placeholder={searchPlaceholder}
+                  placeholderTextColor="#B0A18C"
+                  value={search}
+                  onChangeText={setSearch}
+                  autoCapitalize="words"
+                />
+              </View>
+              <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ paddingBottom: 12 }} keyboardShouldPersistTaps="handled">
+                {filtered.length === 0 ? (
+                  <View className="p-6 items-center">
+                    <Text className="text-xs text-ink-soft">{emptyLabel}</Text>
+                  </View>
+                ) : (
+                  filtered.map((option) => (
+                    <Pressable
+                      key={option.value}
+                      onPress={() => { onSelect(option.value); setOpen(false); }}
+                      className="flex-row items-center justify-between px-4 py-3 border-b border-cream-200 active:opacity-70"
+                    >
+                      <Text style={{ fontFamily: option.value === value ? 'NunitoSans_700Bold' : 'NunitoSans_400Regular', fontSize: 14, color: '#000000' }}>
+                        {option.label}
+                      </Text>
+                      {option.value === value && <Ionicons name="checkmark" size={16} color="#386641" />}
+                    </Pressable>
+                  ))
+                )}
+              </ScrollView>
+              <AndroidNavBarFiller />
+            </Pressable>
           </Pressable>
-        </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

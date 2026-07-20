@@ -109,14 +109,27 @@ export default function UserProfileScreen() {
     staleTime: 60_000,
   });
 
+  // A mutation whose onSuccess only invalidates a query (no local state
+  // reset) fails completely silently if the request errors -- the button
+  // just sits there with no feedback and no obvious way to tell it didn't
+  // work. Every connection/follow mutation below gets the same fallback
+  // error alert, refetching the real state on failure too, in case
+  // whatever's shown got out of sync with the server for some other reason.
+  const onMutationError = (e: any, fallback: string) => {
+    Alert.alert('Error', e?.response?.data?.message ?? fallback);
+    qc.invalidateQueries({ queryKey: ['user-profile', id] });
+  };
+
   const { mutate: follow,   isPending: following }  = useMutation({
     mutationFn: () => client.post(`/users/${id}/follow`),
     onSuccess:  () => qc.invalidateQueries({ queryKey: ['user-profile', id] }),
+    onError: (e: any) => onMutationError(e, 'Could not follow.'),
   });
 
   const { mutate: unfollow, isPending: unfollowing } = useMutation({
     mutationFn: () => client.delete(`/users/${id}/follow`),
     onSuccess:  () => qc.invalidateQueries({ queryKey: ['user-profile', id] }),
+    onError: (e: any) => onMutationError(e, 'Could not unfollow.'),
   });
 
   const invalidateConnections = () => {
@@ -128,22 +141,25 @@ export default function UserProfileScreen() {
   const { mutate: requestConnection, isPending: requesting } = useMutation({
     mutationFn: () => client.post('/connections/requests', { user_id: Number(id) }),
     onSuccess: invalidateConnections,
-    onError: (e: any) => Alert.alert('Error', e?.response?.data?.message ?? 'Could not send request.'),
+    onError: (e: any) => onMutationError(e, 'Could not send request.'),
   });
 
   const { mutate: cancelConnectionRequest, isPending: cancellingReq } = useMutation({
     mutationFn: (connectionId: number) => client.delete(`/connections/requests/${connectionId}`),
     onSuccess: invalidateConnections,
+    onError: (e: any) => onMutationError(e, 'Could not cancel the request.'),
   });
 
   const { mutate: acceptConnection, isPending: acceptingConn } = useMutation({
     mutationFn: (connectionId: number) => client.post(`/connections/requests/${connectionId}/accept`),
     onSuccess: invalidateConnections,
+    onError: (e: any) => onMutationError(e, 'Could not accept the request.'),
   });
 
   const { mutate: removeConnection, isPending: removingConn } = useMutation({
     mutationFn: (connectionId: number) => client.delete(`/connections/${connectionId}`),
     onSuccess: invalidateConnections,
+    onError: (e: any) => onMutationError(e, 'Could not remove the connection.'),
   });
 
   if (isLoading) {
@@ -344,7 +360,12 @@ export default function UserProfileScreen() {
                     </Pressable>
                   )}
 
-                  {user.connection_status === 'none' && (
+                  {/* 'none' is the fallback for any status this UI doesn't
+                      have a specific branch for (e.g. a future 'blocked'),
+                      not just a literal match -- so this row can never
+                      silently render nothing if the API ever returns a
+                      value not explicitly handled below. */}
+                  {!['pending_sent', 'pending_received', 'connected'].includes(user.connection_status) && (
                     <Pressable
                       onPress={() => requestConnection()}
                       disabled={requesting}
