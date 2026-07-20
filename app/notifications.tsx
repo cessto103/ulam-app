@@ -1,6 +1,7 @@
 ﻿import client from '@/src/api/client';
 import { SkeletonListItem } from '@/src/components/Skeleton';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { isSafeAppUrl } from '@/src/utils/safeAppUrl';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import {
@@ -88,7 +89,7 @@ export default function NotificationsScreen() {
       qc.invalidateQueries({ queryKey: ['notifications'] });
       qc.invalidateQueries({ queryKey: ['notif-count'] });
     }
-    if (notif.action_url) {
+    if (isSafeAppUrl(notif.action_url)) {
       router.push(notif.action_url as any);
     }
   };

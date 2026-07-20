@@ -1,3 +1,4 @@
+import { isSafeAppUrl } from '@/src/utils/safeAppUrl';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -7,7 +8,7 @@ import { useEffect, useRef } from 'react';
  * both while running (foreground/background) and from a cold start. The
  * server puts action_url into every push's data payload
  * (NotificationService::send), and the in-app notifications screen already
- * navigates with the same field — this brings push taps to parity.
+ * navigates with the same field, so this brings push taps to parity.
  *
  * Only meaningful once a user session exists; taps that land before login
  * finishes are dropped (the RouteGuard redirect would fight the push anyway).
@@ -19,7 +20,7 @@ export function useNotificationTapRouting(enabled: boolean) {
   const handledRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Push notifications are unavailable in Expo Go (SDK 53+) — same guard
+    // Push notifications are unavailable in Expo Go (SDK 53+), same guard
     // as the notification handler setup in app/_layout.tsx.
     if (Constants.appOwnership === 'expo' || !enabled) return;
 
@@ -28,7 +29,7 @@ export function useNotificationTapRouting(enabled: boolean) {
     const routeFrom = (response: any) => {
       const url = response?.notification?.request?.content?.data?.action_url;
       const responseId = response?.notification?.request?.identifier ?? url;
-      if (!url || handledRef.current === responseId) return;
+      if (!isSafeAppUrl(url) || handledRef.current === responseId) return;
       handledRef.current = responseId;
       try {
         router.push(url);

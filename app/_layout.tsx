@@ -18,7 +18,7 @@ import {
 } from '@expo-google-fonts/nunito-sans';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { Satisfy_400Regular } from '@expo-google-fonts/satisfy';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Constants from 'expo-constants';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
@@ -27,7 +27,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Platform } from 'react-native';
+import { AppState, Platform, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
@@ -45,6 +45,15 @@ if (Constants.appOwnership !== 'expo') {
 }
 
 const queryClient = new QueryClient();
+
+// React Query's focus-based refetch/pause is built for the DOM's
+// visibilitychange event, which doesn't exist in React Native, so every
+// refetchInterval query (unread-count polling, shared shopping-list polling)
+// would otherwise keep firing indefinitely even while the app is backgrounded.
+// Bridging AppState into focusManager is the standard fix for this.
+AppState.addEventListener('change', (status: AppStateStatus) => {
+  focusManager.setFocused(status === 'active');
+});
 
 function RouteGuard() {
   const { user, isLoading } = useAuth();

@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.33.2] — 2026-07-20
+
+### Fixed
+- **Notification tap-routing now only ever opens an in-app screen.** A server-supplied `action_url` was passed straight to `router.push()`, and expo-router forwards anything URL-shaped (`https:`, `tel:`, `market:`, other app schemes) to the OS. Both the push-tap handler and the in-app notifications list now validate the URL is an app-relative path first.
+- **Background polling now actually stops when the app is backgrounded.** React Query's focus detection is built for the browser and never fired in React Native, so the unread-count badge (60s) and the shared shopping-list screen (15s) kept polling indefinitely even while backgrounded. Wired `focusManager` to `AppState` in the root layout, the standard fix for this.
+
 ## [1.33.1] — 2026-07-20
 
 ### Changed
