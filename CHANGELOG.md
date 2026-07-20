@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.38.0] — 2026-07-20
+
+### Fixed
+- **GPS "tap to update" on the Location page now actually fills in Region, City/Municipality, and Barangay.** Previously it silently failed to display any of the three even though the pin itself saved correctly: the City field compared a raw place name against options keyed by PSGC code (could never match), Barangay depended on City having resolved first (never did), and Region rarely matched the OS's casual wording against the dataset's formal PSGC names. GPS capture now does a normalized/fuzzy match against the actual PSGC dataset (handles "Antipolo" vs "CITY OF ANTIPOLO", avoids the "QUEZON" vs "QUEZON CITY" name collision, and falls back to Manila's district-as-city dataset quirk) so all three fields fill from one tap.
+
 ## [1.37.0] — 2026-07-20
 
 ### Added

@@ -2,7 +2,7 @@ import client from '@/src/api/client';
 import SelectField from '@/src/components/SelectField';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
-import { getPhBarangaysForCity, getPhCitiesForRegion, getPhRegions, type PhCity } from '@/src/utils/phLocations';
+import { findPhBarangayName, findPhCityByName, getPhBarangaysForCity, getPhCitiesForRegion, getPhRegions, type PhCity } from '@/src/utils/phLocations';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 import * as Location from 'expo-location';
@@ -104,21 +104,46 @@ export default function LocationScreen() {
       try {
         const [place] = await Location.reverseGeocodeAsync({ latitude: newCoords.lat, longitude: newCoords.lng });
         if (place) {
-          geocodedMunicipality = place.city ?? municipality;
-          geocodedBarangay = place.district ?? barangay;
-          geocodedProvince = place.subregion ?? province;
-          geocodedRegion = place.region ?? region;
           // The OS geocoder's names don't reliably match this dataset's exact
-          // PSGC spelling/casing, so these bypass the cascading setRegion/
-          // setMunicipality wrappers (which look the typed name up in the
-          // dataset) and go straight into state. cityCode is left unset —
-          // the barangay picker stays empty until the user re-confirms the
-          // city via its picker, which is what actually resolves a code.
-          setRegionRaw(geocodedRegion);
-          setMunicipalityRaw(geocodedMunicipality);
-          setProvince(geocodedProvince);
-          setBarangay(geocodedBarangay);
-          setCityCode('');
+          // PSGC spelling/casing ("Antipolo" vs "CITY OF ANTIPOLO"), so a
+          // direct string match against the pickers' options almost never
+          // hits -- findPhCityByName does a normalized/fuzzy lookup across
+          // the whole dataset instead, and returns the matched city's own
+          // region/province so the entire cascade can be filled from one
+          // GPS read instead of requiring the user to re-pick the city.
+          // Manila is a dataset quirk worth falling back for: it has no
+          // city-level row of its own -- its historic districts (Ermita,
+          // Tondo, Malate...) stand in as the city tier -- so `district`
+          // is tried too when `city` ("Manila") doesn't resolve.
+          const cityMatch = (place.city ? findPhCityByName(place.city) : null)
+            ?? (place.district ? findPhCityByName(place.district) : null);
+
+          if (cityMatch) {
+            geocodedRegion = cityMatch.region;
+            geocodedMunicipality = cityMatch.name;
+            geocodedProvince = cityMatch.province ?? '';
+            setRegionRaw(cityMatch.region);
+            setMunicipalityRaw(cityMatch.name);
+            setProvince(cityMatch.province ?? '');
+            setCityCode(cityMatch.code);
+
+            const barangayMatch = place.district ? findPhBarangayName(cityMatch.code, place.district) : null;
+            geocodedBarangay = barangayMatch ?? '';
+            setBarangay(geocodedBarangay);
+          } else {
+            // No confident dataset match -- fall back to the raw OS strings
+            // so the GPS pin + coordinates still save below, but the
+            // pickers show placeholders until the user reconfirms manually.
+            geocodedMunicipality = place.city ?? municipality;
+            geocodedBarangay = place.district ?? barangay;
+            geocodedProvince = place.subregion ?? province;
+            geocodedRegion = place.region ?? region;
+            setRegionRaw(geocodedRegion);
+            setMunicipalityRaw(geocodedMunicipality);
+            setProvince(geocodedProvince);
+            setBarangay(geocodedBarangay);
+            setCityCode('');
+          }
         }
       } catch {
         // Reverse geocoding is best-effort, the GPS pin itself still saves below.

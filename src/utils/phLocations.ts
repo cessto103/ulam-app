@@ -77,3 +77,93 @@ export function getPhBarangaysForCity(cityCode: string): string[] {
     .map((b) => b.name)
     .sort((a, b) => a.localeCompare(b));
 }
+
+// The dataset stores formal PSGC-style names ("CITY OF ANTIPOLO", "(Pob.)"
+// suffixes on barangays) that rarely match a reverse-geocoder's casual
+// output ("Antipolo", "Antipolo City") verbatim -- these two lookups
+// normalize both sides before comparing, with a fuzzy contains-match
+// fallback, so GPS capture can actually resolve a real dataset entry
+// instead of only ever matching on a lucky exact string.
+function normalizeCityName(s: string): string {
+  // Only the "CITY OF " prefix is stripped -- it's purely a PSGC formatting
+  // convention for the exact same place ("CITY OF ANTIPOLO" = "Antipolo").
+  // A trailing " CITY" is deliberately kept: several proper city names
+  // ("QUEZON CITY") collide with an entirely different, differently-provinced
+  // plain municipality once that suffix is removed ("QUEZON" alone exists in
+  // 6 other provinces) -- stripping it would make matching ambiguous instead
+  // of safer.
+  return s
+    .toUpperCase()
+    .replace(/^CITY OF\s+/, '')
+    .replace(/[^A-Z\s]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function normalizeBarangayName(s: string): string {
+  return s
+    .toUpperCase()
+    .replace(/\(POB\.?\)/g, '')
+    .replace(/[^A-Z0-9\s]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+/**
+ * Finds a dataset city by a loosely-formatted name (as returned by
+ * `Location.reverseGeocodeAsync`'s `city`/`subregion` fields), searching
+ * across all regions rather than requiring one to already be selected --
+ * the matched city's own region/province are returned alongside it so the
+ * caller can fill in the whole cascade from a single GPS read.
+ */
+export function findPhCityByName(rawName: string): (PhCity & { region: string }) | null {
+  const target = normalizeCityName(rawName);
+  if (!target) return null;
+
+  // Multiple same-named cities across different provinces are common (see
+  // the file-level note on `label`) -- if a tier turns up more than one
+  // candidate, there's no reliable signal here to pick the right one, so
+  // this refuses to guess rather than risk silently resolving to the wrong
+  // province. Exact match is tried first specifically because it's less
+  // likely to collide than the fuzzy tier.
+  const exact = cities.filter((c) => normalizeCityName(c.name) === target);
+  let match: CityRow | undefined;
+  if (exact.length === 1) {
+    match = exact[0];
+  } else if (exact.length === 0) {
+    const fuzzy = cities.filter((c) => {
+      const norm = normalizeCityName(c.name);
+      return norm.includes(target) || target.includes(norm);
+    });
+    if (fuzzy.length === 1) match = fuzzy[0];
+  }
+  if (!match) return null;
+
+  const province = provinces.find((p) => p.prov_code === match!.prov_code);
+  const region = province ? regions.find((r) => r.reg_code === province.reg_code) : undefined;
+  if (!region) return null;
+
+  const isNcr = province?.name.startsWith('NCR') ?? false;
+  return {
+    name: match.name,
+    label: match.name,
+    code: match.mun_code,
+    province: isNcr ? null : (province?.name ?? null),
+    region: region.name,
+  };
+}
+
+/** Finds a dataset barangay name within a known city by a loosely-formatted name. */
+export function findPhBarangayName(cityCode: string, rawName: string): string | null {
+  const target = normalizeBarangayName(rawName);
+  if (!target || !cityCode) return null;
+
+  const options = getPhBarangaysForCity(cityCode);
+  const exact = options.find((b) => normalizeBarangayName(b) === target);
+  if (exact) return exact;
+
+  return options.find((b) => {
+    const norm = normalizeBarangayName(b);
+    return norm.includes(target) || target.includes(norm);
+  }) ?? null;
+}

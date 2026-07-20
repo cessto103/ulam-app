@@ -3,7 +3,7 @@
     "name": "uLam-app",
     "slug": "ulam",
     "scheme": "ulam",
-    "version": "1.37.0",
+    "version": "1.38.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,11 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "77",
+      "buildNumber": "78",
       "bundleIdentifier": "com.ulam.app"
     },
     "android": {
-      "versionCode": 77,
+      "versionCode": 78,
       "package": "com.ulam.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -57,9 +57,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "3200d60d-716f-461f-aa45-fd7ff2b2c1b3"
+        "projectId": "280feeb7-9de6-46eb-8528-5e83b038814a"
       }
     },
-    "owner": "cessto103s-team"
+    "owner": "sleepwalker.knows"
   }
 }
