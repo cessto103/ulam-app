@@ -1,14 +1,17 @@
 ﻿import client, { API_URL } from '@/src/api/client';
 import HeartReactButton from '@/src/components/HeartReactButton';
 import { SkeletonPostCard } from '@/src/components/Skeleton';
+import SponsoredAdCard from '@/src/components/SponsoredAdCard';
 import { useLanguage } from '@/src/context/LanguageContext';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
+import { useAdsFeed } from '@/src/hooks/useAdsFeed';
 import { formatCount } from '@/src/utils/formatCount';
+import { type FeedEntry, interleaveAds, isAdSlot } from '@/src/utils/interleaveAds';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -292,6 +295,9 @@ export default function KomunidadScreen() {
 
   const [reactedIds, setReactedIds]  = useState<Set<number>>(new Set());
   const [pusoCounts, setPusoCounts]  = useState<Record<number, number>>({});
+
+  const ads = useAdsFeed('community');
+  const feedItems = useMemo(() => interleaveAds(allPosts, ads), [allPosts, ads]);
   const pendingReact                 = useRef<Set<number>>(new Set());
 
   // Collapsing header: the title/subtitle portion shrinks away on scroll-down,
@@ -425,24 +431,28 @@ export default function KomunidadScreen() {
   const navigateToUser   = useCallback((userId: number) => router.push(`/user/${userId}` as any), [router]);
   const navigateToRecipe = useCallback((recipeId: number) => router.push(`/recipe/${recipeId}` as any), [router]);
 
-  const renderPost = useCallback(({ item: post }: { item: Post }) => (
-    <PostCard
-      post={post}
-      lang={lang}
-      reacted={reactedIds.has(post.id)}
-      pusoCount={pusoCounts[post.id] ?? post.puso_count}
-      onPress={navigateToPost}
-      onUserPress={navigateToUser}
-      onRecipePress={navigateToRecipe}
-      onTogglePuso={togglePuso}
-    />
-  ), [lang, reactedIds, pusoCounts, navigateToPost, navigateToUser, navigateToRecipe, togglePuso]);
+  const renderPost = useCallback(({ item }: { item: FeedEntry<Post> }) => {
+    if (isAdSlot(item)) return <SponsoredAdCard ad={item.ad} />;
+    const post = item;
+    return (
+      <PostCard
+        post={post}
+        lang={lang}
+        reacted={reactedIds.has(post.id)}
+        pusoCount={pusoCounts[post.id] ?? post.puso_count}
+        onPress={navigateToPost}
+        onUserPress={navigateToUser}
+        onRecipePress={navigateToRecipe}
+        onTogglePuso={togglePuso}
+      />
+    );
+  }, [lang, reactedIds, pusoCounts, navigateToPost, navigateToUser, navigateToRecipe, togglePuso]);
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#FFF8E8' }}>
       <FlatList
-        data={allPosts}
-        keyExtractor={(item) => String(item.id)}
+        data={feedItems}
+        keyExtractor={(item) => (isAdSlot(item) ? item.key : String(item.id))}
         renderItem={renderPost}
         refreshControl={
           <RefreshControl

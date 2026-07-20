@@ -3,7 +3,9 @@ import GradientPageHeader from '@/src/components/GradientPageHeader';
 import ItemThumb from '@/src/components/ItemThumb';
 import HeaderIconRow from '@/src/components/HeaderIconRow';
 import RewardCelebration from '@/src/components/RewardCelebration';
+import SponsoredAdCard from '@/src/components/SponsoredAdCard';
 import { HeaderWave, ULamIcon, ULamLogoHorizontal } from '@/src/components/ULamLogo';
+import { useAdsFeed } from '@/src/hooks/useAdsFeed';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useXpReward } from '@/src/hooks/useXpReward';
@@ -11,6 +13,7 @@ import { SkeletonMealCard, SkeletonRecipeCard } from '@/src/components/Skeleton'
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 import { formatCount } from '@/src/utils/formatCount';
+import { type FeedEntry, interleaveAds, isAdSlot } from '@/src/utils/interleaveAds';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -73,7 +76,7 @@ type Recipe = {
 };
 
 type RecipePage = { data: Recipe[]; current_page: number; last_page: number };
-type Section = { key: string; title: string; data: Recipe[] };
+type Section = { key: string; title: string; data: FeedEntry<Recipe>[] };
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -977,18 +980,25 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
   const community = useMemo(() => allRecipes.filter(r => !r.is_mine && r.source === 'community'), [allRecipes]);
   const mine      = useMemo(() => allRecipes.filter(r => r.is_mine),                               [allRecipes]);
 
+  // Each section gets its own light sprinkle of ads (SectionList has no
+  // single flat "every Nth item across all sections" hook) -- "Your recipes"
+  // is deliberately left ad-free, it's your own content, not a browse feed.
+  const ads = useAdsFeed('recipe');
+  const officialWithAds  = useMemo(() => interleaveAds(official, ads),  [official, ads]);
+  const communityWithAds = useMemo(() => interleaveAds(community, ads), [community, ads]);
+
   const sections: Section[] = useMemo(() => sourceFilter === 'all'
     ? [
-        ...(official.length  ? [{ key: 'official',  title: 'Official recipes',  data: official }]  : []),
-        ...(community.length ? [{ key: 'community', title: 'Community recipes', data: community }] : []),
+        ...(official.length  ? [{ key: 'official',  title: 'Official recipes',  data: officialWithAds }]  : []),
+        ...(community.length ? [{ key: 'community', title: 'Community recipes', data: communityWithAds }] : []),
         ...(mine.length      ? [{ key: 'mine',      title: 'Your recipes',      data: mine }]      : []),
       ]
     : sourceFilter === 'mine'
       ? (mine.length      ? [{ key: 'mine',      title: 'Your recipes',      data: mine }]      : [])
       : sourceFilter === 'official'
-        ? (official.length  ? [{ key: 'official',  title: 'Official recipes',  data: official }]  : [])
-        : (community.length ? [{ key: 'community', title: 'Community recipes', data: community }] : []),
-    [sourceFilter, official, community, mine]);
+        ? (official.length  ? [{ key: 'official',  title: 'Official recipes',  data: officialWithAds }]  : [])
+        : (community.length ? [{ key: 'community', title: 'Community recipes', data: communityWithAds }] : []),
+    [sourceFilter, official, community, mine, officialWithAds, communityWithAds]);
 
   // Stable callback identities — required for RecipeCard's memo() to
   // actually skip re-rendering unaffected cards.
@@ -996,18 +1006,22 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
   const navigateToEdit   = useCallback((id: number) => router.push(`/edit-recipe/${id}` as any), [router]);
   const shareRecipe      = useCallback((id: number) => shareMutation.mutate(id), [shareMutation]);
 
-  const renderRecipe = useCallback(({ item: r }: { item: Recipe }) => (
-    <RecipeCard
-      recipe={r}
-      onPress={navigateToRecipe}
-      onEdit={navigateToEdit}
-      onDelete={confirmDeleteRecipe}
-      onToggleSave={toggleSave}
-      onShare={shareRecipe}
-      shareDisabled={shareMutation.isPending && shareMutation.variables === r.id}
-      saveDisabled={saveMutation.isPending && saveMutation.variables === r.id}
-    />
-  ), [navigateToRecipe, navigateToEdit, confirmDeleteRecipe, toggleSave, shareRecipe, shareMutation.isPending, shareMutation.variables, saveMutation.isPending, saveMutation.variables]);
+  const renderRecipe = useCallback(({ item }: { item: FeedEntry<Recipe> }) => {
+    if (isAdSlot(item)) return <SponsoredAdCard ad={item.ad} />;
+    const r = item;
+    return (
+      <RecipeCard
+        recipe={r}
+        onPress={navigateToRecipe}
+        onEdit={navigateToEdit}
+        onDelete={confirmDeleteRecipe}
+        onToggleSave={toggleSave}
+        onShare={shareRecipe}
+        shareDisabled={shareMutation.isPending && shareMutation.variables === r.id}
+        saveDisabled={saveMutation.isPending && saveMutation.variables === r.id}
+      />
+    );
+  }, [navigateToRecipe, navigateToEdit, confirmDeleteRecipe, toggleSave, shareRecipe, shareMutation.isPending, shareMutation.variables, saveMutation.isPending, saveMutation.variables]);
 
   const ListHeader = (
     <>
@@ -1097,7 +1111,7 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
   return (
     <SectionList
       sections={sections}
-      keyExtractor={(r) => String(r.id)}
+      keyExtractor={(item) => (isAdSlot(item) ? item.key : String(item.id))}
       renderItem={renderRecipe}
       stickySectionHeadersEnabled={false}
       renderSectionHeader={({ section }) => (
