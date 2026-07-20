@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-21 · **v1.44.0**
+Last updated: 2026-07-21 · **v1.44.1**
 
 ---
 
@@ -114,6 +114,11 @@ Last updated: 2026-07-21 · **v1.44.0**
 ---
 
 ## Version History
+
+### 2026-07-21 · v1.44.1 — Recipe photos disappearing after upload
+
+- Two compounding bugs (paired uLam commit), both surfaced by a live user report: `ImageModerationService`'s own docblock documents "unknown" verdicts as fail-open ("image stays up... the in-app Report system is the human net"), but the config default actually driving `ModerateImageJob` was inverted, so every "unknown" verdict (moderation service unreachable/unconfigured -- the actual case in this environment, since the local NSFWJS fallback isn't running) got treated as "remove it." Confirmed live: a real recipe's 2 genuine food photos both came back "unknown" and got silently quarantined, twice (once on upload, again on a follow-up edit attempt) -- restored both from quarantine after the fix.
+- Independently, `ModerateImageJob`'s recipe-image removal only updated the `image_urls` array, never the denormalized singular `image_url` column, so a recipe could end up with `image_urls: []` while `image_url` still pointed at a file that had just been quarantined -- and separately, 9 call sites across 6 mobile screens each had their own slightly-wrong fallback for computing a recipe's display photos from those two fields, none of which correctly handled "image_urls is an empty array, not null." Consolidated into one shared, correct `getRecipePhotos()` helper.
 
 ### 2026-07-21 · v1.44.0 — Sponsored Ads
 

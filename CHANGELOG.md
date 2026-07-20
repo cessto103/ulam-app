@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.44.1] — 2026-07-21
+
+### Fixed
+- **Recipe photos disappearing after upload, showing just the gradient header instead.** Two compounding bugs (paired uLam commit): the automated photo-moderation check was failing closed whenever it couldn't reach a verdict (rather than the fail-open behavior it was actually designed for), silently removing freshly-uploaded recipe photos within moments of upload in any environment where the moderation service is unreachable or unconfigured; and separately, every screen that shows a recipe's cover photo had its own slightly-wrong fallback logic that didn't handle the resulting "empty photo list but a photo reference still on file" state, so even a recipe with a genuinely intact photo could render as gradient-only. Consolidated into one shared, correct photo-resolution helper used everywhere.
+
 ## [1.44.0] — 2026-07-21
 
 ### Added
