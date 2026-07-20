@@ -8,6 +8,7 @@ import { API_URL } from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
@@ -15,7 +16,6 @@ import {
   Alert,
   Animated,
   FlatList,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -488,11 +488,11 @@ export default function PostDetailScreen() {
                 {/* Images */}
                 {Array.isArray(post.images) && post.images.length > 0 && (
                   post.images.length === 1 ? (
-                    <Image source={{ uri: post.images[0] }} style={{ width: '100%', height: 220, borderRadius: 12, marginBottom: 12, resizeMode: 'cover' }} />
+                    <Image source={{ uri: post.images[0] }} style={{ width: '100%', height: 220, borderRadius: 12, marginBottom: 12 }} contentFit="cover" />
                   ) : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12, marginHorizontal: -16 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
                       {post.images.map((uri, i) => (
-                        <Image key={i} source={{ uri }} style={{ width: 180, height: 150, borderRadius: 10, resizeMode: 'cover' }} />
+                        <Image key={i} source={{ uri }} style={{ width: 180, height: 150, borderRadius: 10 }} contentFit="cover" />
                       ))}
                     </ScrollView>
                   )

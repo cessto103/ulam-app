@@ -39,4 +39,25 @@ client.interceptors.request.use(async (config) => {
   return config;
 });
 
+// Sanctum tokens now expire (previously they didn't), so a 401 mid-session
+// is a real, expected case, not just a login failure. This module has no
+// access to AuthContext's state, so AuthProvider registers a handler here
+// on mount; any 401 anywhere in the app clears the stored token and lets
+// RouteGuard take it from there.
+let onUnauthorized: (() => void) | null = null;
+export function setUnauthorizedHandler(handler: () => void) {
+  onUnauthorized = handler;
+}
+
+client.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error?.response?.status === 401) {
+      await SecureStore.deleteItemAsync('auth_token');
+      onUnauthorized?.();
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default client;

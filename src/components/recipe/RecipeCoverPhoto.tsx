@@ -1,5 +1,6 @@
 import { LinearGradient, type LinearGradientProps } from 'expo-linear-gradient';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { StyleSheet, Text, View } from 'react-native';
 import { FONT_DEFS, GRADIENT_DEFS, type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 
 const COVER_HEIGHT = 200;
@@ -52,10 +53,10 @@ export default function RecipeCoverPhoto({ photos, collageStyle, gradientKey, fo
     return (
       <View style={[styles.coverBase, hStyle]}>
         <View style={[styles.flexHalf, { borderRightWidth: 3, borderRightColor: '#fff' }]}>
-          <Image source={{ uri: photos[0] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[0] }} style={styles.fillImage} contentFit="cover" />
         </View>
         <View style={styles.flexHalf}>
-          <Image source={{ uri: photos[1] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[1] }} style={styles.fillImage} contentFit="cover" />
         </View>
       </View>
     );
@@ -64,9 +65,9 @@ export default function RecipeCoverPhoto({ photos, collageStyle, gradientKey, fo
   if (effective === 'circle_right' && photos.length >= 2) {
     return (
       <View style={[styles.coverBase, { overflow: 'hidden' }, hStyle]}>
-        <Image source={{ uri: photos[1] }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+        <Image source={{ uri: photos[1] }} style={StyleSheet.absoluteFillObject} contentFit="cover" />
         <View style={styles.circleMask}>
-          <Image source={{ uri: photos[0] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[0] }} style={styles.fillImage} contentFit="cover" />
         </View>
       </View>
     );
@@ -76,13 +77,13 @@ export default function RecipeCoverPhoto({ photos, collageStyle, gradientKey, fo
     return (
       <View style={[styles.coverBase, hStyle]}>
         <View style={styles.flexHalf}>
-          <Image source={{ uri: photos[0] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[0] }} style={styles.fillImage} contentFit="cover" />
         </View>
         <View style={[styles.flexHalf, { marginHorizontal: 1.5 }]}>
-          <Image source={{ uri: photos[1] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[1] }} style={styles.fillImage} contentFit="cover" />
         </View>
         <View style={styles.flexHalf}>
-          <Image source={{ uri: photos[2] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[2] }} style={styles.fillImage} contentFit="cover" />
         </View>
       </View>
     );
@@ -92,10 +93,10 @@ export default function RecipeCoverPhoto({ photos, collageStyle, gradientKey, fo
     return (
       <View style={[styles.coverBase, { flexDirection: 'column' }, hStyle]}>
         <View style={[styles.flexHalf, { marginBottom: 1.5 }]}>
-          <Image source={{ uri: photos[0] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[0] }} style={styles.fillImage} contentFit="cover" />
         </View>
         <View style={styles.flexHalf}>
-          <Image source={{ uri: photos[1] }} style={styles.fillImage} resizeMode="cover" />
+          <Image source={{ uri: photos[1] }} style={styles.fillImage} contentFit="cover" />
         </View>
       </View>
     );
@@ -105,7 +106,7 @@ export default function RecipeCoverPhoto({ photos, collageStyle, gradientKey, fo
   if (photos.length > 0) {
     return (
       <View style={[styles.coverBase, hStyle]}>
-        <Image source={{ uri: photos[0] }} style={styles.fillImage} resizeMode="cover" />
+        <Image source={{ uri: photos[0] }} style={styles.fillImage} contentFit="cover" />
       </View>
     );
   }

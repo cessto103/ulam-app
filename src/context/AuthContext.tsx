@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { getMe, logout as apiLogout, User } from '../api/auth';
+import { setUnauthorizedHandler } from '../api/client';
 
 // How long a stale plan/XP/ban status can sit before a foreground refresh is
 // willing to hit the network again — avoids re-fetching on every quick
@@ -29,6 +30,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // the token changes (the listener is only ever set up once).
   const tokenRef = useRef<string | null>(null);
   tokenRef.current = token;
+
+  // Any 401 from the API client (expired/revoked token) clears in-memory
+  // auth state here; RouteGuard's existing !user redirect takes it from
+  // there, same path as a normal sign-out.
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      setToken(null);
+      setUser(null);
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {

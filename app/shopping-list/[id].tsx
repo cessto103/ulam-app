@@ -5,7 +5,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, ActivityIndicator, Image, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Alert, ActivityIndicator, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 

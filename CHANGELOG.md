@@ -3,6 +3,15 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.33.3] — 2026-07-20
+
+### Added
+- **New expo-image dependency.** Recipe covers, post/store images, and avatars in the community feed, post detail, shared shopping lists, and store pages now decode and cache off the main thread instead of using React Native's core Image, which had no caching at all.
+- **Signing out automatically when a session actually expires.** Sanctum tokens now expire server-side (see the paired uLam commit); the app clears its stored token and returns to the sign-in screen on any 401 instead of leaving you stuck on a broken "logged in" screen mid-session.
+
+### Changed
+- **Market tab and the meal-plan recipe picker no longer fire a network request on every keystroke**, matching the debounce already used for recipe search elsewhere in the app.
+
 ## [1.33.2] — 2026-07-20
 
 ### Fixed

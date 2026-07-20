@@ -11,7 +11,7 @@ import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import ThemedSection from '@/src/components/ThemedSection';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -422,10 +422,17 @@ export default function HomeScreen() {
   const [pickerMealType, setPickerMealType] = useState<string>('almusal');
   const [pickerSearch,   setPickerSearch]   = useState('');
   const [pickerRecipe,   setPickerRecipe]   = useState<RecipeOption | null>(null);
+  // Debounce: fetch only after the user pauses typing, so a fresh cache key
+  // (and a new request) isn't minted on every keystroke.
+  const [pickerDebouncedSearch, setPickerDebouncedSearch] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setPickerDebouncedSearch(pickerSearch), 350);
+    return () => clearTimeout(t);
+  }, [pickerSearch]);
 
   const { data: recipeOptions = [], isLoading: recipesLoading } = useQuery({
-    queryKey: ['recipes-picker', pickerSearch],
-    queryFn:  () => fetchRecipes(pickerSearch),
+    queryKey: ['recipes-picker', pickerDebouncedSearch],
+    queryFn:  () => fetchRecipes(pickerDebouncedSearch),
     enabled:  pickerOpen,
     staleTime: 60_000,
   });

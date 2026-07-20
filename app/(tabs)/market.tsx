@@ -3,7 +3,7 @@ import { SkeletonListItem } from '@/src/components/Skeleton';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ActivityIndicator, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type MarketPrice = {
   id: number;
@@ -23,10 +23,18 @@ export default function MarketScreen() {
   const { lang } = useLanguage();
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
+  // Debounce: fetch only after the user pauses typing, so the list doesn't
+  // fire a new request on every keystroke (same pattern as meal-plan.tsx).
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 350);
+    return () => clearTimeout(t);
+  }, [search]);
 
   const { data: prices = [], isLoading } = useQuery({
-    queryKey: ['market-prices', search],
-    queryFn: () => fetchPrices(search),
+    queryKey: ['market-prices', debouncedSearch],
+    queryFn: () => fetchPrices(debouncedSearch),
+    staleTime: 30_000,
   });
 
   const [refreshing, setRefreshing] = useState(false);

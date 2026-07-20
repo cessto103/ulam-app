@@ -6,6 +6,7 @@ import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 import { formatCount } from '@/src/utils/formatCount';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -13,7 +14,6 @@ import {
   Animated,
   Dimensions,
   FlatList,
-  Image,
   Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -211,7 +211,8 @@ const PostCard = memo(function PostCard({
             <Image
               source={{ uri: post.images[0] }}
               className="w-full rounded-xl mb-3"
-              style={{ height: 200, resizeMode: 'cover' }}
+              style={{ height: 200 }}
+              contentFit="cover"
             />
           </Pressable>
         ) : (
@@ -226,7 +227,8 @@ const PostCard = memo(function PostCard({
               <Pressable key={i} onPress={(e) => { e.stopPropagation(); setLightboxUri(uri); }}>
                 <Image
                   source={{ uri }}
-                  style={{ width: 160, height: 140, borderRadius: 10, resizeMode: 'cover' }}
+                  style={{ width: 160, height: 140, borderRadius: 10 }}
+                  contentFit="cover"
                 />
               </Pressable>
             ))}
@@ -260,7 +262,8 @@ const PostCard = memo(function PostCard({
           {lightboxUri && (
             <Image
               source={{ uri: lightboxUri }}
-              style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height * 0.75, resizeMode: 'contain' }}
+              style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height * 0.75 }}
+              contentFit="contain"
             />
           )}
           <Pressable

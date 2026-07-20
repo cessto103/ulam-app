@@ -20,9 +20,10 @@ import StarRating from '@/src/components/StarRating';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Linking, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -296,7 +297,7 @@ export default function StallDetailScreen() {
           {/* Cover photo header */}
           <View style={{ marginHorizontal: -16, marginTop: -16, height: 200, backgroundColor: '#5E693F', overflow: 'hidden' }}>
             {stall.cover_photo ? (
-              <Image source={{ uri: `${API_URL}${stall.cover_photo}` }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+              <Image source={{ uri: `${API_URL}${stall.cover_photo}` }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
             ) : (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontSize: 46, opacity: 0.45 }}>{MARKET_TYPE_EMOJI[stall.type ?? ''] ?? '\ud83c\udfea'}</Text>
@@ -324,7 +325,7 @@ export default function StallDetailScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
             <View style={{ marginTop: -42, width: 92, height: 92, borderRadius: 46, borderWidth: 3, borderColor: '#FFFCF5', backgroundColor: '#F9EDD3', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
               {stall.photo ? (
-                <Image source={{ uri: `${API_URL}${stall.photo}` }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                <Image source={{ uri: `${API_URL}${stall.photo}` }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
               ) : (
                 <Text style={{ fontSize: 36 }}>{MARKET_TYPE_EMOJI[stall.type ?? ''] ?? '\ud83c\udfea'}</Text>
               )}
