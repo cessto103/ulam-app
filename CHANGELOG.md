@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.33.4] — 2026-07-20
+
+### Fixed
+- **XP bar on Profile and Awards & Achievements now updates right away.** Both screens read the same shared account state, but nothing told it to refresh after earning XP elsewhere (logging spending, reporting a price, generating a meal plan, completing a shared shopping list, posting to the community) — you had to pull-to-refresh to see it catch up. Every XP-earning action now refreshes that state and the Awards screen's achievement/task lists automatically. Meal plan generation and community posts previously didn't even send XP data back to the app at all (paired uLam commit) — fixed there too.
+- **Bookmarking a recipe from the Recipes page no longer needs multiple taps.** The save button had no protection against double-tapping, and since saving is a toggle (each tap flips saved/unsaved), a fast double-tap could silently save-then-unsave in one gesture, making it look like tapping "didn't work." The button now disables itself while a save is in flight, matching the share button next to it. Also made the icon bigger (20px to 26px) with a larger tap target.
+
 ## [1.33.3] — 2026-07-20
 
 ### Added

@@ -1,6 +1,8 @@
 import client, { API_URL } from '@/src/api/client';
 import { useLanguage } from '@/src/context/LanguageContext';
+import RewardCelebration from '@/src/components/RewardCelebration';
 import { Skeleton, SkeletonListItem } from '@/src/components/Skeleton';
+import { useXpReward } from '@/src/hooks/useXpReward';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -102,6 +104,7 @@ export default function ShoppingListDetailScreen() {
   const [shareOpen, setShareOpen] = useState(false);
   const [selectedShareIds, setSelectedShareIds] = useState<number[]>([]);
   const priceInputRef = useRef<TextInput>(null);
+  const { reward, setReward, handleXpResponse } = useXpReward();
 
   const listKey = ['shopping-list', id];
 
@@ -233,10 +236,11 @@ export default function ShoppingListDetailScreen() {
   const { mutate: complete, isPending: completing } = useMutation({
     mutationFn: (body: { log_to_budget?: boolean; use_full_total?: boolean }) =>
       client.post(`/shopping-lists/${id}/complete`, body),
-    onSuccess: () => {
+    onSuccess: (response) => {
       invalidate();
       qc.invalidateQueries({ queryKey: ['shopping-lists'] });
       qc.invalidateQueries({ queryKey: ['budget-today'] });
+      handleXpResponse(response.data);
     },
     onError: (e: any) => Alert.alert('Error', e?.response?.data?.message ?? 'Could not complete the list.'),
   });
@@ -788,6 +792,8 @@ export default function ShoppingListDetailScreen() {
           </Pressable>
         </Pressable>
       </Modal>
+
+      <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
     </SafeAreaView>
   );
 }

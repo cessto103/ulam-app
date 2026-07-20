@@ -2,9 +2,11 @@ import client from '@/src/api/client';
 import GradientPageHeader from '@/src/components/GradientPageHeader';
 import ItemThumb from '@/src/components/ItemThumb';
 import HeaderIconRow from '@/src/components/HeaderIconRow';
+import RewardCelebration from '@/src/components/RewardCelebration';
 import { HeaderWave, ULamIcon, ULamLogoHorizontal } from '@/src/components/ULamLogo';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { useXpReward } from '@/src/hooks/useXpReward';
 import { SkeletonMealCard, SkeletonRecipeCard } from '@/src/components/Skeleton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
@@ -119,9 +121,9 @@ async function fetchTodayPlan(): Promise<MealPlan | null> {
   } catch { return null; }
 }
 
-async function generatePlan(): Promise<MealPlan> {
+async function generatePlan(): Promise<any> {
   const { data } = await client.post('/meal-plans/generate');
-  return data.meal_plan;
+  return data;
 }
 
 async function regeneratePlan(): Promise<MealPlan> {
@@ -341,6 +343,7 @@ function PlanView({ user }: { user: any }) {
   const qc = useQueryClient();
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
+  const { reward, setReward, handleXpResponse } = useXpReward();
 
   const { data: plan, isLoading } = useQuery({
     queryKey: ['meal-plan-today'],
@@ -370,7 +373,10 @@ function PlanView({ user }: { user: any }) {
 
   const { mutate: generate, isPending } = useMutation({
     mutationFn: generatePlan,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['meal-plan-today'] }),
+    onSuccess: (data: any) => {
+      qc.invalidateQueries({ queryKey: ['meal-plan-today'] });
+      handleXpResponse(data ?? {});
+    },
     onError: (e: any) => showMealPlanError(e, lang, router, setAiDisabled),
   });
 
@@ -598,6 +604,7 @@ function PlanView({ user }: { user: any }) {
 
       </ScrollView>
 
+      <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
       </>
     );
   }
@@ -648,6 +655,7 @@ function PlanView({ user }: { user: any }) {
           </Text>
         )
       )}
+      <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
     </View>
   );
 }
@@ -677,6 +685,7 @@ const RecipeCard = memo(function RecipeCard({
   onToggleSave,
   onShare,
   shareDisabled,
+  saveDisabled,
 }: {
   recipe: Recipe;
   onPress: (id: number) => void;
@@ -685,6 +694,7 @@ const RecipeCard = memo(function RecipeCard({
   onToggleSave: (recipe: Recipe) => void;
   onShare: (id: number) => void;
   shareDisabled: boolean;
+  saveDisabled: boolean;
 }) {
   const router = useRouter();
   const isMine   = r.is_mine;
@@ -738,11 +748,13 @@ const RecipeCard = memo(function RecipeCard({
             )}
             <Pressable
               onPress={(e) => { e.stopPropagation(); onToggleSave(r); }}
-              hitSlop={8}
+              disabled={saveDisabled}
+              hitSlop={12}
+              style={{ opacity: saveDisabled ? 0.5 : 1 }}
             >
               <Ionicons
                 name={r.is_saved ? 'bookmark' : 'bookmark-outline'}
-                size={20}
+                size={26}
                 color={r.is_saved ? '#F4B942' : '#D3C5AB'}
               />
             </Pressable>
@@ -992,8 +1004,9 @@ function RecipeListView({ initialFilter }: { initialFilter?: string }) {
       onToggleSave={toggleSave}
       onShare={shareRecipe}
       shareDisabled={shareMutation.isPending && shareMutation.variables === r.id}
+      saveDisabled={saveMutation.isPending && saveMutation.variables === r.id}
     />
-  ), [navigateToRecipe, navigateToEdit, confirmDeleteRecipe, toggleSave, shareRecipe, shareMutation.isPending, shareMutation.variables]);
+  ), [navigateToRecipe, navigateToEdit, confirmDeleteRecipe, toggleSave, shareRecipe, shareMutation.isPending, shareMutation.variables, saveMutation.isPending, saveMutation.variables]);
 
   const ListHeader = (
     <>

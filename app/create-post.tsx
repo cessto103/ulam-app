@@ -1,5 +1,6 @@
 import client from '@/src/api/client';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { useXpReward } from '@/src/hooks/useXpReward';
 import { useQueryClient } from '@tanstack/react-query';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
@@ -103,6 +104,7 @@ export default function CreatePostScreen() {
   const [budgetAmount, setBudgetAmount] = useState('');
   const [photos, setPhotos]             = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [loading, setLoading]           = useState(false);
+  const { handleXpResponse } = useXpReward();
 
   const canSubmit = isRecipeShare
     ? body.length <= 2000
@@ -152,11 +154,15 @@ export default function CreatePostScreen() {
         form.append('images[]', { uri: resizedUri, type: 'image/jpeg', name: fileName } as any);
       }
 
-      await client.post('/community/post', form, {
+      const { data } = await client.post('/community/post', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       queryClient.invalidateQueries({ queryKey: ['community-feed'] });
+      // This screen navigates away immediately, so there's no time to play
+      // the celebration animation here — just make sure the XP/achievement
+      // state is already fresh by the time the user lands back on the feed.
+      handleXpResponse(data ?? {});
       router.back();
     } catch (e: any) {
       const msg = e?.response?.data?.message ?? (lang === 'en' ? 'Could not post. Try again.' : 'Hindi ma-post. Subukan ulit.');

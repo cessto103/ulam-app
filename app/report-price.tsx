@@ -1,9 +1,10 @@
 import { ITEM_CATEGORIES } from '@/src/constants/itemCategories';
 import client from '@/src/api/client';
-import RewardCelebration, { type Reward } from '@/src/components/RewardCelebration';
+import RewardCelebration from '@/src/components/RewardCelebration';
 import { postMultipart, resizeForUpload } from '@/src/utils/uploadImage';
 import * as ImagePicker from 'expo-image-picker';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { useXpReward } from '@/src/hooks/useXpReward';
 import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -59,7 +60,7 @@ export default function ReportPriceScreen() {
   const [loading, setLoading]       = useState(false);
   const [photoUri, setPhotoUri]     = useState<string | null>(null);
   const [success, setSuccess]       = useState(false);
-  const [reward, setReward]         = useState<Reward | null>(null);
+  const { reward, setReward, handleXpResponse } = useXpReward();
 
   const [target, setTarget]         = useState<NearbyTarget | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -108,14 +109,7 @@ export default function ReportPriceScreen() {
         ({ data } = await client.post('/prices/report', body));
       }
       setSuccess(true);
-      if (data?.xp_earned > 0) {
-        setReward({
-          xpEarned: data.xp_earned,
-          leveledUp: data.leveled_up,
-          newLevel: data.new_level,
-          newAchievements: data.new_achievements,
-        });
-      }
+      handleXpResponse(data ?? {});
     } catch (e: any) {
       const msg = e?.response?.data?.message ?? (lang === 'en' ? 'Could not submit. Try again.' : 'Hindi ma-submit. Subukan ulit.');
       Alert.alert('Error', msg);

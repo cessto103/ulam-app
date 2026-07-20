@@ -1,6 +1,7 @@
 import client from '@/src/api/client';
-import RewardCelebration, { type Reward } from '@/src/components/RewardCelebration';
+import RewardCelebration from '@/src/components/RewardCelebration';
 import { useLanguage } from '@/src/context/LanguageContext';
+import { useXpReward } from '@/src/hooks/useXpReward';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -65,7 +66,7 @@ export default function LogSpendingScreen() {
   const [success, setSuccess]     = useState(false);
   const [xpEarned, setXpEarned]   = useState(0);
   const [savedAmt, setSavedAmt]   = useState(0);
-  const [reward, setReward]       = useState<Reward | null>(null);
+  const { reward, setReward, handleXpResponse } = useXpReward();
   const [initialized, setInitialized] = useState(false);
 
   const otherRef = useRef<TextInput>(null);
@@ -137,14 +138,7 @@ export default function LogSpendingScreen() {
       setXpEarned(data.xp_earned ?? 0);
       setSavedAmt(data.saved ?? 0);
       setSuccess(true);
-      if (data.xp_earned > 0) {
-        setReward({
-          xpEarned: data.xp_earned,
-          leveledUp: data.leveled_up,
-          newLevel: data.new_level,
-          newAchievements: data.new_achievements,
-        });
-      }
+      handleXpResponse(data);
     } catch (e: any) {
       const msg = e?.response?.data?.message ?? (lang === 'en' ? 'Something went wrong. Try again.' : 'May error. Subukan ulit.');
       Alert.alert('Error', msg);
