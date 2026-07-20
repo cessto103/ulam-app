@@ -1,7 +1,9 @@
 import client from '@/src/api/client';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { useXpReward } from '@/src/hooks/useXpReward';
-import { useQueryClient } from '@tanstack/react-query';
+import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
+import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
@@ -52,23 +54,37 @@ async function resizeAsset(asset: ImagePicker.ImagePickerAsset): Promise<string>
 
 // ─── Recipe card preview ───────────────────────────────────────────────────────
 
-function RecipePreviewCard({ title, budgetTag, imageUrl }: {
-  title: string; budgetTag?: string; imageUrl?: string | null;
+type RecipePreviewData = {
+  title: string;
+  image_url: string | null;
+  image_urls: string[] | null;
+  collage_style: CollageStyle | null;
+  gradient_key: GradientKey | null;
+  font_key: FontKey | null;
+};
+
+// Reuses the exact same cover component the recipe detail page and every
+// recipe card in the app render -- previously this had its own single-image
+// preview keyed off a single `recipe_image` param, which could show a stale
+// or wrong `image_url` even when the recipe's real photos (image_urls) were
+// fine, and never fell back to the recipe's actual gradient/collage card.
+function RecipePreviewCard({ recipe, budgetTag }: {
+  recipe: RecipePreviewData; budgetTag?: string;
 }) {
+  const photos = recipe.image_urls ?? (recipe.image_url ? [recipe.image_url] : []);
   return (
     <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#F0DEBB', marginBottom: 16 }}>
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={{ width: '100%', height: 140 }} resizeMode="cover" />
-      ) : (
-        <View style={{ width: '100%', height: 100, backgroundColor: '#6E7B4A', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 15, color: '#fff', textAlign: 'center', paddingHorizontal: 16 }}>
-            {title}
-          </Text>
-        </View>
-      )}
+      <RecipeCoverPhoto
+        height={140}
+        photos={photos}
+        collageStyle={recipe.collage_style ?? 'gradient'}
+        gradientKey={recipe.gradient_key ?? 'grad_a'}
+        fontKey={recipe.font_key ?? 'baloo'}
+        title={recipe.title}
+      />
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, backgroundColor: '#fff' }}>
         <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#000000', flex: 1 }} numberOfLines={1}>
-          {title}
+          {recipe.title}
         </Text>
         {budgetTag && (
           <View style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 3, marginLeft: 8 }}>
@@ -91,13 +107,24 @@ export default function CreatePostScreen() {
   const { lang }    = useLanguage();
 
   // Recipe share params passed from recipe detail page
-  const { recipe_id, recipe_title, recipe_budget, recipe_image } = useLocalSearchParams<{
+  const { recipe_id, recipe_title, recipe_budget } = useLocalSearchParams<{
     recipe_id?: string;
     recipe_title?: string;
     recipe_budget?: string;
-    recipe_image?: string;
   }>();
   const isRecipeShare = !!recipe_id;
+
+  // Fetches the recipe's real photos/card style instead of trusting a single
+  // `recipe_image` param passed at navigation time (see RecipePreviewCard).
+  const { data: recipePreview } = useQuery({
+    queryKey: ['recipe-preview', recipe_id],
+    queryFn: async () => {
+      const { data } = await client.get(`/recipes/${recipe_id}`);
+      return data.recipe as RecipePreviewData;
+    },
+    enabled: isRecipeShare,
+    staleTime: 60_000,
+  });
 
   const [postType, setPostType]         = useState(isRecipeShare ? 'recipe_share' : 'price_tip');
   const [body, setBody]                 = useState('');
@@ -199,9 +226,15 @@ export default function CreatePostScreen() {
               Sharing Recipe
             </Text>
             <RecipePreviewCard
-              title={recipe_title ?? 'Recipe'}
+              recipe={recipePreview ?? {
+                title: recipe_title ?? 'Recipe',
+                image_url: null,
+                image_urls: null,
+                collage_style: null,
+                gradient_key: null,
+                font_key: null,
+              }}
               budgetTag={recipe_budget}
-              imageUrl={recipe_image}
             />
             <View style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>

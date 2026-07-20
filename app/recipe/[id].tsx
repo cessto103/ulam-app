@@ -973,7 +973,6 @@ export default function RecipeDetailScreen() {
                 recipe_id: String(recipe.id),
                 recipe_title: recipe.title,
                 recipe_budget: recipe.budget_tag,
-                recipe_image: recipe.image_url ?? '',
               },
             })}
             style={{

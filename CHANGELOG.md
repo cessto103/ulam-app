@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.43.1] — 2026-07-21
+
+### Fixed
+- **Recipe share preview showed an irrelevant stock photo instead of the recipe's real cover.** The "Sharing Recipe" preview on New Post had its own one-off image check that only looked at a single `image_url` value passed at navigation time — for recipes with real uploaded photos (stored separately in `image_urls`) it showed nothing useful, and for recipes carrying an old placeholder `image_url` (e.g. a leftover stock photo unrelated to the dish) it showed that instead. The preview now fetches the recipe fresh and renders it with the exact same cover component used everywhere else in the app (recipe detail page, home, browse) — real photos when present, the recipe's own branded gradient card when not.
+
 ## [1.43.0] — 2026-07-21
 
 ### Fixed

@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-21 · **v1.43.0** (backend-only fix since, no app version bump)
+Last updated: 2026-07-21 · **v1.43.1**
 
 ---
 
@@ -114,6 +114,10 @@ Last updated: 2026-07-21 · **v1.43.0** (backend-only fix since, no app version 
 ---
 
 ## Version History
+
+### 2026-07-21 · v1.43.1 — Recipe share preview showed the wrong photo
+
+- The "Sharing Recipe" preview on New Post had its own one-off image check keyed off a single `image_url` param passed at navigation time, so it never looked at a recipe's real `image_urls`, and for at least one seeded recipe ("Chicken Adobo Flakes", `collage_style: gradient`) it rendered a leftover Unsplash placeholder photo (a chair) that had nothing to do with the dish, ignoring the recipe's own branded gradient card entirely. Preview now fetches the recipe and renders it through `RecipeCoverPhoto`, the same component used on the recipe detail page and every recipe card in the app — real photos when present, the recipe's actual gradient/collage card when not.
 
 ### 2026-07-21 · uLam backend only — full XP-source audit, 3 more farming vectors closed
 
