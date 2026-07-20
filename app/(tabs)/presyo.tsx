@@ -22,6 +22,7 @@ import AddButton from '@/src/components/AddButton';
 import { Ionicons } from '@expo/vector-icons';
 import GradientPageHeader from '@/src/components/GradientPageHeader';
 import HeaderIconRow from '@/src/components/HeaderIconRow';
+import StallDetailSheet from '@/src/components/StallDetailSheet';
 
 type Market = {
   id: number;
@@ -42,6 +43,9 @@ type PriceEntry = {
   id: number;
   store_name: string;
   store_type: string;
+  tindahan_id: number | null;
+  market_id: number | null;
+  market_name: string | null;
   price: number;
   unit: string;
   updated_at: string;
@@ -139,6 +143,7 @@ export default function PresyoScreen() {
   const [search, setSearch]   = useState('');
   const [query, setQuery]     = useState('');
   const [votes, setVotes]     = useState<Record<number, 'up' | 'down' | null>>({});
+  const [sheetTindahanId, setSheetTindahanId] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [gpsCoords, setGpsCoords]   = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating]     = useState(false);
@@ -459,10 +464,22 @@ export default function PresyoScreen() {
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center gap-2 flex-1">
                     <Text style={{ fontSize: 16 }}>{STORE_EMOJI[entry.store_type] ?? '🏪'}</Text>
-                    <View className="flex-1">
-                      <Text className="text-sm text-ink">{entry.store_name}</Text>
-                      <Text className="text-xs text-ink-soft capitalize">{entry.store_type}</Text>
-                    </View>
+                    <Pressable
+                      disabled={entry.tindahan_id == null}
+                      onPress={() => setSheetTindahanId(entry.tindahan_id)}
+                      hitSlop={6}
+                      className="flex-1"
+                    >
+                      <Text
+                        className="text-sm"
+                        style={{ color: entry.tindahan_id != null ? '#6E7B4A' : '#000000' }}
+                      >
+                        {entry.store_name}
+                      </Text>
+                      <Text className="text-xs text-ink-soft capitalize">
+                        {entry.store_type}{entry.market_name ? ` · ${entry.market_name}` : ''}
+                      </Text>
+                    </Pressable>
                   </View>
                   <View className="items-end">
                     <Text className="text-sm font-semibold text-brand-600">₱{entry.price}/{entry.unit}</Text>
@@ -591,6 +608,13 @@ export default function PresyoScreen() {
           />
         </View>
       </Animated.View>
+
+      <StallDetailSheet
+        tindahanId={sheetTindahanId}
+        visible={sheetTindahanId != null}
+        onClose={() => setSheetTindahanId(null)}
+        prefillItem={data?.item}
+      />
     </View>
   );
 }

@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-21 · **v1.44.2**
+Last updated: 2026-07-21 · **v1.45.0**
 
 ---
 
@@ -114,6 +114,13 @@ Last updated: 2026-07-21 · **v1.44.2**
 ---
 
 ## Version History
+
+### 2026-07-21 · v1.45.0 — Price Checker stall preview + Report a Price stall targeting
+
+- Price Checker search results: store names are now tappable (when tied to a real stall) and open a sliding preview sheet — the stall's full item list, which market it's inside (tappable), and, for user-added stores, who listed it (tappable to their profile). Results also now show which market each store belongs to as a subtitle. Backed by a new `tindahan_id`/`market_id`/`market_name` on every `/prices/search` entry (paired uLam commit) — previously the response only had a bare store name, no way to identify or link to the actual stall/market record.
+- The sheet's "Report a price here +15 XP" button jumps to Report a Price with the market *and* the specific stall already selected. Unambiguous by construction even when the same stall name exists at multiple markets (e.g. several branches of "Kuya Rico Meat Shop") — each preview is always opened for one specific stall id, never resolved by matching its name.
+- Report a Price gained a new "Stall (optional)" field: once a market is chosen, it can now be narrowed down to one of that market's individual stalls (sourced from the market's own stall list, reusing the existing `SelectField` picker component) — previously stalls belonging to a market were invisible to this form entirely, only whole markets or fully-standalone stores could be targeted.
+- Verified backend end-to-end via curl against real seed data (a real "Kuya Rico Meat Shop" stall with no owner on file): search results correctly carried the new fields, `GET /tindahan/{id}` and `GET /markets/{id}` needed no changes to support the new sheet/field, and submitting a report with only `tindahan_id` still correctly resolves to pending-review status with the right address. Full backend test suite green (31/31).
 
 ### 2026-07-21 · v1.44.2 — Meal Plan + Prices pull-to-refresh, meal plan cache-key fix
 

@@ -1,6 +1,7 @@
 import { ITEM_CATEGORIES } from '@/src/constants/itemCategories';
 import client from '@/src/api/client';
 import RewardCelebration from '@/src/components/RewardCelebration';
+import SelectField from '@/src/components/SelectField';
 import { postMultipart, resizeForUpload } from '@/src/utils/uploadImage';
 import * as ImagePicker from 'expo-image-picker';
 import { useLanguage } from '@/src/context/LanguageContext';
@@ -51,7 +52,15 @@ export default function ReportPriceScreen() {
   const router = useRouter();
   const { lang } = useLanguage();
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ item?: string }>();
+  const params = useLocalSearchParams<{
+    item?: string;
+    tindahan_id?: string;
+    tindahan_name?: string;
+    tindahan_type?: string;
+    market_id?: string;
+    market_name?: string;
+    market_type?: string;
+  }>();
 
   const [itemName, setItemName]     = useState(params.item ?? '');
   const [category, setCategory]     = useState('');
@@ -62,7 +71,42 @@ export default function ReportPriceScreen() {
   const [success, setSuccess]       = useState(false);
   const { reward, setReward, handleXpResponse } = useXpReward();
 
-  const [target, setTarget]         = useState<NearbyTarget | null>(null);
+  // Prepopulation from the Price Checker stall sheet's "Report a price here"
+  // button: a market_id means the target is that market (the stall itself,
+  // if any, is tracked separately below); a tindahan_id with no market_id
+  // means that stall IS the target directly, same as picking a standalone
+  // store manually. barangay/municipality are left blank here -- they're
+  // only read from the picker's own candidate rows, never for a
+  // params-derived selection or the submit payload (the backend resolves
+  // address from the DB row by id).
+  const [target, setTarget] = useState<NearbyTarget | null>(() => {
+    if (params.market_id) {
+      return {
+        id: Number(params.market_id),
+        kind: 'market',
+        name: params.market_name ?? '',
+        type: params.market_type ?? '',
+        barangay: '',
+        municipality: '',
+      };
+    }
+    if (params.tindahan_id) {
+      return {
+        id: Number(params.tindahan_id),
+        kind: 'tindahan',
+        name: params.tindahan_name ?? '',
+        type: params.tindahan_type ?? '',
+        barangay: '',
+        municipality: '',
+      };
+    }
+    return null;
+  });
+  const [stall, setStall] = useState<{ id: number; name: string; type: string } | null>(() =>
+    params.market_id && params.tindahan_id
+      ? { id: Number(params.tindahan_id), name: params.tindahan_name ?? '', type: params.tindahan_type ?? '' }
+      : null
+  );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [targetSearch, setTargetSearch] = useState('');
 
@@ -86,7 +130,26 @@ export default function ReportPriceScreen() {
     );
   }, [nearbyTargets, targetSearch]);
 
+  // Stalls belonging to the chosen market, for the optional "narrow down to
+  // a specific stall" field -- stalls-within-a-market never appear in the
+  // flat nearbyTargets list above (that's markets + standalone stores only).
+  const { data: marketDetail, isLoading: stallsLoading } = useQuery<{ stalls: { id: number; name: string; type: string }[] }>({
+    queryKey: ['market-stalls', target?.id],
+    queryFn: async () => {
+      const { data } = await client.get(`/markets/${target!.id}`);
+      return data;
+    },
+    enabled: target?.kind === 'market',
+    staleTime: 5 * 60_000,
+  });
+  const stalls = marketDetail?.stalls ?? [];
+
   const canSubmit = itemName.trim() && category && price && parseFloat(price) > 0 && !!target;
+  // A stall-scoped report (whether hand-picked here or prepopulated from the
+  // Price Checker sheet) always needs owner review, same as picking a
+  // standalone store directly -- only a bare market target publishes at once.
+  const isTindahanReport = !!stall || target?.kind === 'tindahan';
+  const reportedAtName = stall?.name ?? target?.name;
 
   const handleSubmit = async () => {
     if (!canSubmit || !target) return;
@@ -98,7 +161,8 @@ export default function ReportPriceScreen() {
         reported_price: parseFloat(price),
         unit,
       };
-      if (target.kind === 'tindahan') body.tindahan_id = target.id;
+      if (stall) body.tindahan_id = stall.id;
+      else if (target.kind === 'tindahan') body.tindahan_id = target.id;
       else if (target.kind === 'market') body.market_id = target.id;
 
       let data: any;
@@ -127,10 +191,10 @@ export default function ReportPriceScreen() {
         </Text>
         <Text className="text-sm text-ink-soft text-center mb-2">
           {lang === 'en'
-            ? `Reported the price of ${itemName} at ${target?.name}.`
-            : `Na-report ang presyo ng ${itemName} sa ${target?.name}.`}
+            ? `Reported the price of ${itemName} at ${reportedAtName}.`
+            : `Na-report ang presyo ng ${itemName} sa ${reportedAtName}.`}
         </Text>
-        {target?.kind === 'tindahan' && (
+        {isTindahanReport && (
           <View className="rounded-xl px-4 py-2.5 mb-2" style={{ backgroundColor: '#FDEFC9' }}>
             <Text className="text-xs text-center" style={{ fontFamily: 'NunitoSans_600SemiBold', color: '#9A6A12' }}>
               {lang === 'en'
@@ -159,6 +223,7 @@ export default function ReportPriceScreen() {
             setPrice('');
             setUnit('kg');
             setTarget(null);
+            setStall(null);
             setSuccess(false);
           }}
           className="mt-3 py-2"
@@ -302,6 +367,31 @@ export default function ReportPriceScreen() {
           </Pressable>
         </View>
 
+        {/* Stall within the chosen market (optional) */}
+        {target?.kind === 'market' && (
+          <SelectField
+            label={lang === 'en' ? 'Stall (optional)' : 'Puwesto (opsyonal)'}
+            placeholder={lang === 'en' ? 'Select a specific stall' : 'Pumili ng puwesto'}
+            value={stall ? String(stall.id) : ''}
+            options={stalls.map((s) => ({
+              label: `${TARGET_TYPE_EMOJI[s.type] ?? '🛒'} ${s.name}`,
+              value: String(s.id),
+            }))}
+            onSelect={(v) => {
+              const found = stalls.find((s) => String(s.id) === v);
+              if (found) setStall(found);
+            }}
+            disabled={stallsLoading || stalls.length === 0}
+            disabledHint={
+              stallsLoading
+                ? (lang === 'en' ? 'Loading stalls...' : 'Naglo-load ng mga puwesto...')
+                : (lang === 'en' ? 'No individual stalls listed at this market' : 'Walang nakalistang puwesto sa palengkeng ito')
+            }
+            searchPlaceholder={lang === 'en' ? 'Search stall name...' : 'Maghanap ng pangalan ng puwesto...'}
+            emptyLabel={lang === 'en' ? 'No stalls found.' : 'Walang nahanap na puwesto.'}
+          />
+        )}
+
         {/* Price + unit side by side */}
         <View className="flex-row gap-3 mb-8">
           <View className="flex-1">
@@ -398,7 +488,7 @@ export default function ReportPriceScreen() {
                 filteredTargets.map((m) => (
                   <Pressable
                     key={`${m.kind ?? 'market'}-${m.id}`}
-                    onPress={() => { setTarget(m); setPickerOpen(false); setTargetSearch(''); }}
+                    onPress={() => { setTarget(m); setStall(null); setPickerOpen(false); setTargetSearch(''); }}
                     className="flex-row items-center gap-2 px-4 py-3 border-b border-cream-200 active:opacity-70"
                   >
                     <Text style={{ fontSize: 16 }}>{TARGET_TYPE_EMOJI[m.type] ?? (m.kind === 'tindahan' ? '🛒' : '🏪')}</Text>

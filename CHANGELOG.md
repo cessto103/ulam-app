@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.45.0] — 2026-07-21
+
+### Added
+- **Price Checker stall preview + smarter Report a Price.** Tapping a store name in a Price Checker search result now opens a sliding preview of everything that store sells, without leaving the page — including which market it's inside (tap to visit) and, for stores added by an app user, who listed it (tap to view their profile). Search results also now show which market each store belongs to. The preview's "Report a price here" button jumps straight to Report a Price with both the market and that exact stall already selected — correct even when the same stall name exists at more than one market, since each result and each preview is always tied to one specific store, never guessed from its name. Report a Price also gained its own new "Stall (optional)" field, so a report can now be narrowed down to a specific stall within a chosen market by hand, not just picked at the whole-market level (paired uLam commit).
+
 ## [1.44.2] — 2026-07-21
 
 ### Fixed
