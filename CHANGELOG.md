@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.35.0] — 2026-07-20
+
+### Added
+- **Awards screen restructured around one unified Tasks system** (paired uLam backend commits). Daily Tasks, a new Weekly section, and a brand-new Monthly section now render separately instead of one merged list. Achievements gained real progress: lifetime milestones that come in tiers (Recipe Collector, Presyo Patrol, the new Mr./Ms. Palengke, Post Creator, Meal Planner) now show one badge with a live "12/30 to Silver" progress line instead of a single locked/unlocked entry, via a new `TierProgressCard`.
+- **Saving a recipe now earns XP** and can trigger a tiered achievement (fixed a real bug: it previously earned nothing at all, ever, no matter how many recipes you saved). The celebration popup now shows a Bronze/Silver/Gold/Diamond ribbon when a tiered achievement unlocks.
+
 ## [1.34.0] — 2026-07-20
 
 ### Added

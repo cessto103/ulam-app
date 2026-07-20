@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import ConfettiBurst from '@/src/components/ConfettiBurst';
+import { TIER_STYLE, type Tier } from '@/src/components/TierProgressCard';
 import { useLanguage } from '@/src/context/LanguageContext';
 
 export type UnlockedAchievement = {
@@ -9,6 +10,8 @@ export type UnlockedAchievement = {
   name: string;
   icon: string | null;
   xp_reward: number;
+  tier?: Tier | null;
+  frequency?: 'daily' | 'weekly' | 'monthly' | 'once';
 };
 
 export type Reward = {
@@ -219,6 +222,21 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
           <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C', letterSpacing: 1, marginBottom: 2 }}>
             {lang === 'en' ? 'ACHIEVEMENT UNLOCKED' : 'NA-UNLOCK NA ACHIEVEMENT'}
           </Text>
+          {currentAchievement.tier && (
+            <View
+              style={{
+                backgroundColor: TIER_STYLE[currentAchievement.tier].bg,
+                borderRadius: 999,
+                paddingHorizontal: 10,
+                paddingVertical: 2,
+                marginBottom: 4,
+              }}
+            >
+              <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 11, color: TIER_STYLE[currentAchievement.tier].text }}>
+                {TIER_STYLE[currentAchievement.tier].label.toUpperCase()}
+              </Text>
+            </View>
+          )}
           <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 17, color: '#000000', textAlign: 'center' }}>
             {currentAchievement.name}
           </Text>

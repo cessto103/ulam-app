@@ -2,6 +2,7 @@
 import FireXpBar from '@/src/components/FireXpBar';
 import { Skeleton, SkeletonListItem } from '@/src/components/Skeleton';
 import ThemedSection, { useSectionColors } from '@/src/components/ThemedSection';
+import TierProgressCard, { type TierGroup } from '@/src/components/TierProgressCard';
 import { uploadAvatar } from '@/src/api/user';
 import { resizeForUpload } from '@/src/utils/uploadImage';
 import { HeaderWave } from '@/src/components/ULamLogo';
@@ -30,11 +31,23 @@ import {
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type AchievementItem = {
-  id: number; slug: string; title: string; title_en: string | null;
-  description: string; description_en: string | null;
-  icon: string; xp_reward: number; category: string;
+type SingleAchievement = {
+  id: number; title: string; title_en: string | null;
+  description: string; icon: string | null; xp_reward: number;
   is_earned: boolean; earned_at: string | null;
+};
+
+type RepeatingTask = {
+  id: number; title: string; description: string | null;
+  icon: string | null; xp_reward: number;
+  frequency: 'daily' | 'weekly' | 'monthly'; is_completed: boolean;
+};
+
+type TasksResponse = {
+  daily: RepeatingTask[];
+  weekly: RepeatingTask[];
+  monthly: RepeatingTask[];
+  once: { single: SingleAchievement[]; tier_groups: TierGroup[] };
 };
 
 type LeaderboardEntry = {
@@ -51,12 +64,6 @@ type LeaderboardResponse = {
 type UserStats = {
   total_saved: number; meal_plans_generated: number;
   posts_count: number; achievements_count: number;
-};
-
-type DailyTaskItem = {
-  id: number; title: string; description: string | null;
-  icon: string | null; xp_reward: number;
-  frequency: 'daily' | 'weekly'; is_completed: boolean;
 };
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -78,9 +85,9 @@ function initials(name: string) {
 
 // ─── API ───────────────────────────────────────────────────────────────────────
 
-async function fetchAchievements(): Promise<AchievementItem[]> {
-  const { data } = await client.get('/user/achievements');
-  return data.achievements;
+async function fetchTasks(): Promise<TasksResponse> {
+  const { data } = await client.get('/user/tasks');
+  return data;
 }
 
 async function fetchLeaderboard(): Promise<LeaderboardResponse> {
@@ -93,27 +100,26 @@ async function fetchStats(): Promise<UserStats> {
   return data.stats;
 }
 
-async function fetchDailyTasks(): Promise<DailyTaskItem[]> {
-  const { data } = await client.get('/user/daily-tasks');
-  return data.tasks;
-}
-
 // ─── Sub-tabs ──────────────────────────────────────────────────────────────────
 
 function AwardsTab({
-  achievements, loadingAch, leaderData, loadingLb, stats, dailyTasks, loadingTasks,
+  tasksData, loadingTasks, leaderData, loadingLb, stats,
 }: {
-  achievements: AchievementItem[] | undefined;
-  loadingAch: boolean;
+  tasksData: TasksResponse | undefined;
+  loadingTasks: boolean;
   leaderData: LeaderboardResponse | undefined;
   loadingLb: boolean;
   stats: UserStats | undefined;
-  dailyTasks: DailyTaskItem[] | undefined;
-  loadingTasks: boolean;
 }) {
   const { lang } = useLanguage();
-  const earnedCount = achievements?.filter((a) => a.is_earned).length ?? 0;
-  const totalCount  = achievements?.length ?? 0;
+  const single = tasksData?.once.single ?? [];
+  const tierGroups = tasksData?.once.tier_groups ?? [];
+  // Each tier group counts as one achievement slot, complete once maxed
+  // (diamond earned) -- an ambiguous call with no single correct answer,
+  // easy to flip later if it reads oddly in practice.
+  const earnedCount = single.filter((a) => a.is_earned).length
+    + tierGroups.filter((g) => g.current_tier === 'diamond').length;
+  const totalCount = single.length + tierGroups.length;
 
   const savedColors        = useSectionColors('awards_stat_saved', ['#F4B942', '#58200F']);
   const mealPlansColors    = useSectionColors('awards_stat_meal_plans', ['#386641', '#FFFFFF']);
@@ -151,92 +157,105 @@ function AwardsTab({
         </View>
       )}
 
-      {/* Daily & weekly tasks — completion happens automatically when the
-          matching action is performed elsewhere in the app; this is a
-          read-only checklist, not a tap-to-complete list. */}
-      {(loadingTasks || (dailyTasks && dailyTasks.length > 0)) && (
-        <>
-          <Text className="text-xs font-medium text-ink-soft uppercase tracking-wider mb-2">
-            {lang === 'en' ? "Today's Tasks" : 'Mga Gawain Ngayon'}
-          </Text>
-          <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-4">
-            {loadingTasks ? (
-              <ActivityIndicator color="#386641" />
-            ) : (dailyTasks ?? []).map((task, i) => (
-              <View
-                key={task.id}
-                className={`flex-row items-center gap-3 py-2.5 ${
-                  i < (dailyTasks?.length ?? 0) - 1 ? 'border-b border-cream-200' : ''
-                }`}
-                style={{ opacity: task.is_completed ? 1 : 0.7 }}
-              >
+      {/* Daily / Weekly / Monthly tasks — completion happens automatically
+          when the matching action is performed elsewhere in the app; this
+          is a read-only checklist, not a tap-to-complete list. */}
+      {([
+        { key: 'daily',   tasks: tasksData?.daily,   label: lang === 'en' ? "Today's Tasks" : 'Mga Gawain Ngayon' },
+        { key: 'weekly',  tasks: tasksData?.weekly,  label: lang === 'en' ? 'This Week' : 'Ngayong Linggo' },
+        { key: 'monthly', tasks: tasksData?.monthly, label: lang === 'en' ? 'This Month' : 'Ngayong Buwan' },
+      ] as const).map(({ key, tasks, label }) => (
+        (loadingTasks || (tasks && tasks.length > 0)) && (
+          <View key={key}>
+            <Text className="text-xs font-medium text-ink-soft uppercase tracking-wider mb-2">
+              {label}
+            </Text>
+            <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-4">
+              {loadingTasks ? (
+                <ActivityIndicator color="#386641" />
+              ) : (tasks ?? []).map((task, i) => (
                 <View
-                  className="w-10 h-10 rounded-xl items-center justify-center"
-                  style={{ backgroundColor: task.is_completed ? '#EFF4EC' : '#F9EDD3' }}
+                  key={task.id}
+                  className={`flex-row items-center gap-3 py-2.5 ${
+                    i < (tasks?.length ?? 0) - 1 ? 'border-b border-cream-200' : ''
+                  }`}
+                  style={{ opacity: task.is_completed ? 1 : 0.7 }}
                 >
-                  <Text style={{ fontSize: 18 }}>{task.icon || '🎯'}</Text>
-                </View>
-                <View className="flex-1">
-                  <Text className={`text-sm font-medium ${task.is_completed ? 'text-ink' : 'text-ink-soft'}`}>
-                    {task.title}
-                  </Text>
-                  <Text className="text-xs text-ink-soft">
-                    {task.frequency === 'weekly'
-                      ? (lang === 'en' ? 'This week' : 'Ngayong linggo')
-                      : (lang === 'en' ? 'Today' : 'Ngayong araw')}
-                  </Text>
-                </View>
-                {task.is_completed ? (
-                  <View className="rounded-full bg-leaf-50 px-2 py-0.5">
-                    <Text className="text-xs font-semibold text-leaf-700">✓</Text>
+                  <View
+                    className="w-10 h-10 rounded-xl items-center justify-center"
+                    style={{ backgroundColor: task.is_completed ? '#EFF4EC' : '#F9EDD3' }}
+                  >
+                    <Text style={{ fontSize: 18 }}>{task.icon || '🎯'}</Text>
                   </View>
-                ) : (
-                  <Text className="text-xs text-gold-500 font-medium">+{task.xp_reward} XP</Text>
-                )}
-              </View>
-            ))}
+                  <View className="flex-1">
+                    <Text className={`text-sm font-medium ${task.is_completed ? 'text-ink' : 'text-ink-soft'}`}>
+                      {task.title}
+                    </Text>
+                  </View>
+                  {task.is_completed ? (
+                    <View className="rounded-full bg-leaf-50 px-2 py-0.5">
+                      <Text className="text-xs font-semibold text-leaf-700">✓</Text>
+                    </View>
+                  ) : (
+                    <Text className="text-xs text-gold-500 font-medium">+{task.xp_reward} XP</Text>
+                  )}
+                </View>
+              ))}
+            </View>
           </View>
-        </>
-      )}
+        )
+      ))}
 
-      {/* Achievements */}
+      {/* Achievements — flat one-off entries, then lifetime tier groups
+          (Recipe Collector, Presyo Patrol, Mr./Ms. Palengke, etc.) as a
+          single progressive badge each. */}
       <Text className="text-xs font-medium text-ink-soft uppercase tracking-wider mb-2">
         {lang === 'en' ? 'Achievements' : 'Mga Achievement'} ({earnedCount}/{totalCount})
       </Text>
       <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-4">
-        {loadingAch ? (
+        {loadingTasks ? (
           <ActivityIndicator color="#386641" />
-        ) : (achievements ?? []).map((a, i) => (
-          <View
-            key={a.id}
-            className={`flex-row items-center gap-3 py-2.5 ${
-              i < (achievements?.length ?? 0) - 1 ? 'border-b border-cream-200' : ''
-            }`}
-            style={{ opacity: a.is_earned ? 1 : 0.45 }}
-          >
-            <View
-              className="w-10 h-10 rounded-xl items-center justify-center"
-              style={{ backgroundColor: a.is_earned ? '#EFF4EC' : '#F9EDD3' }}
-            >
-              <Text style={{ fontSize: 18 }}>{a.icon}</Text>
-            </View>
-            <View className="flex-1">
-              <Text className={`text-sm font-medium ${a.is_earned ? 'text-ink' : 'text-ink-soft'}`}>
-                {lang === 'en' ? (a.title_en || a.title) : a.title}
-              </Text>
-              <Text className="text-xs text-ink-soft">
-                {lang === 'en' ? (a.description_en || a.description) : a.description}
-              </Text>
-            </View>
-            {a.is_earned ? (
-              <View className="rounded-full bg-leaf-50 px-2 py-0.5">
-                <Text className="text-xs font-semibold text-leaf-700">✓</Text>
+        ) : (
+          <>
+            {single.map((a, i) => (
+              <View
+                key={a.id}
+                className={`flex-row items-center gap-3 py-2.5 ${
+                  i < single.length - 1 || tierGroups.length > 0 ? 'border-b border-cream-200' : ''
+                }`}
+                style={{ opacity: a.is_earned ? 1 : 0.45 }}
+              >
+                <View
+                  className="w-10 h-10 rounded-xl items-center justify-center"
+                  style={{ backgroundColor: a.is_earned ? '#EFF4EC' : '#F9EDD3' }}
+                >
+                  <Text style={{ fontSize: 18 }}>{a.icon}</Text>
+                </View>
+                <View className="flex-1">
+                  <Text className={`text-sm font-medium ${a.is_earned ? 'text-ink' : 'text-ink-soft'}`}>
+                    {lang === 'en' ? (a.title_en || a.title) : a.title}
+                  </Text>
+                  <Text className="text-xs text-ink-soft">{a.description}</Text>
+                </View>
+                {a.is_earned ? (
+                  <View className="rounded-full bg-leaf-50 px-2 py-0.5">
+                    <Text className="text-xs font-semibold text-leaf-700">✓</Text>
+                  </View>
+                ) : (
+                  <Text className="text-xs text-gold-500 font-medium">+{a.xp_reward} XP</Text>
+                )}
               </View>
-            ) : (
-              <Text className="text-xs text-gold-500 font-medium">+{a.xp_reward} XP</Text>
-            )}
-          </View>
-        ))}
+            ))}
+            {tierGroups.map((g, i) => (
+              <View
+                key={g.tier_group}
+                className={i < tierGroups.length - 1 ? 'border-b border-cream-200' : ''}
+              >
+                <TierProgressCard group={g} />
+              </View>
+            ))}
+          </>
+        )}
       </View>
 
       {/* Leaderboard */}
@@ -293,9 +312,9 @@ export default function AwardsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const qc = useQueryClient();
 
-  const { data: achievements, isLoading: loadingAch } = useQuery({
-    queryKey: ['achievements'],
-    queryFn:  fetchAchievements,
+  const { data: tasksData, isLoading: loadingTasks } = useQuery({
+    queryKey: ['tasks'],
+    queryFn:  fetchTasks,
     staleTime: 60_000,
   });
 
@@ -309,12 +328,6 @@ export default function AwardsScreen() {
     queryKey: ['user-stats'],
     queryFn:  fetchStats,
     staleTime: 120_000,
-  });
-
-  const { data: dailyTasks, isLoading: loadingTasks } = useQuery({
-    queryKey: ['daily-tasks'],
-    queryFn:  fetchDailyTasks,
-    staleTime: 60_000,
   });
 
   // Seller plan takes priority in the header badge over the consumer
@@ -337,7 +350,6 @@ export default function AwardsScreen() {
   const myXp      = user?.xp    ?? 0;
   const myLevel   = user?.level  ?? 1;
   const { next, progress } = xpProgress(myXp, myLevel);
-  const earnedCount = achievements?.filter((a) => a.is_earned).length ?? 0;
 
   const showPhotoOptions = () => {
     Alert.alert('Profile Photo', lang === 'en' ? 'Choose an option' : 'Pumili ng opsyon', [
@@ -371,10 +383,9 @@ export default function AwardsScreen() {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
-      qc.invalidateQueries({ queryKey: ['achievements'] }),
+      qc.invalidateQueries({ queryKey: ['tasks'] }),
       qc.invalidateQueries({ queryKey: ['leaderboard'] }),
       qc.invalidateQueries({ queryKey: ['user-stats'] }),
-      qc.invalidateQueries({ queryKey: ['daily-tasks'] }),
       refreshUser(),
     ]);
     setRefreshing(false);
@@ -498,7 +509,7 @@ export default function AwardsScreen() {
             <Text className="text-xs font-semibold text-brand-600">🔥 {user?.streak_days ?? 0}d</Text>
           </View>
           <View className="rounded-full bg-gold-50 px-3 py-1">
-            <Text className="text-xs font-semibold text-gold-600">🏅 {earnedCount}</Text>
+            <Text className="text-xs font-semibold text-gold-600">🏅 {stats?.achievements_count ?? 0}</Text>
           </View>
         </View>
 
@@ -539,13 +550,11 @@ export default function AwardsScreen() {
       {/* Saved recipes moved to Profile > Saved Recipes — this screen is
           Awards-only now, so there's no more tab switcher here. */}
       <AwardsTab
-        achievements={achievements}
-        loadingAch={loadingAch}
+        tasksData={tasksData}
+        loadingTasks={loadingTasks}
         leaderData={leaderData}
         loadingLb={loadingLb}
         stats={stats}
-        dailyTasks={dailyTasks}
-        loadingTasks={loadingTasks}
       />
 
       {/* ── Account section ──────────────────────────────────────────── */}

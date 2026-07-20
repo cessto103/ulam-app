@@ -3,7 +3,9 @@ import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import client, { API_URL } from '@/src/api/client';
 import { BoostBadge, BoostButton } from '@/src/components/BoostButton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
+import RewardCelebration from '@/src/components/RewardCelebration';
 import { useSectionColors } from '@/src/components/ThemedSection';
+import { useXpReward } from '@/src/hooks/useXpReward';
 import StarRating from '@/src/components/StarRating';
 import { formatCount } from '@/src/utils/formatCount';
 import { Skeleton } from '@/src/components/Skeleton';
@@ -464,6 +466,7 @@ export default function RecipeDetailScreen() {
   const timeColors     = useSectionColors('awards_stat_achievements', ['#5E693F', '#FFFFFF']);
 
   const [savePending,  setSavePending]  = useState(false);
+  const { reward, setReward, handleXpResponse } = useXpReward();
   const [myReaction,   setMyReaction]   = useState<'up' | 'down' | null>(null);
   const [voteUp,       setVoteUp]       = useState<number | null>(null);
   const [voteDown,     setVoteDown]     = useState<number | null>(null);
@@ -655,9 +658,12 @@ export default function RecipeDetailScreen() {
     if (savePending || !recipe) return;
     setSavePending(true);
     try {
-      await client.post(`/recipes/${recipe.id}/save`);
+      const { data } = await client.post(`/recipes/${recipe.id}/save`);
       qc.invalidateQueries({ queryKey: ['recipe', id] });
       qc.invalidateQueries({ queryKey: ['recipes'] });
+      // Only the save branch returns reward fields (no XP clawback on
+      // unsave), so this is a no-op on the unsave path.
+      if (data?.saved) handleXpResponse(data);
     } catch {
       Alert.alert('Error', 'Could not save recipe. Please try again.');
     } finally {
@@ -1454,6 +1460,7 @@ export default function RecipeDetailScreen() {
       </View>
     <ReportContentSheet visible={reportSheetOpen} onClose={() => setReportSheetOpen(false)} contentType="recipe" contentId={recipe.id} />
     </ScrollView>
+    <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
     </KeyboardAvoidingView>
   );
 }

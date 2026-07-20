@@ -15,8 +15,8 @@ type XpResponseFields = {
  * new_level/new_achievements should call handleXpResponse(data) on
  * success. Without this, XP-earning actions only ever drove the one-shot
  * celebration toast — the shared user.xp/user.level (read by both Profile
- * and Awards) and the Awards screen's own achievement/daily-task caches
- * never got told anything changed, so both stayed stale until an unrelated
+ * and Awards) and the Awards screen's own tasks/achievements cache never
+ * got told anything changed, so both stayed stale until an unrelated
  * pull-to-refresh happened to fire.
  */
 export function useXpReward() {
@@ -28,10 +28,9 @@ export function useXpReward() {
     if ((data.xp_earned ?? 0) <= 0) return;
 
     refreshUser().catch(() => {});
-    qc.invalidateQueries({ queryKey: ['achievements'] });
+    qc.invalidateQueries({ queryKey: ['tasks'] });
     qc.invalidateQueries({ queryKey: ['leaderboard'] });
     qc.invalidateQueries({ queryKey: ['user-stats'] });
-    qc.invalidateQueries({ queryKey: ['daily-tasks'] });
 
     setReward({
       xpEarned: data.xp_earned ?? 0,
