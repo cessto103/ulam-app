@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.36.0] — 2026-07-20
+
+### Added
+- **Boost button now offers a free credit when you've earned one.** Reward Tiers (paired uLam commit) can grant a recipe or store boost credit for completing a set of tasks. When you have an unspent one, the Boost sheet on that recipe/store shows "Use free N-day boost credit" above the paid options — no GCash reference needed, activates instantly.
+
 ## [1.35.0] — 2026-07-20
 
 ### Added

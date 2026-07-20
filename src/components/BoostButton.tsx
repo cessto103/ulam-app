@@ -16,6 +16,17 @@ type BoostCatalog = {
   };
 };
 
+type EarnedRewardTier = {
+  id: number;
+  user_reward_tier_id: number;
+  title: string;
+  icon: string | null;
+  reward_type: string;
+  reward_value: number | null;
+  redeemed_at: string | null;
+  boostable_target: 'recipe' | 'tindahan' | null;
+};
+
 function errorMessage(e: any, fallback: string): string {
   const errors = e?.response?.data?.errors;
   if (errors) return Object.values(errors).flat().join('\n');
@@ -50,6 +61,7 @@ export function BoostButton({
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<BoostOption | null>(null);
+  const [selectedCredit, setSelectedCredit] = useState<EarnedRewardTier | null>(null);
   const [reference, setReference] = useState('');
 
   const { data, isLoading } = useQuery({
@@ -58,20 +70,48 @@ export function BoostButton({
     enabled: open,
   });
 
+  const { data: credits } = useQuery({
+    queryKey: ['reward-credits', target],
+    queryFn: async () => {
+      const res = await client.get<{ earned: EarnedRewardTier[] }>('/user/reward-tiers');
+      return res.data.earned.filter((t) => t.boostable_target === target && !t.redeemed_at);
+    },
+    enabled: open,
+  });
+
   const options = (data?.boosts ?? []).filter((b) => b.target === target);
+
+  const pickPaid = (opt: BoostOption) => {
+    setSelectedCredit(null);
+    setSelected(opt);
+  };
+
+  const pickCredit = (credit: EarnedRewardTier) => {
+    setSelected(null);
+    setReference('');
+    setSelectedCredit(credit);
+  };
 
   const { mutate: submit, isPending: submitting } = useMutation({
     mutationFn: async () =>
-      client.post('/boosts', {
-        target,
-        boostable_id: boostableId,
-        duration_days: selected!.duration_days,
-        payment_reference: reference.trim(),
-      }),
+      selectedCredit
+        ? client.post('/boosts', {
+            target,
+            boostable_id: boostableId,
+            user_reward_tier_id: selectedCredit.user_reward_tier_id,
+          })
+        : client.post('/boosts', {
+            target,
+            boostable_id: boostableId,
+            duration_days: selected!.duration_days,
+            payment_reference: reference.trim(),
+          }),
     onSuccess: async (res) => {
       await qc.invalidateQueries({ queryKey: refetchKey });
+      await qc.invalidateQueries({ queryKey: ['reward-credits', target] });
       setOpen(false);
       setSelected(null);
+      setSelectedCredit(null);
       setReference('');
       Alert.alert(lang === 'en' ? 'Submitted' : 'Naipadala', res.data?.message ?? '');
     },
@@ -111,16 +151,34 @@ export function BoostButton({
               <ActivityIndicator color="#E7653B" style={{ marginVertical: 24 }} />
             ) : (
               <>
+                {(credits ?? []).map((credit) => {
+                  const active = selectedCredit?.id === credit.id;
+                  return (
+                    <Pressable
+                      key={credit.id}
+                      onPress={() => pickCredit(credit)}
+                      className={`flex-row items-center gap-2 rounded-xl border px-4 py-3 mb-3 ${active ? 'border-leaf-500 bg-leaf-50' : 'border-cream-200 bg-cream-50'}`}
+                    >
+                      <Ionicons name="gift" size={16} color={active ? '#386641' : '#9A6A12'} />
+                      <Text className={`flex-1 text-sm font-bold ${active ? 'text-leaf-700' : 'text-ink'}`}>
+                        {lang === 'en'
+                          ? `Use free ${credit.reward_value}-day boost credit`
+                          : `Gamitin ang libreng ${credit.reward_value}-araw na boost credit`}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+
                 <Text className="text-xs font-medium text-ink-soft mb-2">
-                  {lang === 'en' ? 'Choose duration' : 'Pumili ng tagal'}
+                  {lang === 'en' ? 'Or choose a paid duration' : 'O pumili ng bayad na tagal'}
                 </Text>
                 <View className="flex-row flex-wrap gap-2 mb-4">
                   {options.map((opt) => {
-                    const active = selected?.duration_days === opt.duration_days;
+                    const active = !selectedCredit && selected?.duration_days === opt.duration_days;
                     return (
                       <Pressable
                         key={opt.duration_days}
-                        onPress={() => setSelected(opt)}
+                        onPress={() => pickPaid(opt)}
                         className={`rounded-xl border px-4 py-3 ${active ? 'border-brand-500 bg-brand-50' : 'border-cream-200 bg-cream-50'}`}
                       >
                         <Text className={`text-sm font-bold ${active ? 'text-brand-600' : 'text-ink'}`}>
@@ -131,6 +189,20 @@ export function BoostButton({
                     );
                   })}
                 </View>
+
+                {selectedCredit && (
+                  <Pressable
+                    onPress={() => submit()}
+                    disabled={submitting}
+                    className="w-full rounded-xl bg-leaf-600 py-3.5 items-center active:opacity-80 disabled:opacity-60"
+                  >
+                    {submitting ? (
+                      <ActivityIndicator color="white" size="small" />
+                    ) : (
+                      <Text className="text-sm font-semibold text-white">{lang === 'en' ? 'Use credit' : 'Gamitin'}</Text>
+                    )}
+                  </Pressable>
+                )}
 
                 {selected && (
                   <>
