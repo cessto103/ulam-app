@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.41.1] — 2026-07-20
+
+### Fixed
+- **Recipes showed the raw `budget_400plus` slug instead of "₱400+"** wherever a budget tag renders (recipe detail, Meal Plan, Community, Recipe Book, home, create-post). It's a legacy tag from an older tier scheme — nothing creates it anymore, but existing recipes still carry it, and every budget-label map in the app was missing it. Also fixed the admin side (paired uLam commit): the admin's Zod schema and backend validation both excluded it too, meaning admins couldn't save *any* edit to a legacy-tagged recipe without the request being rejected outright.
+
 ## [1.41.0] — 2026-07-20
 
 ### Fixed

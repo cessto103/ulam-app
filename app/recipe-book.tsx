@@ -48,7 +48,7 @@ type Recipe = {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const BUDGET_LABEL: Record<string, string> = {
-  budget_100: '₱100', budget_200: '₱200', budget_400: '₱400',
+  budget_100: '₱100', budget_200: '₱200', budget_400: '₱400', budget_400plus: '₱400+',
   budget_600: '₱600', budget_800: '₱800', budget_1000: '₱1,000',
   budget_1000plus: '₱1,000+',
 };
