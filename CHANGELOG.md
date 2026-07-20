@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.44.0] — 2026-07-21
+
+### Added
+- **Sponsored Ads**: native ad cards for third-party paid product placements (e.g. a company promoting a product), interleaved lightly into the Community feed and the Recipe browse feed (~1 ad per 8 organic items). Distinct from the existing Boost feature — a Sponsored Ad has no underlying recipe/store/account, it's a standalone paid placement the admin sets up from scratch (paired uLam Phase 1 + admin v1.27.0). Each card is clearly labeled "Sponsored" with a muted pill deliberately different from Boost's gold badge, opens its link externally on tap, and never shows in "Your recipes" since that's your own content, not a browse feed. Whether free and/or Premium users see a given ad is set per-ad by the admin.
+
 ## [1.43.1] — 2026-07-21
 
 ### Fixed

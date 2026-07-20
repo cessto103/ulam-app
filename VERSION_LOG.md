@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-21 · **v1.43.1**
+Last updated: 2026-07-21 · **v1.44.0**
 
 ---
 
@@ -114,6 +114,12 @@ Last updated: 2026-07-21 · **v1.43.1**
 ---
 
 ## Version History
+
+### 2026-07-21 · v1.44.0 — Sponsored Ads
+
+- New native ad system for selling paid product placements directly to outside companies (paired uLam Phases 1-4 + admin v1.27.0) — deliberately distinct from the existing Boost feature (a creator paying to rank their *own* recipe/store higher): a Sponsored Ad has no underlying in-app content at all, it's admin-authored from scratch for a real brand deal (product/company name, tagline, longer description, photo, link, button text, flight dates).
+- Admin gets a full CRUD screen (new "Sponsored Ads" entry in the Monetization sidebar) with per-ad targeting: which feed(s) it shows in, and independently, whether free and/or Premium users see it. "Running/Scheduled/Ended/Disabled" status is always computed live from the enabled flag + flight dates, never a stored status that could drift.
+- Mobile interleaves ad cards lightly into the Community feed and the Recipe browse feed (~1 per 8 organic items, cycling through the active pool) via a new shared `interleaveAds()` utility — "Your recipes" stays ad-free since it's personal content, not a browse feed. Each card carries a muted "Sponsored" pill, deliberately styled apart from Boost's gold badge so the two can never be confused. Tapping opens the link in the external browser and records a click; the card records an impression once on render. Audience filtering happens entirely server-side against the viewer's real plan — the app has no say in which ads it's shown, it just renders what the API returns.
 
 ### 2026-07-21 · v1.43.1 — Recipe share preview showed the wrong photo
 
