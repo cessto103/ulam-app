@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-21 · **v1.44.1**
+Last updated: 2026-07-21 · **v1.44.2**
 
 ---
 
@@ -114,6 +114,12 @@ Last updated: 2026-07-21 · **v1.44.1**
 ---
 
 ## Version History
+
+### 2026-07-21 · v1.44.2 — Meal Plan + Prices pull-to-refresh, meal plan cache-key fix
+
+- Adding a recipe to your meal plan (from the recipe page, recipe book, or home screen) invalidated `['meal-plan-date', ...]` but the Plan tab's own query is keyed `['meal-plan-today']` — all three "add to meal plan" entry points now invalidate both, so a newly-added recipe actually shows up instead of leaving only the "Generate meal plan" empty state visible. Verified end-to-end via curl against the real API (cleared a test user's plan, added an item with the exact mobile payload shape, confirmed it appears on `GET /meal-plans/today`).
+- Meal Plan tab's empty state wasn't scrollable, so there was nothing to pull down on; wrapped it in a `RefreshControl`-bearing `ScrollView` like the rest of the app.
+- Prices page: confirmed the main list already had a correctly-wired `RefreshControl`, but its absolutely-positioned collapsing header overlay (needed so the header can animate independently of the list's own scroll) had no `pointerEvents` set, so it was silently swallowing the pull-down gesture across its full width/height before it ever reached the list underneath. Added `pointerEvents="box-none"` so the overlay only intercepts touches on its own actual buttons/content, letting everything else pass through to the list.
 
 ### 2026-07-21 · v1.44.1 — Recipe photos disappearing after upload
 

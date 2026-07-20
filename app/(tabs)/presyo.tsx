@@ -574,8 +574,13 @@ export default function PresyoScreen() {
       </ScrollView>
 
       {/* Collapsing header — absolute overlay, never a layout sibling of the
-          ScrollView, so animating it can't disturb the list's own scroll gesture. */}
-      <Animated.View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: animatedHeaderHeight, overflow: 'hidden' }}>
+          ScrollView, so animating it can't disturb the list's own scroll gesture.
+          pointerEvents="box-none" so this overlay itself doesn't swallow the
+          pull-to-refresh drag gesture meant for the ScrollView underneath it --
+          without it, any touch starting in the header's (large, full-width)
+          bounds never reaches the ScrollView's native RefreshControl at all,
+          since the header sits on top of it for the entire un-scrolled height. */}
+      <Animated.View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: animatedHeaderHeight, overflow: 'hidden' }}>
         <View onLayout={(e) => { if (headerHeight == null) setHeaderHeight(e.nativeEvent.layout.height); }}>
           <GradientPageHeader
             title={lang === 'en' ? 'Prices' : 'Presyo'}

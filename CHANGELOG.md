@@ -3,6 +3,13 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.44.2] — 2026-07-21
+
+### Fixed
+- **Added meal plan recipes not appearing on the Plan tab.** Adding a recipe to your meal plan from the recipe page, recipe book, or home screen invalidated the wrong cache key, so the Plan tab kept showing its empty "Generate meal plan" state even though the recipe had actually been saved. All three "add to meal plan" entry points now correctly refresh the Plan tab.
+- **No pull-to-refresh on the Meal Plan tab's Plan view.** The empty state wasn't scrollable, so there was nothing to pull down on. It's now wrapped in a refreshable scroll view like the rest of the app.
+- **No pull-to-refresh on the Prices page.** The page's collapsing gradient header is an overlay positioned on top of the price list so it can animate independently, but with no `pointerEvents` set it was silently intercepting the pull-down gesture before it ever reached the list underneath. The header now lets touches pass through its empty areas to the list below.
+
 ## [1.44.1] — 2026-07-21
 
 ### Fixed
