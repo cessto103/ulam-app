@@ -130,6 +130,11 @@ export default function SettingsScreen() {
           </Pressable>
 
           <SettingsRow
+            icon="shield-outline"
+            label={lang === 'en' ? 'Account Status' : 'Katayuan ng Account'}
+            onPress={() => router.push('/account-status' as any)}
+          />
+          <SettingsRow
             icon="location-outline"
             label={lang === 'en' ? 'Location' : 'Lokasyon'}
             onPress={() => router.push('/location' as any)}

@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-20 · **v1.41.1**
+Last updated: 2026-07-20 · **v1.42.0**
 
 ---
 
@@ -114,6 +114,14 @@ Last updated: 2026-07-20 · **v1.41.1**
 ---
 
 ## Version History
+
+### 2026-07-20 · v1.42.0 — User moderation (strikes, restrictions, bans)
+
+- New 3-strike moderation system, built end-to-end this session: reported posts/recipes/stores were previously collected (`ContentReport`) but had **zero admin surface** — nobody could ever review or act on one. Admin now has a full Content Reports queue (Warn/Restrict/Ban/Dismiss, strike history shown inline per report) alongside the existing Reported Listings, both regrouped under a new "Moderation" sidebar section.
+- Warn → 7-day content restriction → permanent ban, with an admin severity-override to skip straight to ban for serious violations; strikes age off after 9 months of good behavior. Restriction blocks every content-creation surface (posts, comments, recipes, stores, price reports) admin-side and mobile-side.
+- Fixed a real pre-existing bug found while building this: banning a user via a Reported Listing didn't revoke their login tokens the way banning via Users did — two different code paths silently did different things. Both now go through one `UserModerationService`.
+- New mobile **Account Status** screen (Settings) shows current standing + strike history. A ban's reason reaches the device as a push notification (works independent of the dead API token); a generic one-time "Signed out" message now covers the case where a session dies for any reason with no push registered, replacing a silent reset to the welcome screen.
+- Reporter identity is a hard confidentiality boundary end-to-end — every notification body is built only from the admin-entered reason, never the reporter relation.
 
 ### 2026-07-20 · v1.30.2–v1.37.0 — Post-launch polish, Connections, shared shopping lists, a security/perf audit, and a full gamification rebuild
 

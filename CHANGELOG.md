@@ -3,6 +3,15 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.42.0] — 2026-07-20
+
+### Added
+- **Account Status screen** (Settings > Account Status): shows your current standing (good standing / temporarily restricted with the reason and lift date / suspended with the reason) plus your full warning/restriction/ban history. Backs the new 3-strike moderation system (paired uLam Phases 1–5): reported content can now actually be reviewed by an admin and acted on, instead of going nowhere.
+- Notification icons for the 4 new moderation notification types (warning ⚠️, restriction ⏳, ban 🚫, strike expired ✅).
+
+### Fixed
+- **Silent logout with zero explanation.** Any 401 (expired session, or a ban — a ban revokes every device's login instantly, so the very next request just looks like an expired session with no way to say why) used to reset the app straight back to the welcome screen without a word. Now shows a one-time "Signed out" message. A ban's actual reason still reaches the device reliably as a push notification, independent of the dead API token; this generic message is the fallback for anyone without push notifications enabled.
+
 ## [1.41.1] — 2026-07-20
 
 ### Fixed

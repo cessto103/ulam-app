@@ -49,9 +49,26 @@ export function setUnauthorizedHandler(handler: () => void) {
   onUnauthorized = handler;
 }
 
+// A ban revokes the current Sanctum token server-side on the triggering
+// request only -- every request after that just gets a plain 401 (the token
+// no longer exists), so the ban reason would otherwise be shown at most once,
+// and only if the triggering request happened to be on a screen with its own
+// error handling. Routing it through AuthProvider instead means it's shown
+// reliably exactly once, regardless of which screen or background request
+// happened to trigger the detecting call.
+let onBanned: ((message: string) => void) | null = null;
+export function setBannedHandler(handler: (message: string) => void) {
+  onBanned = handler;
+}
+
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
+    if (error?.response?.status === 403 && error?.response?.data?.code === 'banned') {
+      await SecureStore.deleteItemAsync('auth_token');
+      onBanned?.(error.response.data.message ?? 'Your account has been suspended.');
+      return Promise.reject(error);
+    }
     if (error?.response?.status === 401) {
       await SecureStore.deleteItemAsync('auth_token');
       onUnauthorized?.();

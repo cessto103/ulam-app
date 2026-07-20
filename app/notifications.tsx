@@ -26,10 +26,14 @@ type AppNotif = {
 type NotifPage = { data: AppNotif[]; current_page: number; last_page: number };
 
 const TYPE_ICON: Record<string, string> = {
-  reaction:       '❤️',
-  achievement:    '🏆',
-  daily_reminder: '🍳',
-  default:        '🔔',
+  reaction:                 '❤️',
+  achievement:              '🏆',
+  daily_reminder:           '🍳',
+  moderation_warning:       '⚠️',
+  moderation_restriction:   '⏳',
+  moderation_ban:           '🚫',
+  moderation_strike_expired:'✅',
+  default:                  '🔔',
 };
 
 function timeAgo(iso: string, lang: 'en' | 'tl'): string {

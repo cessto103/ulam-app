@@ -27,7 +27,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { AppState, Platform, type AppStateStatus } from 'react-native';
+import { Alert, AppState, Platform, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
@@ -56,7 +56,7 @@ AppState.addEventListener('change', (status: AppStateStatus) => {
 });
 
 function RouteGuard() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, bannedMessage, clearBannedMessage, sessionEndedMessage, clearSessionEndedMessage } = useAuth();
   const { lang } = useLanguage();
   usePushNotifications();
   useNotificationTapRouting(!isLoading && !!user && !!user.email_verified_at);
@@ -79,6 +79,31 @@ function RouteGuard() {
       router.replace('/(tabs)');
     }
   }, [user, isLoading, segments]);
+
+  // A ban clears `user` the same way an expired session does, so the redirect
+  // above already sends the user back to the welcome screen -- this only
+  // needs to surface the reason, exactly once, wherever it happened to fire.
+  useEffect(() => {
+    if (!bannedMessage) return;
+    Alert.alert(
+      lang === 'en' ? 'Account suspended' : 'Na-suspend ang account',
+      bannedMessage,
+      [{ text: 'OK', onPress: clearBannedMessage }]
+    );
+  }, [bannedMessage, lang, clearBannedMessage]);
+
+  // Generic "your session ended" fallback for every other silent-logout
+  // case, ban included -- a ban revokes every token instantly, so the
+  // specific reason above almost never actually reaches the client; this is
+  // what a banned user without a registered push token actually sees.
+  useEffect(() => {
+    if (!sessionEndedMessage || bannedMessage) return;
+    Alert.alert(
+      lang === 'en' ? 'Signed out' : 'Naka-sign out',
+      sessionEndedMessage,
+      [{ text: 'OK', onPress: clearSessionEndedMessage }]
+    );
+  }, [sessionEndedMessage, bannedMessage, lang, clearSessionEndedMessage]);
 
   return (
     <Stack>
@@ -236,6 +261,10 @@ function RouteGuard() {
       />
       <Stack.Screen
         name="account"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="account-status"
         options={{ headerShown: false }}
       />
       <Stack.Screen

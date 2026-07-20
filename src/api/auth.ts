@@ -29,6 +29,7 @@ export type User = {
   longitude: number | null;
   dietary_preferences: string[] | null;
   onboarding_completed: boolean;
+  restricted_until: string | null;
 };
 
 export type LoginPayload = { login: string; password: string };
