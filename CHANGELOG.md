@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.39.0] — 2026-07-20
+
+### Fixed
+- **Today's Tasks / This Week / This Month on Awards now show English titles when English is selected** (paired uLam commit). Every other bilingual section of the app already respected the language toggle; these three were the one remaining spot that always showed Tagalog regardless of setting, because the backend never sent an English title for them and the 5 underlying tasks had never had an English translation recorded at all.
+
 ## [1.38.0] — 2026-07-20
 
 ### Fixed

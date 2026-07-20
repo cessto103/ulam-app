@@ -38,7 +38,7 @@ type SingleAchievement = {
 };
 
 type RepeatingTask = {
-  id: number; title: string; description: string | null;
+  id: number; title: string; title_en: string | null; description: string | null; description_en: string | null;
   icon: string | null; xp_reward: number;
   frequency: 'daily' | 'weekly' | 'monthly'; is_completed: boolean;
 };
@@ -221,7 +221,7 @@ function AwardsTab({
                   </View>
                   <View className="flex-1">
                     <Text className={`text-sm font-medium ${task.is_completed ? 'text-ink' : 'text-ink-soft'}`}>
-                      {task.title}
+                      {lang === 'en' ? (task.title_en || task.title) : task.title}
                     </Text>
                   </View>
                   {task.is_completed ? (
