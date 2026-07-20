@@ -72,7 +72,7 @@ Last updated: 2026-07-20 · **v1.33.3**
 |---------|-------------------|-----------|
 | @types/react | ~19.1.10 | 19.1.10 |
 | typescript | ~5.9.2 | 5.9.2 |
-| eas-cli | ^20.5.1 | 20.5.1 (EAS builds live: project `ulam`, package com.ulam.app, preview APK profile) |
+| eas-cli | ^21.0.2 | 21.0.2 (bumped 2026-07-20 from 20.5.1 to clear `npm audit`-flagged transitive vulns in its bundled deps -- xmldom, node-forge, tar, js-yaml; all were devDependency-only, never shipped in the app bundle. EAS builds live: project `ulam`, package com.ulam.app, preview APK profile) |
 | sharp | (latest) | image asset compression script use (header photo slimming, v1.20.0) |
 
 ---
@@ -109,6 +109,7 @@ Last updated: 2026-07-20 · **v1.33.3**
 | `react-native 0.81.5` | Pinned by Expo SDK 54. Do not upgrade independently. |
 | `laravel/framework ^12.0` | Laravel 12 (not 13) — `laravel new` scaffolded v12 at project creation time. |
 | `anthropic-ai/sdk ^0.30.0` | Used for AI meal plan generation via `MealPlanService`. |
+| `postcss <8.5.10` (npm audit moderate) left unfixed | Only resolvable by bumping `expo` to 57.0.7, a major SDK jump past the pinned 54 line above. postcss here is a build-time CSS processor (via `@expo/metro-config` and `tailwindcss`), not code that ships in the runtime bundle, so the actual exposure is minimal; not worth the SDK-upgrade risk right now. |
 
 ---
 
