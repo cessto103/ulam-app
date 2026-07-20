@@ -615,7 +615,12 @@ function PlanView({ user }: { user: any }) {
   }
 
   return (
-    <View className="flex-1 items-center justify-center px-8">
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />
+      }
+    >
       <Text style={{ fontSize: 40, marginBottom: 16 }}>🍽️</Text>
       <Text className="text-base font-medium text-ink mb-2 text-center">
         {lang === 'en' ? 'No meal plan yet' : 'Walang meal plan pa'}
@@ -661,7 +666,7 @@ function PlanView({ user }: { user: any }) {
         )
       )}
       <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
-    </View>
+    </ScrollView>
   );
 }
 

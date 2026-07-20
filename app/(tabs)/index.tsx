@@ -445,6 +445,11 @@ export default function HomeScreen() {
       setPickerRecipe(null);
       qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] });
       qc.invalidateQueries({ queryKey: ['meal-plan-dates'] });
+      // Also refresh the Meal Plan tab's own "today" cache -- it's keyed
+      // differently (meal-plan-today, no date param) and was never being
+      // invalidated by this mutation, so a recipe added here wouldn't show
+      // up there until something else happened to refetch it.
+      qc.invalidateQueries({ queryKey: ['meal-plan-today'] });
     },
     onError: (e: any) => {
       const slotLabel = MEAL_TYPES.find(m => m.key === pickerMealType)?.[lang === 'en' ? 'labelEn' : 'labelTl'] ?? pickerMealType;

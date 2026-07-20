@@ -260,6 +260,10 @@ export default function RecipeBookScreen() {
       setMealModal(false);
       setMealRecipe(null);
       qc.invalidateQueries({ queryKey: ['meal-plan-date'] });
+      // Also refresh the Meal Plan tab's own "today" cache -- it's keyed
+      // differently (meal-plan-today) and was never being invalidated by
+      // this mutation, so a recipe added here wouldn't show up there.
+      qc.invalidateQueries({ queryKey: ['meal-plan-today'] });
     },
     onError: (e: any) => {
       const slotLabel = MEAL_TYPES.find(m => m.key === mealType)?.[lang === 'en' ? 'labelEn' : 'labelTl'] ?? mealType;
