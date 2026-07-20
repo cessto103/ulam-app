@@ -2,6 +2,7 @@ import client from '@/src/api/client';
 import CollageStylePicker from '@/src/components/recipe/CollageStylePicker';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -160,7 +161,7 @@ export default function EditRecipeScreen() {
         : [{ name: '', qty: '', price: '' }]
     );
     // Cover fields
-    const urls: string[] = r.image_urls ?? (r.image_url ? [r.image_url] : []);
+    const urls: string[] = getRecipePhotos(r);
     setExistingPhotoUrls(urls);
     setCollageStyle(r.collage_style ?? 'gradient');
     setGradientKey(r.gradient_key ?? 'grad_a');

@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Skeleton, SkeletonBudgetCard, SkeletonMealCard, SkeletonStatsRow, SkeletonStreakCard } from '@/src/components/Skeleton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import ThemedSection from '@/src/components/ThemedSection';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -241,7 +242,7 @@ function PickerRecipeCard({
   onPress: () => void;
   lang: 'en' | 'tl';
 }) {
-  const photos   = recipe.image_urls ?? [];
+  const photos   = getRecipePhotos(recipe);
   const totalMin = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
   const diff     = recipe.difficulty ? DIFF_COLOR[recipe.difficulty] : null;
 
@@ -1148,7 +1149,7 @@ export default function HomeScreen() {
                 style={{ width: 150 }}
               >
                 <RecipeCoverPhoto
-                  photos={r.image_urls ?? []}
+                  photos={getRecipePhotos(r)}
                   collageStyle={(r.collage_style ?? 'gradient') as any}
                   gradientKey={(r.gradient_key ?? 'grad_a') as any}
                   fontKey={(r.font_key ?? 'baloo') as any}

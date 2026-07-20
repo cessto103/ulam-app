@@ -3,6 +3,7 @@ import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { SkeletonRecipeCard } from '@/src/components/Skeleton';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -100,7 +101,7 @@ function RecipeCard({
   lang: 'en' | 'tl';
 }) {
   const router   = useRouter();
-  const photos   = recipe.image_urls ?? [];
+  const photos   = getRecipePhotos(recipe);
   const totalMin = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
   const diff     = recipe.difficulty ? DIFF_COLOR[recipe.difficulty] : null;
 
@@ -469,7 +470,7 @@ export default function RecipeBookScreen() {
           {mealRecipe && (
             <View style={{ height: 160, overflow: 'hidden' }}>
               <RecipeCoverPhoto
-                photos={mealRecipe.image_urls ?? []}
+                photos={getRecipePhotos(mealRecipe)}
                 collageStyle={mealRecipe.collage_style ?? 'gradient'}
                 gradientKey={mealRecipe.gradient_key ?? 'grad_a'}
                 fontKey={mealRecipe.font_key ?? 'baloo'}

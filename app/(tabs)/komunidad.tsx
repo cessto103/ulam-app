@@ -8,6 +8,7 @@ import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/r
 import { useAdsFeed } from '@/src/hooks/useAdsFeed';
 import { formatCount } from '@/src/utils/formatCount';
 import { type FeedEntry, interleaveAds, isAdSlot } from '@/src/utils/interleaveAds';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -183,7 +184,7 @@ const PostCard = memo(function PostCard({
           {/* Cover — clipped to 150px so it matches the card width */}
           <View style={{ height: 150, overflow: 'hidden' }}>
             <RecipeCoverPhoto
-              photos={post.recipe.image_urls ?? (post.recipe.image_url ? [post.recipe.image_url] : [])}
+              photos={getRecipePhotos(post.recipe)}
               collageStyle={post.recipe.collage_style ?? 'gradient'}
               gradientKey={post.recipe.gradient_key ?? 'grad_a'}
               fontKey={post.recipe.font_key ?? 'baloo'}

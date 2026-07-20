@@ -14,6 +14,7 @@ import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 import { formatCount } from '@/src/utils/formatCount';
 import { type FeedEntry, interleaveAds, isAdSlot } from '@/src/utils/interleaveAds';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -703,7 +704,7 @@ const RecipeCard = memo(function RecipeCard({
   const router = useRouter();
   const isMine   = r.is_mine;
   const totalMin = (r.prep_time_minutes ?? 0) + (r.cook_time_minutes ?? 0);
-  const photos   = r.image_urls ?? (r.image_url ? [r.image_url] : []);
+  const photos   = getRecipePhotos(r);
 
   return (
     <Pressable

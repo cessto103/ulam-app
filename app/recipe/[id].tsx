@@ -8,6 +8,7 @@ import { useSectionColors } from '@/src/components/ThemedSection';
 import { useXpReward } from '@/src/hooks/useXpReward';
 import StarRating from '@/src/components/StarRating';
 import { formatCount } from '@/src/utils/formatCount';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { Skeleton } from '@/src/components/Skeleton';
 import { usePopOnActivate } from '@/src/hooks/usePopOnActivate';
 import { useAuth } from '@/src/context/AuthContext';
@@ -776,7 +777,7 @@ export default function RecipeDetailScreen() {
     );
   }
 
-  const photos    = recipe.image_urls ?? (recipe.image_url ? [recipe.image_url] : []);
+  const photos    = getRecipePhotos(recipe);
   const totalTime = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
   const videoId   = recipe.youtube_url ? extractYouTubeId(recipe.youtube_url) : null;
 

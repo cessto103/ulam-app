@@ -3,6 +3,7 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { useXpReward } from '@/src/hooks/useXpReward';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
@@ -71,7 +72,7 @@ type RecipePreviewData = {
 function RecipePreviewCard({ recipe, budgetTag }: {
   recipe: RecipePreviewData; budgetTag?: string;
 }) {
-  const photos = recipe.image_urls ?? (recipe.image_url ? [recipe.image_url] : []);
+  const photos = getRecipePhotos(recipe);
   return (
     <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#F0DEBB', marginBottom: 16 }}>
       <RecipeCoverPhoto
