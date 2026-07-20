@@ -53,6 +53,7 @@ export default function AccountScreen() {
   const [username, setUsername]           = useState(user?.username ?? '');
   const [bio, setBio]                     = useState(user?.bio ?? '');
   const [householdSize, setHouseholdSize] = useState(user?.household_size ?? 1);
+  const [gender, setGender]               = useState<'male' | 'female' | null>(user?.gender ?? null);
   const [dietaryPrefs, setDietaryPrefs]   = useState<string[]>(user?.dietary_preferences ?? []);
 
   const toggleDietary = (key: string) => {
@@ -66,6 +67,7 @@ export default function AccountScreen() {
         username: username.trim() || undefined,
         bio: bio.trim() || null,
         household_size: householdSize,
+        gender: gender,
         dietary_preferences: dietaryPrefs,
       }),
     onSuccess: async () => {
@@ -238,6 +240,28 @@ export default function AccountScreen() {
               <Text className="text-xs text-ink-soft">
                 {lang === 'en' ? (householdSize === 1 ? 'person' : 'people') : 'tao'}
               </Text>
+            </View>
+
+            <Text className="text-xs font-medium text-ink-soft mb-2">
+              {lang === 'en' ? 'How should we address you?' : 'Paano ka namin tatawagin?'}
+            </Text>
+            <View className="flex-row gap-2 mb-4">
+              <Pressable
+                onPress={() => setGender(gender === 'male' ? null : 'male')}
+                className={`px-4 py-2 rounded-full border ${gender === 'male' ? 'bg-brand-600 border-brand-600' : 'bg-cream-50 border-cream-200'}`}
+              >
+                <Text className={`text-xs font-medium ${gender === 'male' ? 'text-white' : 'text-ink-soft'}`}>
+                  {lang === 'en' ? '👨 Male' : '👨 Lalaki'}
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setGender(gender === 'female' ? null : 'female')}
+                className={`px-4 py-2 rounded-full border ${gender === 'female' ? 'bg-brand-600 border-brand-600' : 'bg-cream-50 border-cream-200'}`}
+              >
+                <Text className={`text-xs font-medium ${gender === 'female' ? 'text-white' : 'text-ink-soft'}`}>
+                  {lang === 'en' ? '👩 Female' : '👩 Babae'}
+                </Text>
+              </Pressable>
             </View>
 
             <Text className="text-xs font-medium text-ink-soft mb-2">Dietary Preferences</Text>

@@ -20,6 +20,7 @@ export type User = {
   ai_meal_plans_used_this_month: number;
   ai_plans_remaining: number | null;
   household_size: number | null;
+  gender: 'male' | 'female' | null;
   barangay: string | null;
   municipality: string | null;
   province: string | null;

@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-20 · **v1.33.4**
+Last updated: 2026-07-20 · **v1.34.0**
 
 ---
 

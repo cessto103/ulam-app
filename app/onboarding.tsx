@@ -125,12 +125,14 @@ function Step1({
 // ── Step 2 — Household size ──────────────────────────────────────────────────
 
 function Step2({
-  lang, slideAnim, householdSize, setHouseholdSize, onNext, onBack,
+  lang, slideAnim, householdSize, setHouseholdSize, gender, setGender, onNext, onBack,
 }: {
   lang: Lang;
   slideAnim: Animated.Value;
   householdSize: number;
   setHouseholdSize: (fn: (s: number) => number) => void;
+  gender: 'male' | 'female' | null;
+  setGender: (g: 'male' | 'female' | null) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
@@ -165,6 +167,31 @@ function Step2({
             className="w-14 h-14 rounded-full bg-cream-200 items-center justify-center active:opacity-70"
           >
             <Text className="text-2xl text-ink">+</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Optional, skippable -- tapping the already-selected chip deselects */}
+      <View className="items-center mb-12">
+        <Text className="text-xs text-ink-soft mb-2">
+          {lang === 'en' ? 'How should we address you? (optional)' : 'Paano ka namin tatawagin? (opsyonal)'}
+        </Text>
+        <View className="flex-row gap-3">
+          <Pressable
+            onPress={() => setGender(gender === 'male' ? null : 'male')}
+            className={`px-5 py-2.5 rounded-full border ${gender === 'male' ? 'bg-brand-600 border-brand-600' : 'bg-cream-50 border-cream-300'}`}
+          >
+            <Text className={`text-sm font-medium ${gender === 'male' ? 'text-white' : 'text-ink'}`}>
+              {lang === 'en' ? '👨 Male' : '👨 Lalaki'}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setGender(gender === 'female' ? null : 'female')}
+            className={`px-5 py-2.5 rounded-full border ${gender === 'female' ? 'bg-brand-600 border-brand-600' : 'bg-cream-50 border-cream-300'}`}
+          >
+            <Text className={`text-sm font-medium ${gender === 'female' ? 'text-white' : 'text-ink'}`}>
+              {lang === 'en' ? '👩 Female' : '👩 Babae'}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -397,6 +424,7 @@ export default function OnboardingScreen() {
 
   // Step 2
   const [householdSize, setHouseholdSize] = useState(user?.household_size ?? 4);
+  const [gender, setGender] = useState<'male' | 'female' | null>(user?.gender ?? null);
 
   // Step 3
   const [budgetAmount, setBudgetAmount] = useState('');
@@ -434,6 +462,7 @@ export default function OnboardingScreen() {
         municipality:         municipality.trim() || null,
         barangay:             barangay.trim() || null,
         household_size:       householdSize,
+        gender:               gender,
         onboarding_completed: true,
       });
       await refreshUser();
@@ -467,6 +496,7 @@ export default function OnboardingScreen() {
         municipality:         municipality.trim() || null,
         barangay:             barangay.trim() || null,
         household_size:       householdSize,
+        gender:               gender,
         onboarding_completed: true,
       });
       await refreshUser();
@@ -518,6 +548,8 @@ export default function OnboardingScreen() {
           slideAnim={slideAnim}
           householdSize={householdSize}
           setHouseholdSize={setHouseholdSize}
+          gender={gender}
+          setGender={setGender}
           onNext={goNext}
           onBack={goBack}
         />

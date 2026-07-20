@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.34.0] — 2026-07-20
+
+### Added
+- **New optional "How should we address you?" field** (Male/Female, tap-to-toggle) in onboarding and Settings > My Account. Entirely skippable — it only powers a gendered title on one specific Awards badge ("Mr./Ms. Palengke," for helping shop off a shared list), which shows a neutral title until you set it.
+
 ## [1.33.4] — 2026-07-20
 
 ### Fixed
