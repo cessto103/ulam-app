@@ -50,6 +50,22 @@ type TasksResponse = {
   once: { single: SingleAchievement[]; tier_groups: TierGroup[] };
 };
 
+type EarnedRewardTier = {
+  id: number; user_reward_tier_id: number; title: string; description: string | null;
+  icon: string | null; reward_type: string; reward_value: number | null;
+  earned_at: string; redeemed_at: string | null;
+  boostable_target: 'recipe' | 'tindahan' | null;
+};
+
+type LockedRewardTier = {
+  id: number; title: string; description: string | null; icon: string | null;
+  reward_type: string; reward_value: number | null; xp_threshold: number | null;
+  required_tasks: { id: number; title: string; icon: string | null; is_completed: boolean }[];
+  tasks_completed: number; tasks_required: number;
+};
+
+type RewardTiersResponse = { earned: EarnedRewardTier[]; locked: LockedRewardTier[] };
+
 type LeaderboardEntry = {
   rank: number;
   user: { id: number; name: string; username: string | null; avatar: string | null; level: number };
@@ -100,18 +116,34 @@ async function fetchStats(): Promise<UserStats> {
   return data.stats;
 }
 
+async function fetchRewardTiers(): Promise<RewardTiersResponse> {
+  const { data } = await client.get('/user/reward-tiers');
+  return data;
+}
+
+function rewardSummary(tier: { reward_type: string; reward_value: number | null }, lang: string): string {
+  switch (tier.reward_type) {
+    case 'premium_days': return lang === 'en' ? `${tier.reward_value} days Premium` : `${tier.reward_value} araw na Premium`;
+    case 'booster_credit': return lang === 'en' ? `${tier.reward_value}-day recipe boost credit` : `${tier.reward_value}-araw na boost credit (recipe)`;
+    case 'store_boost_credit': return lang === 'en' ? `${tier.reward_value}-day store boost credit` : `${tier.reward_value}-araw na boost credit (tindahan)`;
+    default: return lang === 'en' ? 'Badge' : 'Badge';
+  }
+}
+
 // ─── Sub-tabs ──────────────────────────────────────────────────────────────────
 
 function AwardsTab({
-  tasksData, loadingTasks, leaderData, loadingLb, stats,
+  tasksData, loadingTasks, leaderData, loadingLb, stats, rewardTiersData,
 }: {
   tasksData: TasksResponse | undefined;
   loadingTasks: boolean;
   leaderData: LeaderboardResponse | undefined;
   loadingLb: boolean;
   stats: UserStats | undefined;
+  rewardTiersData: RewardTiersResponse | undefined;
 }) {
   const { lang } = useLanguage();
+  const router = useRouter();
   const single = tasksData?.once.single ?? [];
   const tierGroups = tasksData?.once.tier_groups ?? [];
   // Each tier group counts as one achievement slot, complete once maxed
@@ -258,6 +290,69 @@ function AwardsTab({
         )}
       </View>
 
+      {/* Rewards — Reward Tier unlocks (premium days, boost credits, badges).
+          Only shown once at least one tier exists, earned or locked, so a
+          fresh admin config with zero tiers doesn't leave an empty section. */}
+      {((rewardTiersData?.earned.length ?? 0) + (rewardTiersData?.locked.length ?? 0) > 0) && (
+        <>
+          <Text className="text-xs font-medium text-ink-soft uppercase tracking-wider mb-2">
+            {lang === 'en' ? 'Rewards' : 'Mga Reward'}
+          </Text>
+          <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-4">
+            {(rewardTiersData?.earned ?? []).map((tier, i, arr) => (
+              <View
+                key={`earned-${tier.id}`}
+                className={`flex-row items-center gap-3 py-2.5 ${
+                  i < arr.length - 1 || (rewardTiersData?.locked.length ?? 0) > 0 ? 'border-b border-cream-200' : ''
+                }`}
+              >
+                <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: '#EFF4EC' }}>
+                  <Text style={{ fontSize: 18 }}>{tier.icon || '🎁'}</Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-medium text-ink">{tier.title}</Text>
+                  <Text className="text-xs text-ink-soft">{rewardSummary(tier, lang)}</Text>
+                </View>
+                {tier.redeemed_at ? (
+                  <View className="rounded-full bg-leaf-50 px-2 py-0.5">
+                    <Text className="text-xs font-semibold text-leaf-700">✓</Text>
+                  </View>
+                ) : tier.boostable_target === 'tindahan' ? (
+                  <Pressable
+                    onPress={() => router.push('/my-stores' as any)}
+                    className="rounded-full bg-gold-100 px-3 py-1 active:opacity-70"
+                  >
+                    <Text className="text-xs font-semibold text-gold-700">{lang === 'en' ? 'Use' : 'Gamitin'}</Text>
+                  </Pressable>
+                ) : (
+                  <Text className="text-xs text-ink-soft text-right" style={{ maxWidth: 90 }}>
+                    {lang === 'en' ? 'Use on a recipe you own' : 'Gamitin sa sarili mong recipe'}
+                  </Text>
+                )}
+              </View>
+            ))}
+            {(rewardTiersData?.locked ?? []).map((tier, i, arr) => (
+              <View
+                key={`locked-${tier.id}`}
+                className={`flex-row items-center gap-3 py-2.5 ${i < arr.length - 1 ? 'border-b border-cream-200' : ''}`}
+                style={{ opacity: 0.55 }}
+              >
+                <View className="w-10 h-10 rounded-xl items-center justify-center" style={{ backgroundColor: '#F9EDD3' }}>
+                  <Text style={{ fontSize: 18 }}>{tier.icon || '🎁'}</Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-medium text-ink-soft">{tier.title}</Text>
+                  <Text className="text-xs text-ink-soft">{rewardSummary(tier, lang)}</Text>
+                </View>
+                <Text className="text-xs text-gold-500 font-medium">
+                  {tier.tasks_required > 0 ? `${tier.tasks_completed}/${tier.tasks_required}` : `${tier.xp_threshold} XP`}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </>
+      )}
+
       {/* Leaderboard */}
       <Text className="text-xs font-medium text-ink-soft uppercase tracking-wider mb-2">
         {lang === 'en' ? 'Top in' : 'Top sa'} {leaderData?.scope_value ?? (lang === 'en' ? 'Community' : 'Komunidad')}
@@ -330,6 +425,12 @@ export default function AwardsScreen() {
     staleTime: 120_000,
   });
 
+  const { data: rewardTiersData } = useQuery({
+    queryKey: ['reward-tiers'],
+    queryFn:  fetchRewardTiers,
+    staleTime: 60_000,
+  });
+
   // Seller plan takes priority in the header badge over the consumer
   // Free/Premium plan — it's the bigger paid commitment for a store owner,
   // and showing "Free" right under the name reads as broken once someone
@@ -386,6 +487,7 @@ export default function AwardsScreen() {
       qc.invalidateQueries({ queryKey: ['tasks'] }),
       qc.invalidateQueries({ queryKey: ['leaderboard'] }),
       qc.invalidateQueries({ queryKey: ['user-stats'] }),
+      qc.invalidateQueries({ queryKey: ['reward-tiers'] }),
       refreshUser(),
     ]);
     setRefreshing(false);
@@ -555,6 +657,7 @@ export default function AwardsScreen() {
         leaderData={leaderData}
         loadingLb={loadingLb}
         stats={stats}
+        rewardTiersData={rewardTiersData}
       />
 
       {/* ── Account section ──────────────────────────────────────────── */}

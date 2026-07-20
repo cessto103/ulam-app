@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.37.0] — 2026-07-20
+
+### Added
+- **Reward Tiers are now visible in the app** (paired uLam backend commits). Awards & Achievements gained a "Rewards" section listing earned tiers (badges and Premium days show a checkmark, unspent boost credits show a "Use" shortcut) and locked ones with a live "X/Y tasks" progress line. Earned cosmetic badges now also show as a horizontal chip row on your own Profile and as small pills on other users' public profiles. Unlocking a reward tier now plays the same celebration overlay as an achievement, headed "REWARD UNLOCKED" instead.
+
 ## [1.36.0] — 2026-07-20
 
 ### Added

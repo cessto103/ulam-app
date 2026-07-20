@@ -62,6 +62,17 @@ export default function ProfileScreen() {
   const sellerPlanName = billing?.subscription?.plan_name ?? null;
   const sellerPlanActive = billing?.subscription && billing.subscription.status !== 'free';
 
+  // Cosmetic badges earned from Reward Tiers -- independent query, React
+  // Query dedupes this against the same key already fetched on Awards.
+  const { data: rewardTiersData } = useQuery({
+    queryKey: ['reward-tiers'],
+    queryFn: async () => (await client.get('/user/reward-tiers')).data as {
+      earned: { id: number; title: string; icon: string | null; reward_type: string; redeemed_at: string | null }[];
+    },
+    staleTime: 60_000,
+  });
+  const badges = (rewardTiersData?.earned ?? []).filter((t) => t.reward_type === 'badge' && t.redeemed_at);
+
   const handlePickPhoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -228,6 +239,29 @@ export default function ProfileScreen() {
           </View>
         ))}
       </View>
+
+      {/* Cosmetic badges earned from Reward Tiers */}
+      {badges.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mb-5"
+          contentContainerClassName="gap-2"
+        >
+          {badges.map((b) => (
+            <View
+              key={b.id}
+              className="rounded-2xl border border-gold-200 bg-gold-50 px-3 py-2.5 items-center"
+              style={{ minWidth: 78 }}
+            >
+              <Text style={{ fontSize: 24 }}>{b.icon || '🏅'}</Text>
+              <Text className="text-xs font-medium text-gold-700 text-center mt-1" numberOfLines={2} style={{ maxWidth: 70 }}>
+                {b.title}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+      )}
 
       {/* Connections (relocated from the Awards header) */}
       <Pressable

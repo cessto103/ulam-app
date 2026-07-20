@@ -12,6 +12,8 @@ export type UnlockedAchievement = {
   xp_reward: number;
   tier?: Tier | null;
   frequency?: 'daily' | 'weekly' | 'monthly' | 'once';
+  kind?: 'task' | 'reward_tier';
+  reward_type?: string;
 };
 
 export type Reward = {
@@ -220,7 +222,9 @@ export default function RewardCelebration({ reward, onDismiss }: Props) {
         >
           <Text style={{ fontSize: 36, marginBottom: 6 }}>{currentAchievement.icon || '🏆'}</Text>
           <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#C4881C', letterSpacing: 1, marginBottom: 2 }}>
-            {lang === 'en' ? 'ACHIEVEMENT UNLOCKED' : 'NA-UNLOCK NA ACHIEVEMENT'}
+            {currentAchievement.kind === 'reward_tier'
+              ? (lang === 'en' ? 'REWARD UNLOCKED' : 'NA-UNLOCK NA REWARD')
+              : (lang === 'en' ? 'ACHIEVEMENT UNLOCKED' : 'NA-UNLOCK NA ACHIEVEMENT')}
           </Text>
           {currentAchievement.tier && (
             <View
