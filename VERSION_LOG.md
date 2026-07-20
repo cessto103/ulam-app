@@ -115,6 +115,34 @@ Last updated: 2026-07-20 · **v1.37.0**
 
 ## Version History
 
+### 2026-07-20 · v1.30.2–v1.37.0 — Post-launch polish, Connections, shared shopping lists, a security/perf audit, and a full gamification rebuild
+
+**v1.37.0 / v1.36.0 — Reward Tiers**
+- New feature: admin-defined Reward Tiers (paired uLam Phases 1–4 + admin v1.24.0) now actually grant something instead of being scaffolding — Premium days (extend-only, never shortens an active subscription), a recipe or store boost credit (banked until spent free through the existing Boost sheet, no GCash reference needed), or a cosmetic badge — once a user completes every required Task (AND-gated, not any-of) and/or crosses an XP threshold. Surfaces on Awards (new "Rewards" section), your own Profile (badge chip row), and other users' public profiles (badge pills, via the now-extended `GET /users/{id}`). 6 starter tiers seeded on top of the existing Tasks catalog.
+
+**v1.35.0 — Unified Tasks/Awards revamp**
+- Achievements (previously seeder-only, no admin UI, and silently broken — "Recipe Collector" could never actually be earned) merged into Daily/Weekly Tasks into one admin-manageable "Tasks" system (admin v1.23.0). New Monthly frequency; lifetime tasks can now be tiered Bronze/Silver/Gold/Diamond sharing a tier group, rendered as one progressive badge via the new `TierProgressCard`. Saving a recipe now actually earns XP (previously a silent no-op with 24-save test accounts to prove it).
+
+**v1.34.0 — Gender field**
+- Optional Male/Female field in onboarding + Settings > My Account, entirely skippable; powers a gendered "Mr./Ms. Palengke" Awards badge for the shared-shopping-list helper flow. Unset users see a neutral fallback title.
+
+**v1.33.x — Budget custom expenses, security/perf audit, XP staleness fix**
+- Daily fare/allowance replaced with a repeatable custom-expenses list (Travel/Load/Baon/Others categories); Today-duration budgets now correctly deduct them too (v1.33.1 fixed a leftover today-only exemption carried over from the old fields).
+- Full project security + performance audit: fixed an open-redirect via notification tap-routing (a server-controlled `action_url` could reach `Linking.openURL` completely unguarded — new `safeAppUrl.ts` gate); bridged `AppState` to React Query's `focusManager` so background polling (unread-count, shared-list) actually pauses, which it never did on native; swapped core `Image` usage to `expo-image` on the highest-traffic screens; added session-expiry handling now that Sanctum tokens actually expire (paired uLam commit); debounced two search inputs that were minting a fresh query on every keystroke.
+- XP bar on Profile/Awards now updates instantly instead of requiring a manual pull-to-refresh (shared account state was never told to refresh after an XP-earning action); recipe bookmark double-tap race fixed — button now disables itself while a save is in flight, matching the share button beside it.
+
+**v1.32.x — Shared shopping lists**
+- Shopping list moved from device-local storage to the server: shareable with Connections, live 15s polling while a shared list is open, per-item added-by/checked-by attribution, event lists that complete without touching the budget. Push notification taps now route straight to their `action_url`. Home's 4th tile renamed My Recipe Book → My Shopping List.
+
+**v1.31.0 — Connections**
+- New mutual-connection system, distinct from the existing one-way Follows: request/accept/decline with a badge count, private relationship-label chips (admin-managed list), a Connect button on profiles.
+
+**v1.30.2–v1.30.14 — Post-v1.30.1 polish batch**
+- Terracotta-themed several remaining native-style headers; fixed the Boost sheet, cover-photo picker, and meal-plan modal sitting behind the Android nav bar — eventually solved app-wide with a persistent `AndroidNavBarFiller` once it turned out `NavigationBar.setBackgroundColorAsync` is a documented no-op under this app's edge-to-edge setup; several rounds of keyboard-avoidance fixes on comment/report fields (height→padding mode, explicit scroll-snap on show/hide).
+- Pull-to-refresh spinner fixed on Android app-wide — 23 `RefreshControl` instances across 22 files were missing the Android-specific `colors` prop (only had the iOS-only `tintColor`).
+- Added an email verification screen (OTP, gated ahead of onboarding); account state now auto-refreshes on app foreground and on the Meal Plan tab gaining focus, so an admin-side change (e.g. granting Premium) no longer needs a re-login to show up.
+- Replaced free-text location entry (onboarding + Location settings) with cascading region → city → barangay selects backed by a bundled PSGC dataset (~1,600 cities/municipalities, ~42,000 barangays) — fixed a real duplicate-key crash along the way from city names that repeat across provinces (e.g. "Burgos" ×4 in Region I alone). Report a Price now requires a specific market/store instead of a generic city/municipality field.
+
 ### 2026-07-17 · v1.28.1–v1.30.1 — Gamification, celebrations, and a large UX/perf pass
 
 **v1.30.x — Daily/weekly tasks + UI batch**
