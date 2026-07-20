@@ -3,6 +3,14 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.43.0] — 2026-07-21
+
+### Fixed
+- **Unlimited XP farming via save/unsave.** Saving a recipe granted 5 XP; unsaving didn't claw it back (by design — no clawback pattern exists anywhere in the app), but re-saving the *same* recipe granted another 5 XP every time, with no limit. Now only the first-ever save of a given recipe by a given user grants XP (paired uLam commit) — unsave/re-save still toggles normally, just without repeat rewards.
+
+### Changed
+- **Recipe page stats/actions redesigned** to match the target layout: the bookmark (save) toggle moved up next to the recipe title; a new centered row shows save count / view count / last-edited date together; thumbs up/down switched from emoji to outline icons (filled + colored when you've voted); Share moved into its own pill button reading "Share to community".
+
 ## [1.42.0] — 2026-07-20
 
 ### Added

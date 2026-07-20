@@ -312,15 +312,16 @@ function commentIsEditable(iso: string) {
 
 // ─── Components ───────────────────────────────────────────────────────────────
 
-function VoteButton({ emoji, active, activeColor, count, onPress }: {
-  emoji: string; active: boolean; activeColor: string; count: number; onPress: () => void;
+function VoteButton({ icon, iconOutline, active, activeColor, count, onPress }: {
+  icon: keyof typeof Ionicons.glyphMap; iconOutline: keyof typeof Ionicons.glyphMap;
+  active: boolean; activeColor: string; count: number; onPress: () => void;
 }) {
   const scale = usePopOnActivate(active);
   return (
     <Pressable onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-      <Animated.Text style={{ fontSize: 20, opacity: active ? 1 : 0.35, transform: [{ scale }] }}>
-        {emoji}
-      </Animated.Text>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <Ionicons name={active ? icon : iconOutline} size={20} color={active ? activeColor : '#B0A18C'} />
+      </Animated.View>
       <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: active ? activeColor : '#B0A18C' }}>
         {count}
       </Text>
@@ -875,9 +876,18 @@ export default function RecipeDetailScreen() {
             />
           </View>
         )}
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 22, color: '#000000', lineHeight: 28, marginBottom: 2 }}>
-          {recipe.title}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 2 }}>
+          <Text style={{ flex: 1, fontFamily: 'Baloo2_700Bold', fontSize: 22, color: '#000000', lineHeight: 28 }}>
+            {recipe.title}
+          </Text>
+          <Pressable onPress={toggleSave} disabled={savePending} hitSlop={8} style={{ paddingTop: 2 }}>
+            {savePending ? (
+              <ActivityIndicator color="#6E7B4A" size="small" />
+            ) : (
+              <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={24} color={isSaved ? '#F4B942' : '#C45E3A'} />
+            )}
+          </Pressable>
+        </View>
         {recipe.description ? (
           <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', lineHeight: 20, marginBottom: 8 }}>
             {recipe.description}
@@ -915,64 +925,69 @@ export default function RecipeDetailScreen() {
         )}
       </View>
 
-      {/* ── Vote + Save row ── */}
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F9EDD3', marginTop: 12, gap: 16 }}>
-        <View>
-          <VoteButton
-            emoji="👍"
-            active={myReaction === 'up'}
-            activeColor="#5E693F"
-            count={voteUp ?? recipe.vote_up_count ?? 0}
-            onPress={() => voteRecipe('up')}
-          />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-            <Ionicons name="eye-outline" size={13} color="#B0A18C" />
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-              {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
-            </Text>
-          </View>
-        </View>
-        <VoteButton
-          emoji="👎"
-          active={myReaction === 'down'}
-          activeColor="#E24B4A"
-          count={voteDown ?? recipe.vote_down_count ?? 0}
-          onPress={() => voteRecipe('down')}
-        />
-        <View style={{ flex: 1 }} />
-        {/* Share */}
-        <Pressable
-          onPress={() => router.push({
-            pathname: '/create-post' as any,
-            params: {
-              recipe_id: String(recipe.id),
-              recipe_title: recipe.title,
-              recipe_budget: recipe.budget_tag,
-              recipe_image: recipe.image_url ?? '',
-            },
-          })}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: 12 }}
-        >
-          <Ionicons name="paper-plane-outline" size={20} color="#6F655A" />
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-            {recipe.share_count ?? 0}
+      {/* ── Stats + Vote/Share row ── */}
+      <View style={{ paddingHorizontal: 20, paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F9EDD3', marginTop: 12, gap: 12 }}>
+        {/* Row 1: saved / views / edited — centered */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Ionicons name="bookmark-outline" size={13} color="#B0A18C" />
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginLeft: 4 }}>
+            {recipe.save_count ?? 0} {lang === 'en' ? 'saved' : 'na-save'}
           </Text>
-        </Pressable>
-        {/* Save */}
-        <View>
-          <Pressable onPress={toggleSave} disabled={savePending} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            {savePending ? <ActivityIndicator color="#6E7B4A" size="small" /> : (
-              <>
-                <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={22} color={isSaved ? '#F4B942' : '#D3C5AB'} />
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-                  {recipe.save_count ?? 0} saved
-                </Text>
-              </>
-            )}
-          </Pressable>
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#D3C5AB', marginHorizontal: 8 }}>|</Text>
+          <Ionicons name="eye-outline" size={13} color="#B0A18C" />
+          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginLeft: 4 }}>
+            {formatCount(recipe.views_count ?? 0)} {lang === 'en' ? 'views' : 'panonood'}
+          </Text>
           {wasEdited && (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 12, color: '#6F655A', marginTop: 6 }}>{editedLabel()}</Text>
+            <>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#D3C5AB', marginHorizontal: 8 }}>|</Text>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>{editedLabel()}</Text>
+            </>
           )}
+        </View>
+
+        {/* Row 2: thumbs up/down on the left, Share to community on the right */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+            <VoteButton
+              icon="thumbs-up"
+              iconOutline="thumbs-up-outline"
+              active={myReaction === 'up'}
+              activeColor="#5E693F"
+              count={voteUp ?? recipe.vote_up_count ?? 0}
+              onPress={() => voteRecipe('up')}
+            />
+            <VoteButton
+              icon="thumbs-down"
+              iconOutline="thumbs-down-outline"
+              active={myReaction === 'down'}
+              activeColor="#E24B4A"
+              count={voteDown ?? recipe.vote_down_count ?? 0}
+              onPress={() => voteRecipe('down')}
+            />
+          </View>
+          <Pressable
+            onPress={() => router.push({
+              pathname: '/create-post' as any,
+              params: {
+                recipe_id: String(recipe.id),
+                recipe_title: recipe.title,
+                recipe_budget: recipe.budget_tag,
+                recipe_image: recipe.image_url ?? '',
+              },
+            })}
+            style={{
+              flexDirection: 'row', alignItems: 'center', gap: 6,
+              borderWidth: 1, borderColor: '#E3CA9B', borderRadius: 999,
+              paddingHorizontal: 12, paddingVertical: 7,
+            }}
+            className="active:opacity-70"
+          >
+            <Ionicons name="paper-plane-outline" size={16} color="#6F655A" />
+            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A' }}>
+              {lang === 'en' ? 'Share to community' : 'Ibahagi sa komunidad'}
+            </Text>
+          </Pressable>
         </View>
       </View>
 

@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-20 · **v1.42.0**
+Last updated: 2026-07-21 · **v1.43.0**
 
 ---
 
@@ -114,6 +114,11 @@ Last updated: 2026-07-20 · **v1.42.0**
 ---
 
 ## Version History
+
+### 2026-07-21 · v1.43.0 — Recipe page redesign + XP-farming fix
+
+- Recipe stats/actions row redesigned per a UI mockup: bookmark toggle moved next to the title, save/views/edited-date collapsed into one centered row, thumbs up/down switched from emoji to outline icons, Share became its own pill button.
+- Fixed a real exploit found while testing: saving a recipe granted 5 XP with no clawback on unsave (by design), but re-saving the same recipe kept granting XP every time — unlimited farming via save/unsave/save/... New `XpService::awardOncePerSource()` (paired uLam commit) grants XP for a given user+recipe combo once, ever, regardless of how many times it's toggled.
 
 ### 2026-07-20 · v1.42.0 — User moderation (strikes, restrictions, bans)
 
