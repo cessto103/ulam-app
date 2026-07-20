@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-21 · **v1.43.0**
+Last updated: 2026-07-21 · **v1.43.0** (backend-only fix since, no app version bump)
 
 ---
 
@@ -114,6 +114,12 @@ Last updated: 2026-07-21 · **v1.43.0**
 ---
 
 ## Version History
+
+### 2026-07-21 · uLam backend only — full XP-source audit, 3 more farming vectors closed
+
+- No mobile changes; documenting here since it's directly related to the recipe-save fix below. Audited every `XpService::award()` call site after finding the recipe one: `create_post` (30 XP, no minimum body length, users can delete their own posts — farmable via create/delete/repeat) and `report_price` (15 XP, no delete even needed — endless distinct throwaway reports) both switched to `awardOncePerDay`, same guard already used for `help_shopping`.
+- `generate_meal_plan` (20 XP) also switched to `awardOncePerDay` — Premium users get intentionally unlimited generations by design, and the route had **zero rate-limiting**, so each call (a real billed Anthropic API request) was uncapped. Added `throttle:5,1` to all 3 routes touching meal-plan generation (including `regenerate`, which awards no XP but shares the same uncapped-API-cost exposure).
+- `report_accepted` (5 XP) and `log_budget`/`help_shopping`/task completions were all audited and found already safe.
 
 ### 2026-07-21 · v1.43.0 — Recipe page redesign + XP-farming fix
 
