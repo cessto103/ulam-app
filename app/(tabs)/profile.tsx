@@ -67,7 +67,7 @@ export default function ProfileScreen() {
   const { data: rewardTiersData } = useQuery({
     queryKey: ['reward-tiers'],
     queryFn: async () => (await client.get('/user/reward-tiers')).data as {
-      earned: { id: number; title: string; icon: string | null; reward_type: string; redeemed_at: string | null }[];
+      earned: { id: number; title: string; title_en: string | null; icon: string | null; reward_type: string; redeemed_at: string | null }[];
     },
     staleTime: 60_000,
   });
@@ -256,7 +256,7 @@ export default function ProfileScreen() {
             >
               <Text style={{ fontSize: 24 }}>{b.icon || '🏅'}</Text>
               <Text className="text-xs font-medium text-gold-700 text-center mt-1" numberOfLines={2} style={{ maxWidth: 70 }}>
-                {b.title}
+                {lang === 'en' ? (b.title_en || b.title) : b.title}
               </Text>
             </View>
           ))}

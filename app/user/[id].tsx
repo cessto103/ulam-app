@@ -28,7 +28,7 @@ type PublicUser = {
   connection_status: 'none' | 'pending_sent' | 'pending_received' | 'connected' | 'blocked';
   connection_id: number | null;
   my_label_id: number | null;
-  badges: { id: number; title: string; icon: string | null }[];
+  badges: { id: number; title: string; title_en: string | null; icon: string | null }[];
 };
 
 type PostUser = { id: number; name: string; username: string | null; avatar: string | null };
@@ -274,7 +274,9 @@ export default function UserProfileScreen() {
                     )}
                     {user.badges.map((b) => (
                       <View key={b.id} className="rounded-full bg-gold-50 px-2.5 py-0.5">
-                        <Text className="text-xs font-semibold text-gold-700">{b.icon} {b.title}</Text>
+                        <Text className="text-xs font-semibold text-gold-700">
+                          {b.icon} {lang === 'en' ? (b.title_en || b.title) : b.title}
+                        </Text>
                       </View>
                     ))}
                   </View>

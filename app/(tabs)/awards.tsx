@@ -51,16 +51,18 @@ type TasksResponse = {
 };
 
 type EarnedRewardTier = {
-  id: number; user_reward_tier_id: number; title: string; description: string | null;
+  id: number; user_reward_tier_id: number; title: string; title_en: string | null;
+  description: string | null; description_en: string | null;
   icon: string | null; reward_type: string; reward_value: number | null;
   earned_at: string; redeemed_at: string | null;
   boostable_target: 'recipe' | 'tindahan' | null;
 };
 
 type LockedRewardTier = {
-  id: number; title: string; description: string | null; icon: string | null;
+  id: number; title: string; title_en: string | null;
+  description: string | null; description_en: string | null; icon: string | null;
   reward_type: string; reward_value: number | null; xp_threshold: number | null;
-  required_tasks: { id: number; title: string; icon: string | null; is_completed: boolean }[];
+  required_tasks: { id: number; title: string; title_en: string | null; icon: string | null; is_completed: boolean }[];
   tasks_completed: number; tasks_required: number;
 };
 
@@ -310,7 +312,7 @@ function AwardsTab({
                   <Text style={{ fontSize: 18 }}>{tier.icon || '🎁'}</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-sm font-medium text-ink">{tier.title}</Text>
+                  <Text className="text-sm font-medium text-ink">{lang === 'en' ? (tier.title_en || tier.title) : tier.title}</Text>
                   <Text className="text-xs text-ink-soft">{rewardSummary(tier, lang)}</Text>
                 </View>
                 {tier.redeemed_at ? (
@@ -341,7 +343,7 @@ function AwardsTab({
                   <Text style={{ fontSize: 18 }}>{tier.icon || '🎁'}</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-sm font-medium text-ink-soft">{tier.title}</Text>
+                  <Text className="text-sm font-medium text-ink-soft">{lang === 'en' ? (tier.title_en || tier.title) : tier.title}</Text>
                   <Text className="text-xs text-ink-soft">{rewardSummary(tier, lang)}</Text>
                 </View>
                 <Text className="text-xs text-gold-500 font-medium">

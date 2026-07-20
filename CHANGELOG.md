@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.40.0] — 2026-07-20
+
+### Fixed
+- **Reward Tiers now show correctly in your selected language** (paired uLam commit). The "Rewards" section on Awards, the badge chip row on your own Profile, and badge pills on other users' public profiles all now show the English title when English is selected — previously they always showed Tagalog regardless of the language toggle, since Reward Tiers had no English text recorded at all.
+
 ## [1.39.0] — 2026-07-20
 
 ### Fixed
