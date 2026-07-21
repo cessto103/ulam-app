@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.45.1] — 2026-07-21
+
+### Fixed
+- **Theme changes took up to 30 minutes to show up.** The admin-controlled header/dashboard/Awards background theme was cached for 30 minutes on the device, so testing a theme change by backgrounding and reopening the app usually looked like nothing had happened. Now refreshes within 2 minutes.
+- **"Set recipe as meal" reached under the Android status bar and nav bar.** Two of the three "add to meal plan" entry points (Home tab's recipe picker, and the one inside Recipe Book) were missing safe-area padding entirely — the recipe detail page's own copy already had it right, but the other two didn't. All three now match.
+
 ## [1.45.0] — 2026-07-21
 
 ### Added

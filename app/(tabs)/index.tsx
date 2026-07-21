@@ -1,6 +1,7 @@
 import client from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
+import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import BrandLogo from '@/src/components/BrandLogo';
 import BudgetExplainerSheet from '@/src/components/BudgetExplainerSheet';
 import DailyTaskRow from '@/src/components/DailyTaskRow';
@@ -1189,7 +1190,7 @@ export default function HomeScreen() {
         <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
           {/* Modal header */}
           <View style={{
-            paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12,
+            paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12,
             backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3',
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
           }}>
@@ -1278,7 +1279,8 @@ export default function HomeScreen() {
 
           {/* Confirm button */}
           <View style={{
-            padding: 16, borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff',
+            paddingHorizontal: 16, paddingTop: 16, paddingBottom: insets.bottom + 16,
+            borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff',
           }}>
             <Pressable
               disabled={!pickerRecipe || assigning}
@@ -1304,6 +1306,7 @@ export default function HomeScreen() {
               }
             </Pressable>
           </View>
+          <AndroidNavBarFiller />
         </View>
       </Modal>
 

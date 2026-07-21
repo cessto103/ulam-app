@@ -33,7 +33,14 @@ export function useSectionColors(sectionKey: string, fallback: [string, string])
   const { data } = useQuery({
     queryKey: ['theme'],
     queryFn: async () => (await client.get<ThemeResponse>('/theme')).data,
-    staleTime: 30 * 60_000,
+    // Admin-controlled and expected to reflect promptly when changed --
+    // 30 minutes made a fresh theme change look broken to anyone testing it
+    // via a normal background/foreground cycle (the AppState-driven
+    // refetch-on-focus in app/_layout.tsx only refetches when the cached
+    // data is actually stale, so it silently did nothing inside that
+    // window). The endpoint itself is a single indexed query with no
+    // server-side caching, so a short staleTime here is cheap.
+    staleTime: 2 * 60_000,
     retry: 1,
   });
 
@@ -74,7 +81,14 @@ export default function ThemedSection({
   const { data } = useQuery({
     queryKey: ['theme'],
     queryFn: async () => (await client.get<ThemeResponse>('/theme')).data,
-    staleTime: 30 * 60_000,
+    // Admin-controlled and expected to reflect promptly when changed --
+    // 30 minutes made a fresh theme change look broken to anyone testing it
+    // via a normal background/foreground cycle (the AppState-driven
+    // refetch-on-focus in app/_layout.tsx only refetches when the cached
+    // data is actually stale, so it silently did nothing inside that
+    // window). The endpoint itself is a single indexed query with no
+    // server-side caching, so a short staleTime here is cheap.
+    staleTime: 2 * 60_000,
     retry: 1,
   });
 

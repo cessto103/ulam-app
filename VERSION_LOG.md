@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-21 · **v1.45.0**
+Last updated: 2026-07-21 · **v1.45.1**
 
 ---
 
@@ -114,6 +114,11 @@ Last updated: 2026-07-21 · **v1.45.0**
 ---
 
 ## Version History
+
+### 2026-07-21 · v1.45.1 — Theme refresh + Android safe-area fixes
+
+- Theme staleTime dropped from 30 minutes to 2 minutes (`src/components/ThemedSection.tsx`) — the admin-controlled header/dashboard/Awards background is a single cheap, uncached-server-side query, so there was no real cost to making it feel responsive. The `AppState`-driven refetch-on-focus wiring in `app/_layout.tsx` was already correct; it just never had anything stale to refetch within a realistic testing window.
+- "Set recipe as meal" (Home tab) and the equivalent picker in Recipe Book both reached under the Android status bar and nav bar — neither had any `useSafeAreaInsets()` padding at all, unlike the third copy of this same flow on the recipe detail page, which already had it right. All three now match.
 
 ### 2026-07-21 · v1.45.0 — Price Checker stall preview + Report a Price stall targeting
 

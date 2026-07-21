@@ -1,4 +1,5 @@
 import client from '@/src/api/client';
+import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import { SkeletonRecipeCard } from '@/src/components/Skeleton';
 import { useLanguage } from '@/src/context/LanguageContext';
@@ -447,7 +448,7 @@ export default function RecipeBookScreen() {
         <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
           {/* Modal header */}
           <View style={{
-            paddingHorizontal: 16, paddingTop: 20, paddingBottom: 14,
+            paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 14,
             backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3',
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
           }}>
@@ -515,7 +516,7 @@ export default function RecipeBookScreen() {
           </ScrollView>
 
           {/* Confirm */}
-          <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff' }}>
+          <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: insets.bottom + 16, borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff' }}>
             <Pressable
               onPress={() => {
                 if (!mealRecipe) return;
@@ -536,6 +537,7 @@ export default function RecipeBookScreen() {
                   </Text>}
             </Pressable>
           </View>
+          <AndroidNavBarFiller />
         </View>
       </Modal>
     </SafeAreaView>
