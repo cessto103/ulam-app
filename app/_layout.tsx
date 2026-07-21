@@ -268,6 +268,10 @@ function RouteGuard() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="devices"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="location"
         options={{ headerShown: false }}
       />

@@ -135,6 +135,11 @@ export default function SettingsScreen() {
             onPress={() => router.push('/account-status' as any)}
           />
           <SettingsRow
+            icon="phone-portrait-outline"
+            label={lang === 'en' ? 'My Devices' : 'Aking mga Device'}
+            onPress={() => router.push('/devices' as any)}
+          />
+          <SettingsRow
             icon="location-outline"
             label={lang === 'en' ? 'Location' : 'Lokasyon'}
             onPress={() => router.push('/location' as any)}

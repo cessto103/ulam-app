@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.46.0] — 2026-07-21
+
+### Added
+- **My Devices** (new Settings screen, right after Account Status): see every device currently logged into your account — device name, last active time, and a badge on the device you're using right now — with a one-tap sign-out per device. Backed by a new admin-side "Security" tab on the user's detail page (paired uLam admin v1.31.0), so the same device list is now visible to support/moderation when needed.
+
 ## [1.45.1] — 2026-07-21
 
 ### Fixed

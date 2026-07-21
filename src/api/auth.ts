@@ -1,4 +1,6 @@
 import client from './client';
+import Constants from 'expo-constants';
+import * as Device from 'expo-device';
 
 export type User = {
   id: number;
@@ -41,16 +43,30 @@ export type RegisterPayload = {
   password_confirmation: string;
 };
 
+/** Best-effort device label for the "which devices are logged in" list --
+ * never blocks login/register if unavailable, just omitted server-side. */
+function deviceInfo() {
+  return {
+    device_name: [Device.modelName, Device.osName].filter(Boolean).join(' · ') || undefined,
+    platform: Device.osName?.toLowerCase(),
+    app_version: Constants.expoConfig?.version,
+  };
+}
+
 export async function login(payload: LoginPayload) {
   const { data } = await client.post<{ token: string; user: User }>('/auth/login', {
     login: payload.login,
     password: payload.password,
+    ...deviceInfo(),
   });
   return data;
 }
 
 export async function register(payload: RegisterPayload) {
-  const { data } = await client.post<{ token: string; user: User }>('/auth/register', payload);
+  const { data } = await client.post<{ token: string; user: User }>('/auth/register', {
+    ...payload,
+    ...deviceInfo(),
+  });
   return data;
 }
 
