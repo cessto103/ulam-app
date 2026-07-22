@@ -176,6 +176,13 @@ function RouteGuard() {
         }}
       />
       <Stack.Screen
+        name="weather-detail"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="notifications"
         options={{
           headerTitle: lang === 'en' ? 'Notifications' : 'Mga Notipikasyon',

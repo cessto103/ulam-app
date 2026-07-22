@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.47.0] — 2026-07-23
+
+### Added
+- **Daily weather notification**: each user now gets one push notification a day about the weather for their own saved location — a friendly heads-up ("good day for the market, sunny!", "bring an umbrella before lunch", "rainy for the next few days, plan ahead") rather than raw forecast data. Tapping it opens a detail screen with the full message, and, when there's a top-rated community recipe available, the message can spotlight it (name, author, rating, thumbs up) instead of the plain weather note. During a stretch of 3+ rainy days, non-Premium users may instead see an upgrade nudge toward planning meals ahead. Forecasts come from Open-Meteo, fetched and cached once per rough location (not per user) to stay efficient — no PAGASA storm names, this only ever describes today's/this week's weather in plain terms (paired uLam admin v1.40.0, where all the wording lives as editable phrases under Content → Weather Phrases).
+
 ## [1.46.1] — 2026-07-22
 
 ### Fixed

@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-22 · **v1.46.1**
+Last updated: 2026-07-23 · **v1.47.0**
 
 ---
 
@@ -114,6 +114,12 @@ Last updated: 2026-07-22 · **v1.46.1**
 ---
 
 ## Version History
+
+### 2026-07-23 · v1.47.0 — Daily weather notification
+
+- New backend: `WeatherService` (Open-Meteo fetch/classify, no API key needed) + `WeatherPhraseSelector` (picks an admin-written phrase per weather category/variant, fills `{{recipe_name}}`/`{{recipe_author}}`/`{{rating}}`/`{{thumbs_count}}`/`{{days}}` tokens), a daily `ulam:weather-daily` Artisan command scheduled at 6:00 AM, and a new `weather_forecast_cache` table keyed by rounded lat/long so nearby users share one cached Open-Meteo call per day instead of one per user.
+- New `weather_phrases` table + admin CRUD (Content → Weather Phrases, uLam admin v1.40.0) — the admin owner writes the wording (15 starter phrases per category seeded), the system only decides which one to show and what live data to fill in.
+- New mobile `weather-detail.tsx` modal (tap the notification to open it) and `GET /weather/today` endpoint. Verified end-to-end locally against two simulated users (different lat/long buckets): one cached forecast per bucket confirmed, `info` → `meal_promo` switch confirmed once a recipe had ratings, `premium_promo` correctly gated to non-Premium users only during a 3+ day rain streak.
 
 ### 2026-07-21 · v1.45.1 — Theme refresh + Android safe-area fixes
 
