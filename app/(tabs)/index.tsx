@@ -551,7 +551,7 @@ export default function HomeScreen() {
       {/* Cream header — logo, icons, greeting, search (app-redesign mockup) */}
       <View className="px-4 pb-3" style={{ paddingTop: insets.top + 10 }}>
         <View className="flex-row justify-between items-center mb-3">
-          <BrandLogo size={20} />
+          <BrandLogo size={24} />
           <HeaderIconRow tone="cream" />
         </View>
 

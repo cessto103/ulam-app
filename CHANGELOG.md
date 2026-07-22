@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.46.1] — 2026-07-22
+
+### Fixed
+- **App logo now falls back correctly if a custom uploaded logo fails to load** (e.g. a server storage misconfiguration), instead of rendering blank space. Paired with the admin's Branding page, which also gained an "admin dashboard logo" and favicon slot (uLam admin v1.39.0).
+- Bumped the app logo size in the everyday header spots (bottom-tab header, page headers, Profile) for better visibility.
+
 ## [1.46.0] — 2026-07-21
 
 ### Added

@@ -64,7 +64,7 @@ export default function GradientPageHeader({
           onLayout={onTopRowLayout ? (e) => onTopRowLayout(e.nativeEvent.layout.height) : undefined}
         >
           <View className="flex-row items-center justify-between">
-            <BrandLogo size={21} light />
+            <BrandLogo size={25} light />
             {rightSlot}
           </View>
         </View>

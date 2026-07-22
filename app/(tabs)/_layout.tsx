@@ -67,7 +67,7 @@ export default function TabLayout() {
           headerShadowVisible: false,
           headerTitle: () => (
             <View style={{ paddingLeft: 4 }}>
-              <BrandLogo size={17} light />
+              <BrandLogo size={20} light />
             </View>
           ),
           tabBarStyle: {

@@ -150,7 +150,7 @@ export default function ProfileScreen() {
       >
         {/* Logo + gear row, same layout as the other tab headers */}
         <View className="w-full flex-row items-center justify-between mb-3">
-          <BrandLogo size={21} light />
+          <BrandLogo size={25} light />
           <Pressable
             onPress={() => router.push('/settings' as any)}
             hitSlop={10}
