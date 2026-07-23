@@ -1,9 +1,11 @@
 ﻿import client from '@/src/api/client';
 import SelectField from '@/src/components/SelectField';
+import WhatsNextModal from '@/src/components/WhatsNextModal';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { Lang } from '@/src/i18n/translations';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
@@ -222,6 +224,7 @@ export default function BudgetSetupScreen() {
   const [householdSize, setHouseholdSize] = useState(String(user?.household_size ?? 4));
   const [expenses, setExpenses] = useState<ExpenseRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showWhatsNext, setShowWhatsNext] = useState(false);
   const nextExpenseKey = useRef(0);
 
   const addExpense = () => {
@@ -298,6 +301,23 @@ export default function BudgetSetupScreen() {
 
       await refreshUser();
       qc.invalidateQueries({ queryKey: ['budget-today'] });
+
+      const todayKey = new Date().toISOString().slice(0, 10);
+      const dismissedToday = await AsyncStorage.getItem(`whatsNextDismissed:${todayKey}`).catch(() => null);
+
+      if (!dismissedToday) {
+        const [planRes, budgetRes] = await Promise.all([
+          client.get('/meal-plans/today').catch(() => null),
+          client.get('/budget/today').catch(() => null),
+        ]);
+        const hasNoPlan = planRes !== null && !planRes.data?.meal_plan;
+        const hasNoLog = budgetRes !== null && budgetRes.data?.has_logged_today === false;
+
+        if (hasNoPlan && hasNoLog) {
+          setShowWhatsNext(true);
+          return;
+        }
+      }
 
       Alert.alert(
         lang === 'en' ? 'All set!' : 'Nai-set na!',
@@ -507,6 +527,13 @@ export default function BudgetSetupScreen() {
         </Pressable>
 
       </ScrollView>
+
+      <WhatsNextModal
+        visible={showWhatsNext}
+        dailyBudget={dailyFoodBudget ?? 0}
+        isPremium={user?.plan === 'premium'}
+        onClose={() => setShowWhatsNext(false)}
+      />
     </KeyboardAvoidingView>
   );
 }
