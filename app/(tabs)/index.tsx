@@ -1,7 +1,6 @@
 import client from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
-import AndroidNavBarFiller from '@/src/components/AndroidNavBarFiller';
 import BrandLogo from '@/src/components/BrandLogo';
 import BudgetExplainerSheet from '@/src/components/BudgetExplainerSheet';
 import DailyTaskRow from '@/src/components/DailyTaskRow';
@@ -9,12 +8,13 @@ import HeaderIconRow from '@/src/components/HeaderIconRow';
 import { Ionicons } from '@expo/vector-icons';
 import { Skeleton, SkeletonBudgetCard, SkeletonMealCard, SkeletonStatsRow, SkeletonStreakCard } from '@/src/components/Skeleton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
+import RecipePickerModal, { fetchRecipes, type RecipeOption } from '@/src/components/RecipePickerModal';
 import ThemedSection from '@/src/components/ThemedSection';
 import { getRecipePhotos } from '@/src/utils/recipePhotos';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -101,26 +101,6 @@ type MealPlanData = {
   items: MealItem[];
 } | null;
 
-type RecipeOption = {
-  id: number;
-  title: string;
-  description?: string | null;
-  estimated_cost: number | null;
-  servings: number | null;
-  difficulty?: string | null;
-  budget_tag?: string | null;
-  tags?: string[];
-  prep_time_minutes?: number | null;
-  cook_time_minutes?: number | null;
-  image_url?: string | null;
-  image_urls?: string[] | null;
-  collage_style?: string;
-  gradient_key?: string;
-  font_key?: string;
-  user?: { id: number; name: string; username: string | null } | null;
-  source?: string;
-};
-
 async function fetchBudgetToday(): Promise<BudgetToday | null> {
   try {
     const { data } = await client.get('/budget/today');
@@ -141,23 +121,6 @@ async function fetchMealPlanForDate(date: string): Promise<MealPlanData> {
     const { data } = await client.get(`/meal-plan/today?date=${date}`);
     return data.meal_plan ?? null;
   } catch { return null; }
-}
-
-async function fetchRecipes(search: string): Promise<RecipeOption[]> {
-  try {
-    const { data } = await client.get('/recipes', { params: { search, per_page: 30 } });
-    return (data.data ?? data.recipes ?? []) as RecipeOption[];
-  } catch { return []; }
-}
-
-async function addRecipeToMealPlan(payload: {
-  date: string;
-  meal_type: string;
-  recipe_id: number;
-  estimated_cost?: number;
-}) {
-  const { data } = await client.post('/meal-plan/add-item', payload);
-  return data;
 }
 
 // ─── Display helpers ──────────────────────────────────────────────────────────
@@ -206,144 +169,6 @@ function mealTypeLabel(type: string, lang: 'en' | 'tl'): string {
     'iba pa':   { en: '🍽️ Others',   tl: '🍽️ Iba Pa' },
   };
   return MAP[type]?.[lang] ?? type;
-}
-
-const MEAL_TYPES = [
-  { key: 'almusal',    labelEn: 'Breakfast', labelTl: 'Almusal',    emoji: '🌅' },
-  { key: 'tanghalian', labelEn: 'Lunch',     labelTl: 'Tanghalian', emoji: '☀️' },
-  { key: 'meryenda',   labelEn: 'Snack',     labelTl: 'Meryenda',   emoji: '🍌' },
-  { key: 'hapunan',    labelEn: 'Dinner',    labelTl: 'Hapunan',    emoji: '🌙' },
-  { key: 'iba pa',     labelEn: 'Others',    labelTl: 'Iba Pa',     emoji: '🍽️' },
-];
-
-// DAYS now computed inside component from lang
-
-// ─── Picker card (mirrors recipe-book RecipeCard exactly) ────────────────────
-
-const BUDGET_LABEL: Record<string, string> = {
-  budget_100: '₱100', budget_200: '₱200', budget_400: '₱400', budget_400plus: '₱400+',
-  budget_600: '₱600', budget_800: '₱800', budget_1000: '₱1,000',
-  budget_1000plus: '₱1,000+',
-};
-
-const DIFF_COLOR: Record<string, { bg: string; text: string }> = {
-  easy:   { bg: '#EFF4EC', text: '#2C5234' },
-  medium: { bg: '#FDEFC9', text: '#9A6A12' },
-  hard:   { bg: '#FCEBEB', text: '#E24B4A' },
-};
-
-function PickerRecipeCard({
-  recipe,
-  selected,
-  onPress,
-  lang,
-}: {
-  recipe: RecipeOption;
-  selected: boolean;
-  onPress: () => void;
-  lang: 'en' | 'tl';
-}) {
-  const photos   = getRecipePhotos(recipe);
-  const totalMin = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
-  const diff     = recipe.difficulty ? DIFF_COLOR[recipe.difficulty] : null;
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        borderWidth: selected ? 2 : 0.5,
-        borderColor: selected ? '#6E7B4A' : '#F0DEBB',
-        overflow: 'hidden',
-        marginBottom: 12,
-        marginHorizontal: 16,
-      }}
-      className="active:opacity-80"
-    >
-      {/* Cover photo — full width, same as recipe-book */}
-      <RecipeCoverPhoto
-        photos={photos}
-        collageStyle={(recipe.collage_style ?? 'gradient') as any}
-        gradientKey={(recipe.gradient_key ?? 'grad_a') as any}
-        fontKey={(recipe.font_key ?? 'baloo') as any}
-        title={recipe.title}
-      />
-
-      {/* Card body */}
-      <View style={{ padding: 14 }}>
-        {/* Top row: budget/difficulty chips + selected badge */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 }}>
-            {recipe.budget_tag ? (
-              <View style={{ backgroundColor: '#FDEFC9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#9A6A12' }}>
-                  {BUDGET_LABEL[recipe.budget_tag] ?? recipe.budget_tag}
-                </Text>
-              </View>
-            ) : null}
-            {diff && recipe.difficulty ? (
-              <View style={{ backgroundColor: diff.bg, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 }}>
-                <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: diff.text, textTransform: 'capitalize' }}>
-                  {recipe.difficulty}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-          {/* Selected checkmark (replaces bookmark icon) */}
-          <View style={{
-            width: 28, height: 28, borderRadius: 14,
-            backgroundColor: selected ? '#6E7B4A' : '#F9EDD3',
-            borderWidth: selected ? 0 : 1.5,
-            borderColor: '#B0A18C',
-            alignItems: 'center', justifyContent: 'center',
-          }}>
-            {selected ? (
-              <Text style={{ fontSize: 14, color: '#fff' }}>✓</Text>
-            ) : null}
-          </View>
-        </View>
-
-        {/* Title */}
-        <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000', marginBottom: 3, lineHeight: 20 }} numberOfLines={2}>
-          {recipe.title}
-        </Text>
-
-        {/* Author (community recipes) */}
-        {recipe.user?.name ? (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 4 }}>
-            by {recipe.user.name}
-          </Text>
-        ) : null}
-
-        {/* Description */}
-        {recipe.description ? (
-          <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', lineHeight: 18, marginBottom: 8 }} numberOfLines={2}>
-            {recipe.description}
-          </Text>
-        ) : null}
-
-        {/* Meta chips */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {recipe.estimated_cost ? (
-            <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
-              ₱{Number(recipe.estimated_cost).toFixed(0)}
-            </Text>
-          ) : null}
-          {(recipe.servings ?? 0) > 0 ? (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-              {recipe.servings} {lang === 'en' ? 'servings' : 'serving'}
-            </Text>
-          ) : null}
-          {totalMin > 0 ? (
-            <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-              {totalMin} min
-            </Text>
-          ) : null}
-        </View>
-      </View>
-    </Pressable>
-  );
 }
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
@@ -419,55 +244,8 @@ export default function HomeScreen() {
     router.push('/budget-setup' as any);
   };
 
-  // ── Recipe picker state ───────────────────────────────────────────────────────
-  const [pickerOpen,     setPickerOpen]     = useState(false);
-  const [pickerMealType, setPickerMealType] = useState<string>('almusal');
-  const [pickerSearch,   setPickerSearch]   = useState('');
-  const [pickerRecipe,   setPickerRecipe]   = useState<RecipeOption | null>(null);
-  // Debounce: fetch only after the user pauses typing, so a fresh cache key
-  // (and a new request) isn't minted on every keystroke.
-  const [pickerDebouncedSearch, setPickerDebouncedSearch] = useState('');
-  useEffect(() => {
-    const t = setTimeout(() => setPickerDebouncedSearch(pickerSearch), 350);
-    return () => clearTimeout(t);
-  }, [pickerSearch]);
-
-  const { data: recipeOptions = [], isLoading: recipesLoading } = useQuery({
-    queryKey: ['recipes-picker', pickerDebouncedSearch],
-    queryFn:  () => fetchRecipes(pickerDebouncedSearch),
-    enabled:  pickerOpen,
-    staleTime: 60_000,
-  });
-
-  const { mutate: assignRecipe, isPending: assigning } = useMutation({
-    mutationFn: addRecipeToMealPlan,
-    onSuccess: () => {
-      setPickerOpen(false);
-      setPickerRecipe(null);
-      qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] });
-      qc.invalidateQueries({ queryKey: ['meal-plan-dates'] });
-      // Also refresh the Meal Plan tab's own "today" cache -- it's keyed
-      // differently (meal-plan-today, no date param) and was never being
-      // invalidated by this mutation, so a recipe added here wouldn't show
-      // up there until something else happened to refetch it.
-      qc.invalidateQueries({ queryKey: ['meal-plan-today'] });
-    },
-    onError: (e: any) => {
-      const slotLabel = MEAL_TYPES.find(m => m.key === pickerMealType)?.[lang === 'en' ? 'labelEn' : 'labelTl'] ?? pickerMealType;
-      const isDuplicate = e?.response?.status === 422;
-      if (isDuplicate) {
-        Alert.alert(
-          lang === 'en' ? 'Already in meal plan' : 'Nasa plano na',
-          lang === 'en'
-            ? `${pickerRecipe?.title ?? 'This recipe'} is already in your ${slotLabel} meal plan.`
-            : `Nasa ${slotLabel} meal plan na ang ${pickerRecipe?.title ?? 'recipe na ito'}.`,
-        );
-      } else {
-        const msg: string | undefined = e?.response?.data?.message;
-        Alert.alert('Error', msg ?? (lang === 'en' ? 'Could not add to meal plan.' : 'Hindi maidagdag sa plano.'));
-      }
-    },
-  });
+  // ── Recipe picker ─────────────────────────────────────────────────────────────
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const streak    = user?.streak_days ?? 0;
   const todayDow  = new Date().getDay();
@@ -936,7 +714,7 @@ export default function HomeScreen() {
                 </View>
               ))}
               <Pressable
-                onPress={() => { setPickerMealType('almusal'); setPickerRecipe(null); setPickerSearch(''); setPickerOpen(true); }}
+                onPress={() => setPickerOpen(true)}
                 className="mt-2 rounded-xl border border-cream-300 bg-brand-50 py-2.5 items-center active:opacity-75"
               >
                 <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
@@ -951,7 +729,7 @@ export default function HomeScreen() {
                 {t('history_no_meal')}
               </Text>
               <Pressable
-                onPress={() => { setPickerMealType('almusal'); setPickerRecipe(null); setPickerSearch(''); setPickerOpen(true); }}
+                onPress={() => setPickerOpen(true)}
                 className="mt-3 rounded-xl border border-cream-300 bg-brand-50 py-2 px-5 active:opacity-75"
               >
                 <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
@@ -1180,135 +958,11 @@ export default function HomeScreen() {
         </>
       )}
 
-      {/* ── Recipe picker modal ── */}
-      <Modal
+      <RecipePickerModal
         visible={pickerOpen}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setPickerOpen(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: '#FFFCF5' }}>
-          {/* Modal header */}
-          <View style={{
-            paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12,
-            backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F9EDD3',
-            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-          }}>
-            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
-              {t('set_recipe_as_meal')}
-            </Text>
-            <Pressable onPress={() => setPickerOpen(false)} className="w-8 h-8 rounded-full bg-cream-200 items-center justify-center active:opacity-70">
-              <Text style={{ fontSize: 14, color: '#6F655A' }}>✕</Text>
-            </Pressable>
-          </View>
-
-          <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-            {/* Meal type selector */}
-            <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                {t('pick_meal_type')}
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                {MEAL_TYPES.map((mt) => {
-                  const active = mt.key === pickerMealType;
-                  return (
-                    <Pressable
-                      key={mt.key}
-                      onPress={() => setPickerMealType(mt.key)}
-                      style={{
-                        paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
-                        backgroundColor: active ? '#6E7B4A' : '#F9EDD3',
-                      }}
-                    >
-                      <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: active ? '#fff' : '#000000' }}>
-                        {mt.emoji} {lang === 'en' ? mt.labelEn : mt.labelTl}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-            </View>
-
-            {/* Recipe search */}
-            <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
-              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                {t('pick_recipe')}
-              </Text>
-              <View style={{ position: 'relative' }}>
-                <Text style={{ position: 'absolute', left: 12, top: 11, fontSize: 14, zIndex: 1 }}>🔍</Text>
-                <TextInput
-                  value={pickerSearch}
-                  onChangeText={setPickerSearch}
-                  placeholder={lang === 'en' ? 'Search recipes...' : 'Hanapin ang recipe...'}
-                  style={{
-                    backgroundColor: '#fff', borderRadius: 12, borderWidth: 1,
-                    borderColor: '#F0DEBB', paddingLeft: 36, paddingRight: 12,
-                    paddingVertical: 10, fontSize: 14, color: '#000000',
-                    fontFamily: 'NunitoSans_400Regular',
-                  }}
-                />
-              </View>
-            </View>
-
-            {/* Recipe list */}
-            {recipesLoading ? (
-              <View style={{ marginTop: 12 }}>
-                {[0,1,2].map(i => <SkeletonMealCard key={i} />)}
-              </View>
-            ) : recipeOptions.length === 0 ? (
-              <View style={{ alignItems: 'center', paddingTop: 24 }}>
-                <Text style={{ fontSize: 28, marginBottom: 6 }}>🍽️</Text>
-                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A' }}>
-                  {lang === 'en' ? 'No recipes found' : 'Walang recipe na nahanap'}
-                </Text>
-              </View>
-            ) : (
-              <View style={{ paddingTop: 4 }}>
-                {recipeOptions.map((recipe) => (
-                  <PickerRecipeCard
-                    key={recipe.id}
-                    recipe={recipe}
-                    selected={pickerRecipe?.id === recipe.id}
-                    onPress={() => setPickerRecipe(pickerRecipe?.id === recipe.id ? null : recipe)}
-                    lang={lang}
-                  />
-                ))}
-              </View>
-            )}
-          </ScrollView>
-
-          {/* Confirm button */}
-          <View style={{
-            paddingHorizontal: 16, paddingTop: 16, paddingBottom: insets.bottom + 16,
-            borderTopWidth: 1, borderTopColor: '#F9EDD3', backgroundColor: '#fff',
-          }}>
-            <Pressable
-              disabled={!pickerRecipe || assigning}
-              onPress={() => {
-                if (!pickerRecipe) return;
-                assignRecipe({
-                  date: selectedDate,
-                  meal_type: pickerMealType,
-                  recipe_id: pickerRecipe.id,
-                  estimated_cost: pickerRecipe.estimated_cost ?? undefined,
-                });
-              }}
-              style={{
-                backgroundColor: pickerRecipe ? '#C45E3A' : '#D3C5AB',
-                borderRadius: 14, paddingVertical: 14, alignItems: 'center',
-              }}
-            >
-              {assigning
-                ? <ActivityIndicator color="#fff" />
-                : <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 14, color: '#fff' }}>
-                    {t('add_to_meal_plan')}
-                  </Text>
-              }
-            </Pressable>
-          </View>
-          <AndroidNavBarFiller />
-        </View>
-      </Modal>
+        date={selectedDate}
+        onClose={() => setPickerOpen(false)}
+      />
 
       {/* Budget explainer — opened by the (!) badge on the empty budget card */}
       <BudgetExplainerSheet

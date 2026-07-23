@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-23 · **v1.47.0**
+Last updated: 2026-07-23 · **v1.48.0**
 
 ---
 
@@ -114,6 +114,13 @@ Last updated: 2026-07-23 · **v1.47.0**
 ---
 
 ## Version History
+
+### 2026-07-23 · v1.48.0 — 7-Day Advance Meal Planning (Premium)
+
+- New forward-looking day strip on the Meal Plan tab (Today + next 7 days) — Premium users can generate an AI plan or manually choose a recipe for any day ahead, one day at a time; free users see the Premium upsell on any future-day tap, today's experience unchanged.
+- Backend: `MealPlanController::generate`/`regenerate`/`addItem` all gained date-window validation (today..+7) and a Premium check for non-today dates; `BudgetPeriod::forUserAndDate()` replaces the today-only `$user->currentBudget` accessor so the right budget period resolves for a future day too. `MealPlanService::generate()` accepts an optional target date (the AI prompt itself needed no changes — confirmed date-agnostic).
+- Extracted the Home tab's "set a recipe as a meal" picker into a shared `src/components/RecipePickerModal.tsx`, now reused by both the Home tab and the Meal Plan tab instead of duplicating it.
+- Verified backend gating directly via tinker (no real AI calls made): non-Premium blocked (403) on both manual-add and AI-generate for a future date; Premium succeeds; a date past the 7-day window rejected (422) before ever reaching the paid Anthropic call.
 
 ### 2026-07-23 · v1.47.0 — Daily weather notification
 

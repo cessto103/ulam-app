@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.48.0] — 2026-07-23
+
+### Added
+- **7-Day Advance Meal Planning (Premium)**: the Meal Plan tab now has a day strip (Today + the next 7 days) — tap ahead to generate an AI meal plan or manually choose a recipe for that specific day, one day at a time. Free users can still do everything for today exactly as before; tapping any future day shows the Premium upsell instead of switching. AI generation and budget-vs-cost comparison are both correctly resolved per selected day rather than always assuming today (paired uLam backend commit: `MealPlanController`/`MealPlanService`/`BudgetPeriod` all gained date-aware resolution). The Home tab's "set a recipe as a meal" picker is now a shared component (`RecipePickerModal`) reused here, instead of two separate copies.
+
 ## [1.47.0] — 2026-07-23
 
 ### Added

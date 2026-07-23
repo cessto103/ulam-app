@@ -11,6 +11,7 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { useXpReward } from '@/src/hooks/useXpReward';
 import { SkeletonMealCard, SkeletonRecipeCard } from '@/src/components/Skeleton';
 import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
+import RecipePickerModal from '@/src/components/RecipePickerModal';
 import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
 import { formatCount } from '@/src/utils/formatCount';
 import { type FeedEntry, interleaveAds, isAdSlot } from '@/src/utils/interleaveAds';
@@ -119,20 +120,44 @@ const BUDGET_LABEL: Record<string, string> = {
 
 // ─── API ───────────────────────────────────────────────────────────────────────
 
-async function fetchTodayPlan(): Promise<MealPlan | null> {
+function toDateStr(d: Date): string {
+  const y  = d.getFullYear();
+  const m  = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
+// Today + the next 7 days, forward-looking (mirrors the Home tab's history
+// strip, which walks backward instead).
+function buildForwardDateStrip(count = 8): { date: Date; iso: string }[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const result: { date: Date; iso: string }[] = [];
+  for (let i = 0; i < count; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    result.push({ date: d, iso: toDateStr(d) });
+  }
+  return result;
+}
+
+const FIL_DAY = ['Lin', 'Lun', 'Mar', 'Miy', 'Huw', 'Biy', 'Sab'];
+const EN_DAY  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+async function fetchPlanForDate(date: string): Promise<MealPlan | null> {
   try {
-    const { data } = await client.get('/meal-plans/today');
+    const { data } = await client.get('/meal-plan/today', { params: { date } });
     return data.meal_plan;
   } catch { return null; }
 }
 
-async function generatePlan(): Promise<any> {
-  const { data } = await client.post('/meal-plans/generate');
+async function generatePlan(date: string): Promise<any> {
+  const { data } = await client.post('/meal-plans/generate', { date });
   return data;
 }
 
-async function regeneratePlan(): Promise<MealPlan> {
-  const { data } = await client.post('/meal-plan/regenerate');
+async function regeneratePlan(date: string): Promise<MealPlan> {
+  const { data } = await client.post('/meal-plan/regenerate', { date });
   return data.meal_plan;
 }
 
@@ -152,7 +177,7 @@ function showMealPlanError(
     );
     return;
   }
-  if (e?.response?.data?.quota_exceeded) {
+  if (e?.response?.data?.quota_exceeded || e?.response?.data?.premium_required) {
     Alert.alert(
       lang === 'en' ? 'Premium feature' : 'Premium feature',
       lang === 'en' ? 'AI meal plans are only available on uLam Premium.' : 'AI meal plans ay para lamang sa uLam Premium.',
@@ -342,6 +367,72 @@ function PlanMealCard({
   );
 }
 
+function formatDayLabel(iso: string, todayIso: string, lang: 'en' | 'tl'): string {
+  if (iso === todayIso) return lang === 'en' ? 'today' : 'ngayon';
+  const tomorrow = new Date();
+  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (iso === toDateStr(tomorrow)) return lang === 'en' ? 'tomorrow' : 'bukas';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString(lang === 'en' ? 'en-PH' : 'fil-PH', { month: 'short', day: 'numeric' });
+}
+
+function DateStrip({
+  dateStrip,
+  selectedDate,
+  todayIso,
+  planDates,
+  isPremiumUser,
+  lang,
+  onSelect,
+}: {
+  dateStrip: { date: Date; iso: string }[];
+  selectedDate: string;
+  todayIso: string;
+  planDates: string[];
+  isPremiumUser: boolean;
+  lang: 'en' | 'tl';
+  onSelect: (iso: string) => void;
+}) {
+  return (
+    <View style={{ flexDirection: 'row', gap: 5, paddingHorizontal: 4, paddingBottom: 10 }}>
+      {dateStrip.map(({ date, iso }) => {
+        const selected = iso === selectedDate;
+        const isTodayCell = iso === todayIso;
+        const locked = !isTodayCell && !isPremiumUser;
+        const hasPlan = planDates.includes(iso);
+        return (
+          <Pressable
+            key={iso}
+            onPress={() => onSelect(iso)}
+            style={{
+              flex: 1, alignItems: 'center', paddingVertical: 7, borderRadius: 14,
+              backgroundColor: selected ? '#6E7B4A' : '#FFFCF5',
+              borderWidth: selected ? 0 : 1, borderColor: '#F0DEBB',
+              opacity: locked ? 0.55 : 1,
+            }}
+          >
+            <Text style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 11, color: selected ? 'rgba(255,255,255,0.85)' : '#B0A18C', marginBottom: 2 }}>
+              {(lang === 'en' ? EN_DAY : FIL_DAY)[date.getDay()]}
+            </Text>
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 15, color: selected ? '#FFFFFF' : '#000000', lineHeight: 17 }}>
+              {date.getDate()}
+            </Text>
+            {locked ? (
+              <Text style={{ fontSize: 9, marginTop: 4 }}>🔒</Text>
+            ) : (
+              <View style={{
+                width: 6, height: 6, borderRadius: 3, marginTop: 4,
+                backgroundColor: selected ? '#FFF8E8' : isTodayCell ? '#E3A32A' : hasPlan ? '#4E7A47' : '#E24B4A',
+              }} />
+            )}
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 function PlanView({ user }: { user: any }) {
   const { lang } = useLanguage();
   const router = useRouter();
@@ -350,16 +441,38 @@ function PlanView({ user }: { user: any }) {
   const [refreshing, setRefreshing] = useState(false);
   const { reward, setReward, handleXpResponse } = useXpReward();
 
+  const isPremiumUser = user?.plan === 'premium';
+
+  const todayIso = useMemo(() => toDateStr(new Date()), []);
+  const dateStrip = useMemo(() => buildForwardDateStrip(8), []);
+  const stripEnd = dateStrip[dateStrip.length - 1].iso;
+  const [selectedDate, setSelectedDate] = useState(todayIso);
+  const isToday = selectedDate === todayIso;
+  const dayLabel = formatDayLabel(selectedDate, todayIso, lang);
+
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const { data: planDates = [] } = useQuery<string[]>({
+    queryKey: ['meal-plan-dates', todayIso, stripEnd],
+    queryFn: async () => {
+      try {
+        const { data } = await client.get('/meal-plans/dates', { params: { start: todayIso, end: stripEnd } });
+        return data.dates ?? [];
+      } catch { return []; }
+    },
+    staleTime: 60_000,
+  });
+
   const { data: plan, isLoading } = useQuery({
-    queryKey: ['meal-plan-today'],
-    queryFn: fetchTodayPlan,
+    queryKey: ['meal-plan-date', selectedDate],
+    queryFn: () => fetchPlanForDate(selectedDate),
   });
 
   const { data: budget } = useQuery({
-    queryKey: ['budget-today'],
+    queryKey: ['budget-date', selectedDate],
     queryFn: async () => {
       try {
-        const { data } = await client.get('/budget/today');
+        const { data } = await client.get('/budget/for-date', { params: { date: selectedDate } });
         return data?.has_budget ? (data as { budget: number; has_budget: boolean }) : null;
       } catch { return null; }
     },
@@ -368,26 +481,31 @@ function PlanView({ user }: { user: any }) {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await qc.invalidateQueries({ queryKey: ['meal-plan-today'] });
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] }),
+      qc.invalidateQueries({ queryKey: ['meal-plan-dates'] }),
+    ]);
     setRefreshing(false);
-  }, [qc]);
+  }, [qc, selectedDate]);
 
   const [aiDisabled, setAiDisabled] = useState(false);
 
-  const isPremiumUser = user?.plan === 'premium';
-
   const { mutate: generate, isPending } = useMutation({
-    mutationFn: generatePlan,
+    mutationFn: () => generatePlan(selectedDate),
     onSuccess: (data: any) => {
-      qc.invalidateQueries({ queryKey: ['meal-plan-today'] });
+      qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] });
+      qc.invalidateQueries({ queryKey: ['meal-plan-dates'] });
       handleXpResponse(data ?? {});
     },
     onError: (e: any) => showMealPlanError(e, lang, router, setAiDisabled),
   });
 
   const { mutate: regenerate, isPending: isRegenerating } = useMutation({
-    mutationFn: regeneratePlan,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['meal-plan-today'] }),
+    mutationFn: () => regeneratePlan(selectedDate),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] });
+      qc.invalidateQueries({ queryKey: ['meal-plan-dates'] });
+    },
     onError: (e: any) => showMealPlanError(e, lang, router, setAiDisabled),
   });
 
@@ -399,8 +517,8 @@ function PlanView({ user }: { user: any }) {
     Alert.alert(
       lang === 'en' ? 'Regenerate meal plan?' : 'Gumawa ulit ng meal plan?',
       lang === 'en'
-        ? "This replaces today's plan with a new AI-generated one."
-        : 'Papalitan nito ang plano ngayon ng bagong AI-generated na plano.',
+        ? `This replaces the plan for ${dayLabel} with a new AI-generated one.`
+        : `Papalitan nito ang plano para sa ${dayLabel} ng bagong AI-generated na plano.`,
       [
         { text: lang === 'en' ? 'Cancel' : 'Kanselahin', style: 'cancel' },
         { text: lang === 'en' ? 'Regenerate' : 'Gumawa Ulit', onPress: () => regenerate() },
@@ -408,9 +526,20 @@ function PlanView({ user }: { user: any }) {
     );
   };
 
+  const handleSelectDate = (iso: string) => {
+    if (iso !== todayIso && !isPremiumUser) {
+      router.push('/upgrade' as any);
+      return;
+    }
+    setSelectedDate(iso);
+  };
+
   const { mutate: removeItem } = useMutation({
     mutationFn: (itemId: number) => client.delete(`/meal-plan/items/${itemId}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['meal-plan-today'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] });
+      qc.invalidateQueries({ queryKey: ['meal-plan-dates'] });
+    },
   });
 
   const grouped = plan
@@ -442,6 +571,16 @@ function PlanView({ user }: { user: any }) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />
         }
       >
+        <DateStrip
+          dateStrip={dateStrip}
+          selectedDate={selectedDate}
+          todayIso={todayIso}
+          planDates={planDates}
+          isPremiumUser={isPremiumUser}
+          lang={lang}
+          onSelect={handleSelectDate}
+        />
+
         <View
           style={{
             backgroundColor: '#FEF6E3',
@@ -457,7 +596,7 @@ function PlanView({ user }: { user: any }) {
             <Text style={{ fontSize: 17, marginRight: 8 }}>💡</Text>
             <View style={{ flex: 1 }}>
               <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 13, color: '#9A6A12' }}>
-                {lang === 'en' ? "Today's total cost" : 'Kabuuang gastos ngayon'}
+                {lang === 'en' ? `Total cost for ${dayLabel}` : `Kabuuang gastos para sa ${dayLabel}`}
               </Text>
               <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#9A6A12', marginTop: 2 }}>
                 {lang === 'en'
@@ -610,63 +749,88 @@ function PlanView({ user }: { user: any }) {
       </ScrollView>
 
       <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
+      <RecipePickerModal visible={pickerOpen} date={selectedDate} onClose={() => setPickerOpen(false)} />
       </>
     );
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />
-      }
-    >
-      <Text style={{ fontSize: 40, marginBottom: 16 }}>🍽️</Text>
-      <Text className="text-base font-medium text-ink mb-2 text-center">
-        {lang === 'en' ? 'No meal plan yet' : 'Walang meal plan pa'}
-      </Text>
-      <Text className="text-xs text-ink-soft mb-8 text-center leading-5">
-        {lang === 'en'
-          ? 'Generate an AI-powered meal plan that fits your budget today.'
-          : 'Gumawa ng AI-powered meal plan na akmang-akma sa iyong budget ngayon.'}
-      </Text>
-      <Pressable
-        onPress={() => (isPremiumUser ? generate() : router.push('/upgrade' as any))}
-        disabled={isPending || aiDisabled}
-        className={`rounded-xl px-8 py-3.5 items-center active:opacity-80 disabled:opacity-60 ${aiDisabled ? 'bg-cream-300' : 'bg-brand-600'}`}
+    <View style={{ flex: 1 }}>
+      <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
+        <DateStrip
+          dateStrip={dateStrip}
+          selectedDate={selectedDate}
+          todayIso={todayIso}
+          planDates={planDates}
+          isPremiumUser={isPremiumUser}
+          lang={lang}
+          onSelect={handleSelectDate}
+        />
+      </View>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6E7B4A" colors={['#6E7B4A']} />
+        }
       >
-        {isPending ? (
-          <View className="flex-row items-center gap-2">
-            <ActivityIndicator color="white" size="small" />
-            <Text className="text-sm font-semibold text-white">
-              {lang === 'en' ? 'Generating...' : 'Ginagawa...'}
+        <Text style={{ fontSize: 40, marginBottom: 16 }}>🍽️</Text>
+        <Text className="text-base font-medium text-ink mb-2 text-center">
+          {isToday
+            ? (lang === 'en' ? 'No meal plan yet' : 'Walang meal plan pa')
+            : (lang === 'en' ? `No plan yet for ${dayLabel}` : `Wala pang plano para sa ${dayLabel}`)}
+        </Text>
+        <Text className="text-xs text-ink-soft mb-8 text-center leading-5">
+          {lang === 'en'
+            ? `Generate an AI-powered meal plan that fits your budget for ${dayLabel}, or choose recipes yourself.`
+            : `Gumawa ng AI-powered meal plan na akma sa budget mo para ${dayLabel}, o mamili ng sarili mong recipe.`}
+        </Text>
+        <Pressable
+          onPress={() => (isPremiumUser ? generate() : router.push('/upgrade' as any))}
+          disabled={isPending || aiDisabled}
+          className={`rounded-xl px-8 py-3.5 items-center active:opacity-80 disabled:opacity-60 ${aiDisabled ? 'bg-cream-300' : 'bg-brand-600'}`}
+        >
+          {isPending ? (
+            <View className="flex-row items-center gap-2">
+              <ActivityIndicator color="white" size="small" />
+              <Text className="text-sm font-semibold text-white">
+                {lang === 'en' ? 'Generating...' : 'Ginagawa...'}
+              </Text>
+            </View>
+          ) : (
+            <Text className={`text-sm font-semibold ${aiDisabled ? 'text-ink-soft' : 'text-white'}`}>
+              {aiDisabled
+                ? (lang === 'en' ? 'Temporarily Unavailable' : 'Hindi Muna Available')
+                : isPremiumUser
+                  ? (lang === 'en' ? '🤖 Generate AI Meal Plan' : '🤖 Gumawa ng AI Meal Plan')
+                  : (lang === 'en' ? '⭐ Upgrade to Generate' : '⭐ Mag-Premium para Gumawa')}
             </Text>
-          </View>
-        ) : (
-          <Text className={`text-sm font-semibold ${aiDisabled ? 'text-ink-soft' : 'text-white'}`}>
-            {aiDisabled
-              ? (lang === 'en' ? 'Temporarily Unavailable' : 'Hindi Muna Available')
-              : isPremiumUser
-                ? (lang === 'en' ? 'Generate Meal Plan' : 'Gumawa ng Meal Plan')
-                : (lang === 'en' ? '⭐ Upgrade to Generate' : '⭐ Mag-Premium para Gumawa')}
+          )}
+        </Pressable>
+        <Pressable
+          onPress={() => setPickerOpen(true)}
+          className="mt-3 rounded-xl border border-cream-300 px-8 py-3 items-center active:opacity-70"
+        >
+          <Text className="text-sm font-semibold text-ink">
+            {lang === 'en' ? '🍽️ Choose from Recipes' : '🍽️ Pumili sa mga Recipe'}
           </Text>
+        </Pressable>
+        {!aiDisabled && (
+          isPremiumUser ? (
+            <Text className="mt-3 text-xs text-ink-soft">
+              {user?.premium_source === 'trial'
+                ? (lang === 'en' ? '🎁 Free trial (unlimited AI plans)' : '🎁 Libreng trial (unlimited AI plans)')
+                : (lang === 'en' ? '⭐ Premium (unlimited AI plans)' : '⭐ Premium (unlimited AI plans)')}
+            </Text>
+          ) : (
+            <Text className="mt-3 text-xs text-ink-soft text-center">
+              {lang === 'en' ? 'AI meal plans are a Premium feature' : 'Premium feature ang AI meal plans'}
+            </Text>
+          )
         )}
-      </Pressable>
-      {!aiDisabled && (
-        isPremiumUser ? (
-          <Text className="mt-3 text-xs text-ink-soft">
-            {user?.premium_source === 'trial'
-              ? (lang === 'en' ? '🎁 Free trial (unlimited AI plans)' : '🎁 Libreng trial (unlimited AI plans)')
-              : (lang === 'en' ? '⭐ Premium (unlimited AI plans)' : '⭐ Premium (unlimited AI plans)')}
-          </Text>
-        ) : (
-          <Text className="mt-3 text-xs text-ink-soft text-center">
-            {lang === 'en' ? 'AI meal plans are a Premium feature' : 'Premium feature ang AI meal plans'}
-          </Text>
-        )
-      )}
-      <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
-    </ScrollView>
+        <RewardCelebration reward={reward} onDismiss={() => setReward(null)} />
+      </ScrollView>
+      <RecipePickerModal visible={pickerOpen} date={selectedDate} onClose={() => setPickerOpen(false)} />
+    </View>
   );
 }
 
