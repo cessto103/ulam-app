@@ -170,10 +170,10 @@ function showMealPlanError(
   if (e?.response?.data?.ai_disabled) {
     setAiDisabled(true);
     Alert.alert(
-      lang === 'en' ? 'Temporarily unavailable' : 'Pansamantalang hindi available',
+      lang === 'en' ? '🔜 Coming Soon' : '🔜 Paparating Na',
       lang === 'en'
-        ? 'AI meal plan generation is paused for now. Please check back soon!'
-        : 'Naka-pause muna ang AI meal plan generation. Balik lang po kayo!',
+        ? "AI meal plan generation isn't available yet — it's coming in a future update! You can still choose recipes yourself in the meantime."
+        : 'Hindi pa available ang AI meal plan generation — paparating ito sa susunod na update! Puwede ka munang pumili ng recipe sa ngayon.',
     );
     return;
   }
@@ -490,6 +490,25 @@ function PlanView({ user }: { user: any }) {
 
   const [aiDisabled, setAiDisabled] = useState(false);
 
+  // Proactive check so "Coming Soon" shows immediately on load, not just
+  // after a failed Generate/Regenerate attempt.
+  const { data: aiStatus } = useQuery({
+    queryKey: ['ai-status'],
+    queryFn: async () => {
+      try {
+        const { data } = await client.get('/ai-status');
+        return data as { meal_plans_enabled: boolean };
+      } catch { return null; }
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  useEffect(() => {
+    if (aiStatus && !aiStatus.meal_plans_enabled) {
+      setAiDisabled(true);
+    }
+  }, [aiStatus]);
+
   const { mutate: generate, isPending } = useMutation({
     mutationFn: () => generatePlan(selectedDate),
     onSuccess: (data: any) => {
@@ -721,30 +740,42 @@ function PlanView({ user }: { user: any }) {
           </Pressable>
         </Link>
 
-        <Pressable
-          onPress={handleRegenerate}
-          disabled={isRegenerating || aiDisabled}
-          className="mt-3 rounded-2xl border border-cream-300 items-center active:opacity-70 disabled:opacity-60"
-          style={{ paddingVertical: 13, flexDirection: 'row', justifyContent: 'center', gap: 8 }}
-        >
-          {isRegenerating ? (
-            <>
-              <ActivityIndicator color="#6F655A" size="small" />
-              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#6F655A' }}>
-                {lang === 'en' ? 'Regenerating...' : 'Ginagawa ulit...'}
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text style={{ fontSize: 14 }}>{isPremiumUser ? '🔄' : '⭐'}</Text>
-              <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#6F655A' }}>
-                {isPremiumUser
-                  ? (lang === 'en' ? 'Regenerate Plan' : 'Gumawa Ulit ng Plano')
-                  : (lang === 'en' ? 'Upgrade to Regenerate' : 'Mag-Premium para Gumawa Ulit')}
-              </Text>
-            </>
-          )}
-        </Pressable>
+        {aiDisabled ? (
+          <View
+            className="mt-3 rounded-2xl border border-cream-300 items-center"
+            style={{ paddingVertical: 13, flexDirection: 'row', justifyContent: 'center', gap: 8 }}
+          >
+            <Text style={{ fontSize: 14 }}>🔜</Text>
+            <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#6F655A' }}>
+              {lang === 'en' ? 'AI Regenerate — Coming Soon' : 'AI Regenerate — Paparating Na'}
+            </Text>
+          </View>
+        ) : (
+          <Pressable
+            onPress={handleRegenerate}
+            disabled={isRegenerating}
+            className="mt-3 rounded-2xl border border-cream-300 items-center active:opacity-70 disabled:opacity-60"
+            style={{ paddingVertical: 13, flexDirection: 'row', justifyContent: 'center', gap: 8 }}
+          >
+            {isRegenerating ? (
+              <>
+                <ActivityIndicator color="#6F655A" size="small" />
+                <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#6F655A' }}>
+                  {lang === 'en' ? 'Regenerating...' : 'Ginagawa ulit...'}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={{ fontSize: 14 }}>{isPremiumUser ? '🔄' : '⭐'}</Text>
+                <Text style={{ fontFamily: 'NunitoSans_800ExtraBold', fontSize: 14, color: '#6F655A' }}>
+                  {isPremiumUser
+                    ? (lang === 'en' ? 'Regenerate Plan' : 'Gumawa Ulit ng Plano')
+                    : (lang === 'en' ? 'Upgrade to Regenerate' : 'Mag-Premium para Gumawa Ulit')}
+                </Text>
+              </>
+            )}
+          </Pressable>
+        )}
 
       </ScrollView>
 
@@ -780,9 +811,13 @@ function PlanView({ user }: { user: any }) {
             : (lang === 'en' ? `No plan yet for ${dayLabel}` : `Wala pang plano para sa ${dayLabel}`)}
         </Text>
         <Text className="text-xs text-ink-soft mb-8 text-center leading-5">
-          {lang === 'en'
-            ? `Generate an AI-powered meal plan that fits your budget for ${dayLabel}, or choose recipes yourself.`
-            : `Gumawa ng AI-powered meal plan na akma sa budget mo para ${dayLabel}, o mamili ng sarili mong recipe.`}
+          {aiDisabled
+            ? (lang === 'en'
+                ? `AI-powered meal plans are coming soon! For now, choose recipes yourself for ${dayLabel} below.`
+                : `Paparating na ang AI-powered meal plans! Sa ngayon, pumili ng sarili mong recipe para sa ${dayLabel} sa ibaba.`)
+            : (lang === 'en'
+                ? `Generate an AI-powered meal plan that fits your budget for ${dayLabel}, or choose recipes yourself.`
+                : `Gumawa ng AI-powered meal plan na akma sa budget mo para ${dayLabel}, o mamili ng sarili mong recipe.`)}
         </Text>
         <Pressable
           onPress={() => (isPremiumUser ? generate() : router.push('/upgrade' as any))}
@@ -799,7 +834,7 @@ function PlanView({ user }: { user: any }) {
           ) : (
             <Text className={`text-sm font-semibold ${aiDisabled ? 'text-ink-soft' : 'text-white'}`}>
               {aiDisabled
-                ? (lang === 'en' ? 'Temporarily Unavailable' : 'Hindi Muna Available')
+                ? (lang === 'en' ? '🔜 Coming Soon' : '🔜 Paparating Na')
                 : isPremiumUser
                   ? (lang === 'en' ? '🤖 Generate AI Meal Plan' : '🤖 Gumawa ng AI Meal Plan')
                   : (lang === 'en' ? '⭐ Upgrade to Generate' : '⭐ Mag-Premium para Gumawa')}

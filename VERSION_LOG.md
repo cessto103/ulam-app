@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-23 · **v1.48.0**
+Last updated: 2026-07-23 · **v1.49.0**
 
 ---
 
@@ -114,6 +114,13 @@ Last updated: 2026-07-23 · **v1.48.0**
 ---
 
 ## Version History
+
+### 2026-07-23 · v1.49.0 — Pause AI meal plan generation + AI price refresh
+
+- Real Anthropic spend was already outpacing a small starting balance before real users were even active, and the nightly price-refresh jobs (`prices:refresh-ai`, `prices:refresh-gov`) scale with market/region count rather than paying subscribers — an unbounded cost with no revenue link. Both are now paused behind admin-controlled switches (`ai_meal_plans_enabled`, `price_refresh_ai_enabled` AppSettings, editable from the new admin "AI feature controls" card, uLam admin v1.41.0).
+- Found and fixed a real gap while wiring this up: `TECHNICAL.md` already documented `ai_meal_plans_enabled` as covering both meal plans *and* price refresh, but the code only ever checked it in `MealPlanController` — the price-refresh commands had no kill switch at all. Added `PriceIntelligenceService::aiDisabled()`, checked at the top of both `RefreshPricesAI` and `RefreshGovernmentPrices` before they loop any markets/regions.
+- New public `GET /ai-status` endpoint lets the Meal Plan tab show "🔜 Coming Soon" proactively on load, not just after a failed Generate/Regenerate attempt. 7-Day Advance Planning itself (day strip, manually choosing a recipe for any day) is untouched — never called AI, stays fully available.
+- Verified locally end-to-end: flipped both settings off via tinker, confirmed `PriceIntelligenceService::aiDisabled()` returns true, confirmed both refresh commands log a skip message and return immediately (no markets/regions looped, no API calls made), and confirmed `GET /ai-status` reflects the setting via a simulated request.
 
 ### 2026-07-23 · v1.48.0 — 7-Day Advance Meal Planning (Premium)
 

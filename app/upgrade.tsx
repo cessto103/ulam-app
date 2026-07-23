@@ -22,11 +22,9 @@ type RemotePricing = {
 
 // Compiled-in fallback — shown until the admin sets a custom list (Content → Monetization).
 const DEFAULT_FEATURES: Feature[] = [
-  { emoji: '🍳', titleEn: 'AI Meal Planning',       titleTl: 'AI Meal Planning',       descEn: 'Get a meal plan every day',              descTl: 'Humingi ng meal plan araw-araw',              free: false },
   { emoji: '📊', titleEn: 'Budget Tracking',        titleTl: 'Budget Tracking',        descEn: 'Log expenses, track your savings',       descTl: 'Mag-log ng gastos, tingnan ang savings',      free: true  },
   { emoji: '📢', titleEn: 'Price Reporting',        titleTl: 'Price Reporting',        descEn: 'Report and check prices',                descTl: 'Mag-report at makita ang presyo',             free: true  },
   { emoji: '👥', titleEn: 'Community',              titleTl: 'Komunidad',              descEn: 'Posts, likes, and tips from neighbors',  descTl: 'Mga post, puso, at diskarte ng kapitbahay',   free: true  },
-  { emoji: '🔓', titleEn: 'Unlimited AI Plans',     titleTl: 'Unlimited AI Plans',     descEn: 'No limits, as many times as you want',   descTl: 'Walang limitasyon, kahit ilang beses',        free: false },
   { emoji: '🤝', titleEn: 'Shopping List Sharing',  titleTl: 'Shopping List Sharing',  descEn: 'Share your shopping list with family',   descTl: 'Ibahagi ang shopping list mo sa pamilya',     free: false },
   { emoji: '📅', titleEn: '7-Day Meal Planning',    titleTl: '7-Araw na Meal Planning', descEn: 'Plan your meals a full week ahead',     descTl: 'Magplano ng meals para sa isang buong linggo', free: false },
 ];

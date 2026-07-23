@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.49.0] — 2026-07-23
+
+### Changed
+- **AI meal plan generation paused for now** — Anthropic API cost for both the meal-plan-generation feature and its nightly market/government price-refresh jobs was outpacing what the feature could sustain at this stage, so both are now paused behind an admin-controlled switch (paired uLam admin v1.41.0) rather than continuing to run unmetered. The Meal Plan tab now shows "🔜 Coming Soon" for Generate/Regenerate instead of a generic error, and it checks proactively on load rather than only after a failed attempt. **7-Day Advance Planning itself is unaffected** — the day strip and manually choosing a recipe for any day (today or up to a week ahead) never touched AI and keep working exactly as before. Removed "AI Meal Planning" and "Unlimited AI Plans" from the Upgrade screen's feature list accordingly; "7-Day Meal Planning" stays listed since it's still genuinely available via manual picking.
+
 ## [1.48.0] — 2026-07-23
 
 ### Added
