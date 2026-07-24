@@ -1,6 +1,6 @@
 # uLam — Version Log
 
-Last updated: 2026-07-24 · **v1.50.0**
+Last updated: 2026-07-24 · **v1.50.1**
 
 ---
 
@@ -114,6 +114,10 @@ Last updated: 2026-07-24 · **v1.50.0**
 ---
 
 ## Version History
+
+### 2026-07-24 · v1.50.1 — Settings → Location: city/barangay not appearing saved
+
+- The PATCH to `/user/profile` always persisted `municipality`/`barangay` correctly (confirmed directly against the backend) — the bug was purely client-side: `location.tsx`'s `cityCode` state had no initializer, so it stayed `''` on every fresh mount regardless of what the user had already saved. That broke two things at once: the City/Municipality `SelectField` compares against `cityCode`, so it always showed the placeholder instead of the real saved city; and the Barangay field is `disabled={!cityCode}`, so it stayed locked out even though a barangay was already saved. Fixed by deriving `cityCode` from `user.municipality` on mount via the same `findPhCityByName()` lookup the GPS-capture flow already uses.
 
 ### 2026-07-24 · uLam backend + admin only (admin v1.42.0) — manual "run scheduled jobs" button, Markets AI-disable state
 

@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.50.1] — 2026-07-24
+
+### Fixed
+- **Settings → Location: city/municipality and barangay appeared not to save.** The save itself always worked — the bug was that reopening the Location screen never re-derived the internal city code from your already-saved municipality, so the City/Municipality field showed the placeholder instead of your real city, and Barangay stayed disabled (it's gated on a city being selected). Now resolves your saved city back to its code on load, same lookup already used for the GPS-based flow.
+
 ## [1.50.0] — 2026-07-24
 
 ### Added

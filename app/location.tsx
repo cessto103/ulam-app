@@ -39,7 +39,14 @@ export default function LocationScreen() {
   const [barangay, setBarangay]            = useState(user?.barangay ?? '');
   const [province, setProvince]            = useState(user?.province ?? '');
   const [region, setRegionRaw]             = useState(user?.region ?? '');
-  const [cityCode, setCityCode]            = useState('');
+  // Without this, cityCode stays '' on every fresh mount even when the user
+  // already has a saved municipality -- which both makes the City picker
+  // show the placeholder instead of their real city, AND leaves the
+  // Barangay picker disabled (it's gated on cityCode), since nothing else
+  // ever derives a code from the saved name.
+  const [cityCode, setCityCode]            = useState(() =>
+    user?.municipality ? (findPhCityByName(user.municipality)?.code ?? '') : ''
+  );
   const [coords, setCoords]             = useState<{ lat: number; lng: number } | null>(
     user?.latitude != null && user?.longitude != null ? { lat: user.latitude, lng: user.longitude } : null
   );
