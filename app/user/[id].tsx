@@ -3,6 +3,9 @@ import { Skeleton, SkeletonPostCard } from '@/src/components/Skeleton';
 import { API_URL } from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
+import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
+import { type CollageStyle, type FontKey, type GradientKey } from '@/src/types/recipe';
+import { getRecipePhotos } from '@/src/utils/recipePhotos';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
@@ -33,12 +36,25 @@ type PublicUser = {
 
 type PostUser = { id: number; name: string; username: string | null; avatar: string | null };
 
+type EmbeddedRecipe = {
+  id: number; title: string;
+  image_url: string | null; image_urls: string[] | null;
+  collage_style: CollageStyle | null; gradient_key: GradientKey | null; font_key: FontKey | null;
+  budget_tag: string; estimated_cost: number;
+};
+
 type Post = {
   id: number; user_id: number; user: PostUser;
   post_type: 'recipe_share' | 'price_tip' | 'budget_win' | 'general';
   body: string; images: string[] | null;
+  recipe_id: number | null; recipe: EmbeddedRecipe | null;
   puso_count: number; comments_count: number;
   has_reacted: boolean; created_at: string;
+};
+
+const BUDGET_LABEL: Record<string, string> = {
+  budget_100: '₱100', budget_200: '₱200', budget_400: '₱400', budget_400plus: '₱400+',
+  budget_600: '₱600', budget_800: '₱800', budget_1000: '₱1,000', budget_1000plus: '₱1,000+',
 };
 
 type UserStore = {
@@ -190,7 +206,10 @@ export default function UserProfileScreen() {
   const renderPost = ({ item: post }: { item: Post }) => {
     const meta = TYPE_META[post.post_type] ?? TYPE_META.general;
     return (
-      <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 mx-4">
+      <Pressable
+        onPress={() => router.push(`/post/${post.id}` as any)}
+        className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 mx-4 active:opacity-95"
+      >
         <View className="flex-row items-center justify-between mb-2">
           <View className="rounded-full px-2.5 py-0.5" style={{ backgroundColor: meta.bg }}>
             <Text className="text-xs font-semibold" style={{ color: meta.text }}>
@@ -200,6 +219,37 @@ export default function UserProfileScreen() {
           <Text className="text-xs text-ink-soft">{timeAgo(post.created_at, lang)}</Text>
         </View>
         <Text className="text-sm text-ink leading-5 mb-2">{post.body}</Text>
+
+        {/* Embedded recipe card — uses RecipeCoverPhoto header style, same as the Community feed */}
+        {post.recipe && (
+          <Pressable
+            onPress={(e) => { e.stopPropagation(); router.push(`/recipe/${post.recipe!.id}` as any); }}
+            style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#F0DEBB', marginBottom: 8 }}
+          >
+            <View style={{ height: 150, overflow: 'hidden' }}>
+              <RecipeCoverPhoto
+                photos={getRecipePhotos(post.recipe)}
+                collageStyle={post.recipe.collage_style ?? 'gradient'}
+                gradientKey={post.recipe.gradient_key ?? 'grad_a'}
+                fontKey={post.recipe.font_key ?? 'baloo'}
+                title={post.recipe.title}
+              />
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fff' }}>
+              <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#000000', flex: 1 }} numberOfLines={1}>
+                {post.recipe.title}
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 8 }}>
+                <View style={{ borderRadius: 999, backgroundColor: '#EFF4EC', paddingHorizontal: 8, paddingVertical: 2 }}>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>
+                    {BUDGET_LABEL[post.recipe.budget_tag] ?? post.recipe.budget_tag}
+                  </Text>
+                </View>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#386641' }}>View →</Text>
+              </View>
+            </View>
+          </Pressable>
+        )}
 
         {Array.isArray(post.images) && post.images.length > 0 && (
           post.images.length === 1 ? (
@@ -232,15 +282,12 @@ export default function UserProfileScreen() {
             <Text style={{ fontSize: 14 }}>❤️</Text>
             <Text className="text-xs text-ink-soft">{post.puso_count}</Text>
           </View>
-          <Pressable
-            onPress={() => router.push(`/post/${post.id}` as any)}
-            className="flex-row items-center gap-1.5 active:opacity-70"
-          >
+          <View className="flex-row items-center gap-1.5">
             <Text style={{ fontSize: 14 }}>💬</Text>
             <Text className="text-xs text-ink-soft">{post.comments_count}</Text>
-          </Pressable>
+          </View>
         </View>
-      </View>
+      </Pressable>
     );
   };
 

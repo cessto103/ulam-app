@@ -4,8 +4,8 @@ import { useLanguage } from '@/src/context/LanguageContext';
 import { useXpReward } from '@/src/hooks/useXpReward';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -37,16 +37,19 @@ const MEAL_META: Record<string, { emoji: string; labelEn: string; labelTl: strin
 
 // ─── API ───────────────────────────────────────────────────────────────────────
 
-async function fetchTodayPlan() {
+async function fetchPlanForDate(date: string) {
   try {
-    const { data } = await client.get('/meal-plans/today');
+    const { data } = await client.get(`/meal-plans/today?date=${date}`);
     return data.meal_plan ?? null;
   } catch { return null; }
 }
 
-async function fetchBudgetToday(): Promise<BudgetToday | null> {
+// `/budget/today` and `/budget/for-date` return the same has_budget/budget/
+// spent/remaining shape (for-date just adds a few history-only fields this
+// screen doesn't use), so a past date can reuse the same BudgetToday type.
+async function fetchBudgetForDate(date: string, isToday: boolean): Promise<BudgetToday | null> {
   try {
-    const { data } = await client.get('/budget/today');
+    const { data } = await client.get(isToday ? '/budget/today' : `/budget/for-date?date=${date}`);
     return data;
   } catch { return null; }
 }
@@ -58,6 +61,11 @@ export default function LogSpendingScreen() {
   const qc      = useQueryClient();
   const { lang } = useLanguage();
   const insets  = useSafeAreaInsets();
+  const { date: dateParam } = useLocalSearchParams<{ date?: string }>();
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const date     = dateParam || todayIso;
+  const isToday  = date === todayIso;
 
   const [mealRows, setMealRows]   = useState<MealRow[]>([]);
   const [otherAmt, setOtherAmt]   = useState('');
@@ -71,8 +79,13 @@ export default function LogSpendingScreen() {
 
   const otherRef = useRef<TextInput>(null);
 
-  const { data: plan }   = useQuery({ queryKey: ['meal-plan-today'], queryFn: fetchTodayPlan,   staleTime: 300_000 });
-  const { data: budget } = useQuery({ queryKey: ['budget-today'],    queryFn: fetchBudgetToday, staleTime: 60_000 });
+  const dayLabel = useMemo(() => {
+    if (isToday) return null;
+    return new Date(date + 'T00:00:00').toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' });
+  }, [date, isToday]);
+
+  const { data: plan }   = useQuery({ queryKey: ['meal-plan-for-log', date], queryFn: () => fetchPlanForDate(date), staleTime: 300_000 });
+  const { data: budget } = useQuery({ queryKey: ['budget-for-log', date],    queryFn: () => fetchBudgetForDate(date, isToday), staleTime: 60_000 });
 
   // Populate meal rows from plan once on load
   useEffect(() => {
@@ -132,9 +145,12 @@ export default function LogSpendingScreen() {
         actual_spent:      total,
         expense_breakdown: breakdown,
         notes:             note.trim() || null,
+        date,
       });
 
       qc.invalidateQueries({ queryKey: ['budget-today'] });
+      qc.invalidateQueries({ queryKey: ['budget-date', date] });
+      qc.invalidateQueries({ queryKey: ['meal-plan-date', date] });
       setXpEarned(data.xp_earned ?? 0);
       setSavedAmt(data.saved ?? 0);
       setSuccess(true);
@@ -157,7 +173,9 @@ export default function LogSpendingScreen() {
           {lang === 'en' ? 'Logged!' : 'Nai-log na!'}
         </Text>
         <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 14, color: '#6F655A', textAlign: 'center', marginBottom: 6, lineHeight: 20 }}>
-          {lang === 'en' ? `You spent today: ₱${total.toFixed(0)}` : `Nagastos mo ngayon: ₱${total.toFixed(0)}`}
+          {isToday
+            ? (lang === 'en' ? `You spent today: ₱${total.toFixed(0)}` : `Nagastos mo ngayon: ₱${total.toFixed(0)}`)
+            : (lang === 'en' ? `You spent on ${dayLabel}: ₱${total.toFixed(0)}` : `Nagastos mo noong ${dayLabel}: ₱${total.toFixed(0)}`)}
         </Text>
         {savedAmt > 0 && (
           <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 14, color: '#C4881C', textAlign: 'center', marginBottom: 16 }}>
@@ -206,7 +224,9 @@ export default function LogSpendingScreen() {
           </Pressable>
           <View>
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 18, color: '#fff' }}>
-              {lang === 'en' ? 'Log Spending' : 'I-log ang Gastos'}
+              {isToday
+                ? (lang === 'en' ? 'Log Spending' : 'I-log ang Gastos')
+                : (lang === 'en' ? `Log Spending — ${dayLabel}` : `I-log ang Gastos — ${dayLabel}`)}
             </Text>
             <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
               {lang === 'en' ? "Tap any amount to edit it" : "I-tap ang halaga para baguhin"}
@@ -221,7 +241,9 @@ export default function LogSpendingScreen() {
         {mealRows.length > 0 ? (
           <View style={{ marginBottom: 16 }}>
             <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#6F655A', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
-              {lang === 'en' ? "Today's Meal Plan" : 'Meal plan ngayon'}
+              {isToday
+                ? (lang === 'en' ? "Today's Meal Plan" : 'Meal plan ngayon')
+                : (lang === 'en' ? `Meal Plan — ${dayLabel}` : `Meal plan — ${dayLabel}`)}
             </Text>
             <View style={{ backgroundColor: '#fff', borderRadius: 16, borderWidth: 0.5, borderColor: '#F0DEBB', overflow: 'hidden' }}>
               {mealRows.map((row, idx) => {
@@ -280,7 +302,9 @@ export default function LogSpendingScreen() {
           !initialized && (
             <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 16, alignItems: 'center' }}>
               <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
-                {lang === 'en' ? 'No meal plan for today yet' : 'Wala pang meal plan ngayon'}
+                {isToday
+                  ? (lang === 'en' ? 'No meal plan for today yet' : 'Wala pang meal plan ngayon')
+                  : (lang === 'en' ? 'No meal plan for that day' : 'Walang meal plan noong araw na iyon')}
               </Text>
             </View>
           )

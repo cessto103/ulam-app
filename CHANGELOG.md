@@ -3,6 +3,33 @@
 All notable changes to this project are documented here.
 Format: `## [version] — YYYY-MM-DD` · sections: Added, Changed, Fixed, Removed.
 
+## [1.50.0] — 2026-07-24
+
+### Added
+- **"Recommended for You" (Home dashboard)**: a 2x2 grid of boosted recipes below Popular This Week, with a "Load more" button for further pages. Popular This Week itself no longer factors in boost status at all — it's now purely organic (real views + saves), so a boost buys a real distinct placement instead of just nudging an existing list.
+- **"Recommended Stores Near You" (Home dashboard)**: a 2x2 grid of boosted stores within 5km of the user's saved profile location (same "Load more" pattern), hidden entirely if the user hasn't set a location.
+- **"Recommended Stores" (Prices page)**: a horizontal strip of boosted stores nationwide, most-recently-boosted first.
+- **"Log this day's spending" button**: past days in the budget history view that have a budget but no logged spend now show a one-tap button straight into Log Spending, pre-filled from that day's meal plan cost if one exists. Backend: `BudgetLogService` gained `logForDate()` (any date within a budget period, not just today), and `POST /budget/log` accepts an optional `date`.
+- **Remove a mistakenly-added meal** from a past day's plan — each meal row in the budget history view now has a trash icon (with a confirm prompt) using the same `DELETE /meal-plan/items/{id}` the Meal Plan tab's own remove button already used.
+- **"Set Budget for This Day"**: past days with no budget at all now show a button opening a new dedicated screen (`budget-setup-for-date.tsx`) — household size + custom expenses, same as the "today" budget setup flow, but fixed to that one day only (no duration selector). Posts to a new `POST /budget/setup-for-date` endpoint that creates a budget covering *only* that single day — deliberately separate from the multi-day `/budget/setup` wizard, which always anchors to today and would otherwise deactivate the user's real, current budget period if pointed at a past date.
+
+### Changed
+- Store page (stall detail): removed a duplicated second Back button and Report button that appeared over the cover photo, on top of the ones already in the header.
+- Viewing another user's profile: their posts and shared recipes are now tappable, opening the post or recipe respectively (previously nothing happened on tap for anything but the comment-count icon).
+- Today's food budget card: the "(+) Log" button now reads "Log today's spending" and "Edit" now reads "Edit Budget", so both buttons' purpose is clear at a glance.
+- "Recommended for You" and "Recommended Stores Near You" grids were meant to be 2 columns but their width/gap math (`48.5%` width + a row `gap`) left too little slack and could overflow into a single column instead. Switched to the standard safe pattern (`justifyContent: 'space-between'` + `48%` width), which always renders exactly 2 per row.
+- Past days can no longer have a recipe set as a meal unless a budget already covers that day — previously this worked regardless of whether any budget existed for that date at all.
+- Meal Plan tab's "Coming Soon" Generate button is now two lines ("Generate AI meal" / smaller "Coming Soon") instead of one, and "Choose from Recipes" is now filled orange (matching the bottom nav's center "+" button color) instead of a plain outlined button, so it reads as the primary action while AI generation is paused.
+- Home dashboard: "Recommended for You" now appears above "Popular This Week" (previously the reverse), and "Popular This Week" switched from a horizontal scroll to the same 2-column grid style as "Recommended for You", for visual consistency between the two.
+- "Popular This Week" now shows only 4 recipes initially with a "Load more" button revealing more (up to the 30 already fetched in one request) — previously always showed a fixed 8 with no way to see more.
+
+### Fixed
+- **(Security) AI cost kill-switch could be bypassed.** `POST /markets/{id}/refresh` and its two admin equivalents called the AI price-refresh service directly without checking the `price_refresh_ai_enabled` switch — meaning even with AI price refresh paused, any logged-in user (or admin) could still trigger real, billed Claude + web-search calls through this endpoint. All three now check the switch first.
+- **(Security) Secondary-email verification was brute-forceable.** The request/verify endpoints had no rate limit, and the code was stored unhashed (unlike every other OTP in the app). Now throttled to match the existing email-verification OTP endpoints, and hashed with the same `Hash::make`/`Hash::check` pattern.
+- **(Security) Boost reward-credit could be redeemed twice.** A double-tap on "activate boost from credit" had no row lock, so two near-simultaneous requests could both pass the "not yet redeemed" check and grant two free boosts from one earned credit. Now locked and re-verified inside a single transaction.
+- **(Backend) Push notifications could silently fail past ~100 recipients.** `NotificationService::sendBulk()` sent every token in a single request; Expo's push API caps batches at 100. Now chunks into groups of 100, so a large weather/reminder batch degrades per-chunk instead of failing whole.
+- Backdating a completed meal plan to a past day never moved that day's "Saved" amount or cleared its "Not logged" badge, since meal-plan items and budget logs were entirely separate tables with nothing connecting them — see "Log this day's spending" above.
+
 ## [1.49.0] — 2026-07-23
 
 ### Changed

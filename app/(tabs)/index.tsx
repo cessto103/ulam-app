@@ -1,4 +1,4 @@
-import client from '@/src/api/client';
+import client, { API_URL } from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/context/LanguageContext';
 import BrandLogo from '@/src/components/BrandLogo';
@@ -11,10 +11,10 @@ import RecipeCoverPhoto from '@/src/components/recipe/RecipeCoverPhoto';
 import RecipePickerModal, { fetchRecipes, type RecipeOption } from '@/src/components/RecipePickerModal';
 import ThemedSection from '@/src/components/ThemedSection';
 import { getRecipePhotos } from '@/src/utils/recipePhotos';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -123,6 +123,36 @@ async function fetchMealPlanForDate(date: string): Promise<MealPlanData> {
   } catch { return null; }
 }
 
+type RecommendedStore = {
+  id: number; name: string; type: string | null;
+  barangay: string | null; municipality: string | null;
+  photo: string | null; is_verified: boolean;
+  item_count: number; last_updated: string | null;
+  distance_km?: number;
+};
+
+type PaginatedResponse<T> = { data: T[]; current_page: number; last_page: number };
+
+async function fetchRecommendedRecipes(page: number): Promise<PaginatedResponse<RecipeOption>> {
+  try {
+    const { data } = await client.get(`/recipes/recommended?page=${page}&per_page=4`);
+    return data;
+  } catch { return { data: [], current_page: 1, last_page: 1 }; }
+}
+
+async function fetchRecommendedStores(page: number, lat?: number | null, lng?: number | null): Promise<PaginatedResponse<RecommendedStore>> {
+  try {
+    const params = new URLSearchParams({ page: String(page), per_page: '4' });
+    if (lat != null && lng != null) {
+      params.set('lat', String(lat));
+      params.set('lng', String(lng));
+      params.set('radius_km', '5');
+    }
+    const { data } = await client.get(`/tindahan/recommended?${params}`);
+    return data;
+  } catch { return { data: [], current_page: 1, last_page: 1 }; }
+}
+
 // ─── Display helpers ──────────────────────────────────────────────────────────
 
 function savingsLabel(totalDays: number, lang: 'en' | 'tl'): string {
@@ -197,6 +227,9 @@ export default function HomeScreen() {
       qc.invalidateQueries({ queryKey: ['budget-date', selectedDate] }),
       qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] }),
       qc.invalidateQueries({ queryKey: ['meal-plan-dates'] }),
+      qc.invalidateQueries({ queryKey: ['popular-recipes'] }),
+      qc.invalidateQueries({ queryKey: ['recommended-recipes'] }),
+      qc.invalidateQueries({ queryKey: ['recommended-stores'] }),
     ]);
     setRefreshing(false);
   }, [qc, selectedDate]);
@@ -251,13 +284,101 @@ export default function HomeScreen() {
   const todayDow  = new Date().getDay();
   const todayIdx  = todayDow === 0 ? 6 : todayDow - 1;
 
-  // Popular This Week — /recipes orders by is_boosted, then views in the
+  // Popular This Week — purely organic: /recipes orders by views in the
   // last 7 days, then all-time saves as a tiebreaker (RecipeController::index).
+  // Boosted recipes have their own dedicated "Recommended for you" section
+  // instead, so this stays an honest "what's actually trending" signal.
   const { data: popularRecipes = [] } = useQuery({
     queryKey: ['popular-recipes'],
     queryFn: () => fetchRecipes(''),
     staleTime: 5 * 60_000,
   });
+
+  // fetchRecipes already pulls up to 30 in one request, so "Load more" here
+  // just reveals more of what's already fetched -- no extra network call.
+  const [popularVisibleCount, setPopularVisibleCount] = useState(4);
+
+  // ── Recommended for You — boosted recipes only, the dedicated placement a
+  // boost buys (see RecipeController::recommended). 2x2 grid, "Load more"
+  // appends the next page rather than replacing it.
+  const [recRecipePage, setRecRecipePage]         = useState(1);
+  const [recRecipeItems, setRecRecipeItems]       = useState<RecipeOption[]>([]);
+  const [recRecipeLastPage, setRecRecipeLastPage] = useState(1);
+
+  const { data: recRecipeData, isFetching: recRecipeFetching } = useQuery({
+    queryKey: ['recommended-recipes', recRecipePage],
+    queryFn: () => fetchRecommendedRecipes(recRecipePage),
+    staleTime: 60_000,
+  });
+
+  useEffect(() => {
+    if (!recRecipeData) return;
+    if (recRecipePage === 1) {
+      setRecRecipeItems(recRecipeData.data);
+    } else {
+      setRecRecipeItems((prev) => {
+        const ids = new Set(prev.map((r) => r.id));
+        return [...prev, ...recRecipeData.data.filter((r) => !ids.has(r.id))];
+      });
+    }
+    setRecRecipeLastPage(recRecipeData.last_page);
+  }, [recRecipeData]);
+
+  // ── Recommended Stores Near You — boosted stores within 5km of the user's
+  // saved profile location (see TindahanController::recommended). Same grid
+  // + Load More pattern as recipes above. Hidden entirely if the user has
+  // never set a location, same as the weather feature's requirement.
+  const [recStorePage, setRecStorePage]         = useState(1);
+  const [recStoreItems, setRecStoreItems]       = useState<RecommendedStore[]>([]);
+  const [recStoreLastPage, setRecStoreLastPage] = useState(1);
+
+  const { data: recStoreData, isFetching: recStoreFetching } = useQuery({
+    queryKey: ['recommended-stores', recStorePage, user?.latitude, user?.longitude],
+    queryFn: () => fetchRecommendedStores(recStorePage, user?.latitude, user?.longitude),
+    enabled: user?.latitude != null && user?.longitude != null,
+    staleTime: 60_000,
+  });
+
+  useEffect(() => {
+    if (!recStoreData) return;
+    if (recStorePage === 1) {
+      setRecStoreItems(recStoreData.data);
+    } else {
+      setRecStoreItems((prev) => {
+        const ids = new Set(prev.map((s) => s.id));
+        return [...prev, ...recStoreData.data.filter((s) => !ids.has(s.id))];
+      });
+    }
+    setRecStoreLastPage(recStoreData.last_page);
+  }, [recStoreData]);
+
+  // Remove a mistakenly-added meal from a past day's plan (same endpoint the
+  // Meal Plan tab's own remove button uses -- date-agnostic on the backend).
+  const { mutate: removeMealItem } = useMutation({
+    mutationFn: (itemId: number) => client.delete(`/meal-plan/items/${itemId}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['meal-plan-date', selectedDate] });
+      qc.invalidateQueries({ queryKey: ['meal-plan-dates'] });
+    },
+    onError: () => Alert.alert('Error', lang === 'en' ? 'Could not remove that meal. Try again.' : 'Hindi natanggal ang pagkain. Subukan ulit.'),
+  });
+
+  const confirmRemoveMealItem = (itemId: number, dishName: string) => {
+    Alert.alert(
+      lang === 'en' ? 'Remove this meal?' : 'Tanggalin ang pagkaing ito?',
+      lang === 'en' ? `"${dishName}" will be removed from this day's plan.` : `Aalisin ang "${dishName}" sa plano ng araw na ito.`,
+      [
+        { text: lang === 'en' ? 'Cancel' : 'Kanselahin', style: 'cancel' },
+        { text: lang === 'en' ? 'Remove' : 'Tanggalin', style: 'destructive', onPress: () => removeMealItem(itemId) },
+      ],
+    );
+  };
+
+  // Set a budget for a single past day -- opens app/budget-setup-for-date.tsx,
+  // a dedicated screen (household size + custom expenses, same as "today"'s
+  // budget-setup), never the multi-day /budget-setup wizard, which always
+  // anchors to today and would deactivate the user's real current budget
+  // period if pointed at a past date.
 
   const greetingHour = new Date().getHours();
   const greeting =
@@ -658,13 +779,32 @@ export default function HomeScreen() {
                   "{historyBudget.notes}"
                 </Text>
               ) : null}
+
+              {!historyBudget.has_logged && (
+                <Pressable
+                  onPress={() => router.push(`/log-spending?date=${selectedDate}` as any)}
+                  className="mt-3 rounded-xl border border-cream-300 bg-brand-50 py-2.5 items-center active:opacity-75"
+                >
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
+                    {lang === 'en' ? "✓ Log this day's spending" : '✓ I-log ang gastos ng araw na ito'}
+                  </Text>
+                </Pressable>
+              )}
             </View>
           ) : (
             <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 items-center">
               <Text className="text-2xl mb-1">💸</Text>
-              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
+              <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginBottom: 10 }}>
                 {t('history_no_budget')}
               </Text>
+              <Pressable
+                onPress={() => router.push(`/budget-setup-for-date?date=${selectedDate}` as any)}
+                className="rounded-xl border border-cream-300 bg-brand-50 py-2 px-5 active:opacity-75"
+              >
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
+                  {lang === 'en' ? 'Set Budget for This Day' : 'Mag-set ng Budget sa Araw na Ito'}
+                </Text>
+              </Pressable>
             </View>
           )}
 
@@ -709,18 +849,32 @@ export default function HomeScreen() {
                       <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#4E7A47', marginLeft: 8 }}>
                         ₱{Number(item.estimated_cost).toFixed(0)}
                       </Text>
+                      <Pressable
+                        onPress={() => confirmRemoveMealItem(item.id, item.dish_name)}
+                        hitSlop={8}
+                        style={{ marginLeft: 10 }}
+                        className="active:opacity-50"
+                      >
+                        <Ionicons name="trash-outline" size={15} color="#E24B4A" />
+                      </Pressable>
                     </View>
                   ))}
                 </View>
               ))}
-              <Pressable
-                onPress={() => setPickerOpen(true)}
-                className="mt-2 rounded-xl border border-cream-300 bg-brand-50 py-2.5 items-center active:opacity-75"
-              >
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
-                  {t('set_recipe_as_meal')}
+              {historyBudget?.has_budget ? (
+                <Pressable
+                  onPress={() => setPickerOpen(true)}
+                  className="mt-2 rounded-xl border border-cream-300 bg-brand-50 py-2.5 items-center active:opacity-75"
+                >
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
+                    {t('set_recipe_as_meal')}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 8, textAlign: 'center' }}>
+                  {lang === 'en' ? 'Set a budget for this day first to add more meals.' : 'Mag-set muna ng budget para makapagdagdag pa ng pagkain.'}
                 </Text>
-              </Pressable>
+              )}
             </View>
           ) : (
             <View className="bg-white rounded-2xl border border-cream-200 p-4 mb-3 items-center">
@@ -728,14 +882,20 @@ export default function HomeScreen() {
               <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }}>
                 {t('history_no_meal')}
               </Text>
-              <Pressable
-                onPress={() => setPickerOpen(true)}
-                className="mt-3 rounded-xl border border-cream-300 bg-brand-50 py-2 px-5 active:opacity-75"
-              >
-                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
-                  {t('set_recipe_as_meal')}
+              {historyBudget?.has_budget ? (
+                <Pressable
+                  onPress={() => setPickerOpen(true)}
+                  className="mt-3 rounded-xl border border-cream-300 bg-brand-50 py-2 px-5 active:opacity-75"
+                >
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C45E3A' }}>
+                    {t('set_recipe_as_meal')}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 6, textAlign: 'center' }}>
+                  {lang === 'en' ? 'No budget set for this day yet — set one first to plan a meal here.' : 'Wala pang budget sa araw na ito — mag-set muna para makapagplano ng pagkain.'}
                 </Text>
-              </Pressable>
+              )}
             </View>
           )}
         </>
@@ -782,7 +942,7 @@ export default function HomeScreen() {
                       className="flex-row items-center gap-1 active:opacity-60"
                     >
                       <Ionicons name="create-outline" size={13} color="#B0A18C" />
-                      <Text className="text-xs text-ink-soft">{lang === 'en' ? 'Edit' : 'Baguhin'}</Text>
+                      <Text className="text-xs text-ink-soft">{lang === 'en' ? 'Edit Budget' : 'I-edit ang Budget'}</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -792,19 +952,20 @@ export default function HomeScreen() {
                 </View>
 
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-xs text-ink-soft">
+                  <Text className="text-xs text-ink-soft" style={{ flexShrink: 1, marginRight: 8 }} numberOfLines={1}>
                     ₱{Number(budget.spent ?? 0).toLocaleString()} {lang === 'en' ? 'spent' : 'nagastos'}
                     {hasLoggedToday ? (lang === 'en' ? ' · logged ✓' : ' · na-log ✓') : ''}
                   </Text>
                   <Pressable
                     onPress={() => router.push('/log-spending' as any)}
                     className="flex-row items-center gap-1 bg-brand-50 rounded-full px-3 py-1 active:opacity-70"
+                    style={{ flexShrink: 0 }}
                   >
                     <Ionicons name={hasLoggedToday ? 'create-outline' : 'add-circle-outline'} size={13} color="#C45E3A" />
                     <Text className="text-xs font-semibold text-brand-600">
                       {hasLoggedToday
                         ? (lang === 'en' ? 'Update' : 'I-update')
-                        : (lang === 'en' ? 'Log' : 'Mag-log')}
+                        : (lang === 'en' ? "Log today's spending" : 'I-log ang gastos ngayon')}
                     </Text>
                   </Pressable>
                 </View>
@@ -907,30 +1068,21 @@ export default function HomeScreen() {
         </>
       )}
 
-      {/* ── Popular This Week (app-redesign mockup) ── */}
-      {popularRecipes.length > 0 && (
+      {/* ── Recommended for You — boosted recipes, 2x2 grid + Load More ── */}
+      {recRecipeItems.length > 0 && (
         <>
           <View className="flex-row justify-between items-center mt-5 mb-2">
             <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
-              {lang === 'en' ? 'Popular This Week' : 'Sikat Ngayong Linggo'}
+              {lang === 'en' ? 'Recommended for You' : 'Inirekomenda Para Sa\'yo'}
             </Text>
-            <Pressable onPress={() => router.push('/(tabs)/meal-plan?tab=recipes&filter=all' as any)} hitSlop={8}>
-              <Text className="text-xs font-semibold text-brand-600">
-                {lang === 'en' ? 'See all' : 'Lahat'}
-              </Text>
-            </Pressable>
           </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 12, paddingRight: 4, paddingBottom: 4 }}
-          >
-            {popularRecipes.slice(0, 8).map((r) => (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            {recRecipeItems.map((r) => (
               <Pressable
                 key={r.id}
                 onPress={() => router.push(`/recipe/${r.id}` as any)}
                 className="active:opacity-80 rounded-2xl overflow-hidden border border-cream-200 bg-white"
-                style={{ width: 150 }}
+                style={{ width: '48%', marginBottom: 10 }}
               >
                 <RecipeCoverPhoto
                   photos={getRecipePhotos(r)}
@@ -938,7 +1090,7 @@ export default function HomeScreen() {
                   gradientKey={(r.gradient_key ?? 'grad_a') as any}
                   fontKey={(r.font_key ?? 'baloo') as any}
                   title={r.title}
-                  height={170}
+                  height={140}
                 />
                 <View style={{ paddingHorizontal: 10, paddingVertical: 8 }}>
                   <Text
@@ -954,7 +1106,127 @@ export default function HomeScreen() {
                 </View>
               </Pressable>
             ))}
-          </ScrollView>
+          </View>
+          {recRecipePage < recRecipeLastPage && (
+            <Pressable
+              onPress={() => setRecRecipePage((p) => p + 1)}
+              disabled={recRecipeFetching}
+              className="mt-3 rounded-xl border border-cream-300 py-2.5 items-center active:opacity-70"
+            >
+              <Text className="text-xs font-medium text-ink-soft">
+                {recRecipeFetching ? '…' : (lang === 'en' ? 'Load more' : 'Marami pa')}
+              </Text>
+            </Pressable>
+          )}
+        </>
+      )}
+
+      {/* ── Popular This Week — organic (no boost priority), same 2-column grid style as Recommended for You ── */}
+      {popularRecipes.length > 0 && (
+        <>
+          <View className="flex-row justify-between items-center mt-5 mb-2">
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
+              {lang === 'en' ? 'Popular This Week' : 'Sikat Ngayong Linggo'}
+            </Text>
+            <Pressable onPress={() => router.push('/(tabs)/meal-plan?tab=recipes&filter=all' as any)} hitSlop={8}>
+              <Text className="text-xs font-semibold text-brand-600">
+                {lang === 'en' ? 'See all' : 'Lahat'}
+              </Text>
+            </Pressable>
+          </View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            {popularRecipes.slice(0, popularVisibleCount).map((r) => (
+              <Pressable
+                key={r.id}
+                onPress={() => router.push(`/recipe/${r.id}` as any)}
+                className="active:opacity-80 rounded-2xl overflow-hidden border border-cream-200 bg-white"
+                style={{ width: '48%', marginBottom: 10 }}
+              >
+                <RecipeCoverPhoto
+                  photos={getRecipePhotos(r)}
+                  collageStyle={(r.collage_style ?? 'gradient') as any}
+                  gradientKey={(r.gradient_key ?? 'grad_a') as any}
+                  fontKey={(r.font_key ?? 'baloo') as any}
+                  title={r.title}
+                  height={140}
+                />
+                <View style={{ paddingHorizontal: 10, paddingVertical: 8 }}>
+                  <Text
+                    style={{ fontFamily: 'NunitoSans_700Bold', fontSize: 13, color: '#000000' }}
+                    numberOfLines={1}
+                  >
+                    {r.title}
+                  </Text>
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#C4881C' }}>
+                    {r.estimated_cost != null ? `₱${Number(r.estimated_cost).toLocaleString()}` : '-'}
+                    {r.servings ? ` / ${r.servings} servings` : ''}
+                  </Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
+          {popularVisibleCount < popularRecipes.length && (
+            <Pressable
+              onPress={() => setPopularVisibleCount((c) => c + 4)}
+              className="mt-3 rounded-xl border border-cream-300 py-2.5 items-center active:opacity-70"
+            >
+              <Text className="text-xs font-medium text-ink-soft">
+                {lang === 'en' ? 'Load more' : 'Marami pa'}
+              </Text>
+            </Pressable>
+          )}
+        </>
+      )}
+
+      {/* ── Recommended Stores Near You — boosted stores within 5km, 2x2 grid + Load More ── */}
+      {recStoreItems.length > 0 && (
+        <>
+          <View className="flex-row justify-between items-center mt-5 mb-2">
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 16, color: '#000000' }}>
+              {lang === 'en' ? 'Recommended Stores Near You' : 'Mga Tindahang Malapit Sa\'yo'}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            {recStoreItems.map((s) => (
+              <Pressable
+                key={s.id}
+                onPress={() => router.push(`/stall/${s.id}` as any)}
+                className="bg-white rounded-2xl border border-cream-200 active:opacity-75"
+                style={{ width: '48%', marginBottom: 10, padding: 12 }}
+              >
+                {s.photo ? (
+                  <Image source={{ uri: `${API_URL}${s.photo}` }} style={{ width: 34, height: 34, borderRadius: 17, marginBottom: 6, backgroundColor: '#F9EDD3' }} />
+                ) : (
+                  <Text style={{ fontSize: 22, marginBottom: 6 }}>🛒</Text>
+                )}
+                <Text
+                  style={{ fontFamily: 'Baloo2_700Bold', fontSize: 13, color: '#000000', marginBottom: 2 }}
+                  numberOfLines={2}
+                >
+                  {s.name}{s.is_verified ? ' ✅' : ''}
+                </Text>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
+                  {s.distance_km != null
+                    ? (s.distance_km < 1 ? `${Math.round(s.distance_km * 1000)} m away` : `${s.distance_km.toFixed(1)} km away`)
+                    : [s.barangay, s.municipality].filter(Boolean).join(', ')}
+                </Text>
+                <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#4E7A47', marginTop: 4 }}>
+                  {s.item_count} {lang === 'en' ? 'items' : 'items'}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          {recStorePage < recStoreLastPage && (
+            <Pressable
+              onPress={() => setRecStorePage((p) => p + 1)}
+              disabled={recStoreFetching}
+              className="mt-3 rounded-xl border border-cream-300 py-2.5 items-center active:opacity-70"
+            >
+              <Text className="text-xs font-medium text-ink-soft">
+                {recStoreFetching ? '…' : (lang === 'en' ? 'Load more' : 'Marami pa')}
+              </Text>
+            </Pressable>
+          )}
         </>
       )}
 
@@ -970,6 +1242,7 @@ export default function HomeScreen() {
         onClose={() => setExplainerOpen(false)}
         onProceed={proceedFromExplainer}
       />
+
       </View>
     </ScrollView>
   );

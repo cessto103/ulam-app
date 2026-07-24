@@ -1,4 +1,4 @@
-import client from '@/src/api/client';
+import client, { API_URL } from '@/src/api/client';
 import { useLanguage } from '@/src/context/LanguageContext';
 import { SkeletonMarketCard, SkeletonPriceCard } from '@/src/components/Skeleton';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -8,6 +8,7 @@ import { useState, useCallback, useRef } from 'react';
 import {
   Animated,
   ActivityIndicator,
+  Image,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -70,6 +71,13 @@ type PriceResult = {
   official: OfficialPrice[];
 };
 
+type RecommendedStore = {
+  id: number; name: string; type: string | null;
+  barangay: string | null; municipality: string | null;
+  photo: string | null; is_verified: boolean;
+  item_count: number; last_updated: string | null;
+};
+
 const OFFICIAL_SOURCE_LABEL: Record<string, { en: string; tl: string }> = {
   da_bantay_presyo: { en: 'DA Bantay Presyo', tl: 'DA Bantay Presyo' },
   dti_srp: { en: 'DTI Suggested Retail Price', tl: 'DTI Suggested Retail Price' },
@@ -84,6 +92,18 @@ async function fetchMarkets(lat?: number, lng?: number, radiusKm?: number): Prom
       : '';
     const { data } = await client.get(`/markets${params}`);
     return data.markets ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchRecommendedStores(): Promise<RecommendedStore[]> {
+  try {
+    // No lat/lng here -- this is the plain nationwide "Recommended Stores"
+    // strip (most-recently-boosted first). The location-filtered "near you"
+    // version of this same endpoint lives on the dashboard instead.
+    const { data } = await client.get('/tindahan/recommended?per_page=10');
+    return data.data ?? [];
   } catch {
     return [];
   }
@@ -175,6 +195,7 @@ export default function PresyoScreen() {
     setRefreshing(true);
     await Promise.all([
       qc.invalidateQueries({ queryKey: ['markets', gpsCoords?.lat, gpsCoords?.lng] }),
+      qc.invalidateQueries({ queryKey: ['recommended-stores-strip'] }),
       query ? qc.invalidateQueries({ queryKey: ['prices', query] }) : Promise.resolve(),
     ]);
     setRefreshing(false);
@@ -210,6 +231,12 @@ export default function PresyoScreen() {
   const { data: markets = [], isLoading: marketsLoading } = useQuery({
     queryKey: ['markets', gpsCoords?.lat, gpsCoords?.lng, radiusKm],
     queryFn: () => fetchMarkets(gpsCoords?.lat, gpsCoords?.lng, radiusKm),
+    staleTime: 5 * 60_000,
+  });
+
+  const { data: recommendedStores = [] } = useQuery({
+    queryKey: ['recommended-stores-strip'],
+    queryFn: fetchRecommendedStores,
     staleTime: 5 * 60_000,
   });
 
@@ -391,6 +418,60 @@ export default function PresyoScreen() {
             );
           })}
         </ScrollView>
+      )}
+
+      {/* ── Recommended Stores — boosted stores, the dedicated placement a store boost buys ── */}
+      {recommendedStores.length > 0 && (
+        <>
+          <View className="flex-row justify-between items-center mb-2">
+            <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000' }}>
+              {lang === 'en' ? 'Recommended Stores' : 'Inirekomendang Tindahan'}
+            </Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 10, paddingBottom: 4 }}
+            style={{ marginBottom: 14 }}
+          >
+            {recommendedStores.map((store) => (
+              <Pressable
+                key={store.id}
+                onPress={() => router.push(`/stall/${store.id}` as any)}
+                className="bg-white rounded-2xl border border-cream-200 active:opacity-75"
+                style={{ width: 170, padding: 14 }}
+              >
+                {store.photo ? (
+                  <Image
+                    source={{ uri: `${API_URL}${store.photo}` }}
+                    style={{ width: 34, height: 34, borderRadius: 17, marginBottom: 6, backgroundColor: '#F9EDD3' }}
+                  />
+                ) : (
+                  <Text style={{ fontSize: 24, marginBottom: 6 }}>
+                    {MARKET_TYPE_EMOJI[store.type ?? ''] ?? '🛒'}
+                  </Text>
+                )}
+                <Text
+                  style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: '#000000', marginBottom: 2 }}
+                  numberOfLines={2}
+                >
+                  {store.name}{store.is_verified ? ' ✅' : ''}
+                </Text>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A' }} numberOfLines={1}>
+                  {[store.barangay, store.municipality].filter(Boolean).join(', ')}
+                </Text>
+                <View className="flex-row items-center justify-between mt-2">
+                  <Text style={{ fontFamily: 'NunitoSans_600SemiBold', fontSize: 13, color: '#4E7A47' }}>
+                    {store.item_count} {t('items')}
+                  </Text>
+                </View>
+                <Text style={{ fontFamily: 'NunitoSans_400Regular', fontSize: 13, color: '#6F655A', marginTop: 3 }}>
+                  {timeAgo(store.last_updated, lang)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
       )}
 
       {/* ── Price checker ── */}

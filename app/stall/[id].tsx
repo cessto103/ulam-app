@@ -303,22 +303,6 @@ export default function StallDetailScreen() {
                 <Text style={{ fontSize: 46, opacity: 0.45 }}>{MARKET_TYPE_EMOJI[stall.type ?? ''] ?? '\ud83c\udfea'}</Text>
               </View>
             )}
-            <Pressable
-              onPress={() => router.back()}
-              style={{ position: 'absolute', top: insets.top + 8, left: 16, width: 38, height: 38, borderRadius: 19, backgroundColor: '#FFFCF5', alignItems: 'center', justifyContent: 'center' }}
-              className="active:opacity-80"
-            >
-              <Ionicons name="arrow-back" size={19} color="#3C3A2F" />
-            </Pressable>
-            {!isOwner && (
-              <Pressable
-                onPress={() => setReportOpen(true)}
-                style={{ position: 'absolute', top: insets.top + 8, right: 16, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(41,37,34,0.35)', alignItems: 'center', justifyContent: 'center' }}
-                className="active:opacity-80"
-              >
-                <Ionicons name="flag-outline" size={17} color="#FFF8E8" />
-              </Pressable>
-            )}
           </View>
 
           {/* Store photo + name + action */}

@@ -831,21 +831,28 @@ function PlanView({ user }: { user: any }) {
                 {lang === 'en' ? 'Generating...' : 'Ginagawa...'}
               </Text>
             </View>
+          ) : aiDisabled ? (
+            <View className="items-center">
+              <Text className="text-sm font-semibold text-ink-soft">
+                {lang === 'en' ? '🔜 Generate AI meal' : '🔜 Gumawa ng AI meal'}
+              </Text>
+              <Text className="text-xs text-ink-soft">
+                {lang === 'en' ? 'Coming Soon' : 'Paparating Na'}
+              </Text>
+            </View>
           ) : (
-            <Text className={`text-sm font-semibold ${aiDisabled ? 'text-ink-soft' : 'text-white'}`}>
-              {aiDisabled
-                ? (lang === 'en' ? '🔜 Coming Soon' : '🔜 Paparating Na')
-                : isPremiumUser
-                  ? (lang === 'en' ? '🤖 Generate AI Meal Plan' : '🤖 Gumawa ng AI Meal Plan')
-                  : (lang === 'en' ? '⭐ Upgrade to Generate' : '⭐ Mag-Premium para Gumawa')}
+            <Text className="text-sm font-semibold text-white">
+              {isPremiumUser
+                ? (lang === 'en' ? '🤖 Generate AI Meal Plan' : '🤖 Gumawa ng AI Meal Plan')
+                : (lang === 'en' ? '⭐ Upgrade to Generate' : '⭐ Mag-Premium para Gumawa')}
             </Text>
           )}
         </Pressable>
         <Pressable
           onPress={() => setPickerOpen(true)}
-          className="mt-3 rounded-xl border border-cream-300 px-8 py-3 items-center active:opacity-70"
+          className="mt-3 rounded-xl bg-brand-600 px-8 py-3 items-center active:opacity-80"
         >
-          <Text className="text-sm font-semibold text-ink">
+          <Text className="text-sm font-semibold text-white">
             {lang === 'en' ? '🍽️ Choose from Recipes' : '🍽️ Pumili sa mga Recipe'}
           </Text>
         </Pressable>
